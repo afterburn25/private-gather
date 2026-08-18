@@ -33,15 +33,14 @@ class UpgradeController extends Controller
     {
         $maxKb = max(1024, (int) config('upgrades.max_upload_mb', 256) * 1024);
         $validated = $request->validate([
+            // The client filename/extension is not a security boundary. The
+            // package service opens the bytes with ZipArchive and validates the
+            // complete archive envelope/manifest before any code is activated.
             'upgrade' => ['required', 'file', 'max:'.$maxKb],
             'confirm_backup' => ['accepted'],
         ]);
 
         $file = $validated['upgrade'];
-        if (strtolower($file->getClientOriginalExtension()) !== 'zip') {
-            return back()->withErrors(['upgrade' => 'Upgrade packages must be ZIP files.']);
-        }
-
         $incoming = rtrim((string) config('upgrades.storage_path'), '/').'/incoming';
         File::ensureDirectoryExists($incoming);
         $safeName = now()->format('Ymd-His').'-'.Str::lower(Str::random(10)).'.zip';
@@ -56,13 +55,24 @@ class UpgradeController extends Controller
             return redirect()->route('admin.upgrades.index')->withErrors([
                 'upgrade' => 'Upgrade failed: '.$e->getMessage(),
             ]);
+        } finally {
+            // UpgradeService also deletes accepted packages after processing,
+            // but invalid ZIPs/signatures can fail before a PlatformUpgrade
+            // record exists. Always remove the random incoming file here so
+            // repeated invalid uploads cannot fill server storage.
+            if (is_file($path)) {
+                @unlink($path);
+            }
         }
     }
 
     public function log(PlatformUpgrade $upgrade): BinaryFileResponse
     {
         abort_unless($upgrade->log_path && is_file($upgrade->log_path), 404);
-        return response()->download($upgrade->log_path, 'upgrade-'.$upgrade->upgrade_id.'-log.json');
+        return response()->download($upgrade->log_path, 'upgrade-'.$upgrade->upgrade_id.'-log.json', [
+            'Cache-Control' => 'no-store, private',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     public function backup(PlatformUpgrade $upgrade): BinaryFileResponse
@@ -96,6 +106,9 @@ class UpgradeController extends Controller
             }
         }
 
-        return response()->download($zipPath, 'upgrade-'.$upgrade->upgrade_id.'-backup.zip');
+        return response()->download($zipPath, 'upgrade-'.$upgrade->upgrade_id.'-backup.zip', [
+            'Cache-Control' => 'no-store, private',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 }
