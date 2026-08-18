@@ -14,7 +14,9 @@ class TenantRoutingTest extends TestCase
     public function test_central_domain_loads_marketplace_homepage(): void
     {
         config(['platform.central_domains' => ['platform.test']]);
-        $this->get('http://platform.test/')->assertOk()->assertSee('Discover your next social experience.');
+        $this->get('http://platform.test/')
+            ->assertOk()
+            ->assertSee('Gather privately. Connect confidently.');
     }
 
     public function test_active_tenant_domain_loads_tenant_homepage(): void
