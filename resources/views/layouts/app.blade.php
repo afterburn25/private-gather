@@ -1,137 +1,221 @@
 @php
-$tenant=$layoutTenant??app(\App\Tenancy\TenantContext::class)->tenant();
-$branding=$tenant?->branding;
-$primary=($branding?->primary_color&&preg_match('/^#[0-9A-Fa-f]{6}$/',$branding->primary_color))?$branding->primary_color:'#d7b56d';
-$accent=($branding?->accent_color&&preg_match('/^#[0-9A-Fa-f]{6}$/',$branding->accent_color))?$branding->accent_color:'#7d3b69';
-$isAdmin=request()->routeIs('admin.*')&&!request()->routeIs('admin.login*');
-$isPlatformAdmin=auth()->check()&&(bool)auth()->user()->is_platform_admin;
-$isHosted=\App\Support\Edition::isHosted();
-$canRegister=\App\Support\Edition::registrationEnabled();
-$canManage=false;
-if(auth()->check()&&$tenant){$membership=auth()->user()->tenants()->whereKey($tenant->id)->first()?->pivot;$canManage=$isPlatformAdmin||($membership&&in_array($membership->role,['owner','admin','manager','staff','checkin'],true));}
-$headerNav=$tenant?($tenantNavigation['header']??collect()):collect();
-$footerNav=$tenant?($tenantNavigation['footer']??collect()):collect();
-$platformName=$siteSettings['brand_name']??config('app.name','Private Gather');
-$platformLogo=\App\Support\MountUrl::to($siteSettings['logo_url']??config('brand.logo_path','/assets/branding/private-gather-logo.png'));
+    $tenant = $layoutTenant ?? app(\App\Tenancy\TenantContext::class)->tenant();
+    $branding = $tenant?->branding;
+    $primary = ($branding?->primary_color && preg_match('/^#[0-9A-Fa-f]{6}$/', $branding->primary_color))
+        ? $branding->primary_color
+        : '#d7b56d';
+    $accent = ($branding?->accent_color && preg_match('/^#[0-9A-Fa-f]{6}$/', $branding->accent_color))
+        ? $branding->accent_color
+        : '#7d3b69';
+    $isAdmin = request()->routeIs('admin.*') && ! request()->routeIs('admin.login*');
+    $isPlatformAdmin = auth()->check() && (bool) auth()->user()->is_platform_admin;
+    $isHosted = \App\Support\Edition::isHosted();
+    $canRegister = \App\Support\Edition::registrationEnabled();
+    $canManage = false;
+
+    if (auth()->check() && $tenant) {
+        $membership = auth()->user()->tenants()->whereKey($tenant->id)->first()?->pivot;
+        $canManage = $isPlatformAdmin || (
+            $membership
+            && in_array($membership->role, ['owner', 'admin', 'manager', 'staff', 'checkin'], true)
+        );
+    }
+
+    $headerNav = $tenant ? ($tenantNavigation['header'] ?? collect()) : collect();
+    $footerNav = $tenant ? ($tenantNavigation['footer'] ?? collect()) : collect();
+    $platformName = $siteSettings['brand_name'] ?? config('app.name', 'Private Gather');
+    $platformLogo = \App\Support\MountUrl::to(
+        $siteSettings['logo_url'] ?? config('brand.logo_path', '/assets/branding/private-gather-logo.png')
+    );
 @endphp
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark">
-<meta name="csrf-token" content="{{csrf_token()}}">
-<title>@yield('title',$tenant?->name??$platformName)</title>
-<meta name="description" content="@yield('meta_description','Private Gather connects consenting adults with private social events, clubs and trusted organizers through privacy-focused RSVP and ticketing.')">
-@if($tenant&&$branding?->favicon_path)
-<link rel="icon" href="{{\App\Support\MountUrl::to($branding->favicon_path)}}">
-@elseif(!$tenant)
-<link rel="icon" type="image/png" href="{{$platformLogo}}">
-@endif
-<link rel="stylesheet" href="{{\App\Support\MountUrl::to('/assets/app.css')}}">
-<style>:root{--gold:{{$primary}};--gold2:{{$primary}};--plum:{{$accent}};}@if($branding?->font_family)body{font-family:{{json_encode($branding->font_family)}},sans-serif;}@endif</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', $tenant?->name ?? $platformName)</title>
+    <meta name="description" content="@yield('meta_description', 'Private Gather connects consenting adults with private social events, clubs and trusted organizers through privacy-focused RSVP and ticketing.')">
+
+    @if ($tenant && $branding?->favicon_path)
+        <link rel="icon" href="{{ \App\Support\MountUrl::to($branding->favicon_path) }}">
+    @elseif (! $tenant)
+        <link rel="icon" type="image/png" href="{{ $platformLogo }}">
+    @endif
+
+    <link rel="stylesheet" href="{{ \App\Support\MountUrl::to('/assets/app.css') }}">
+    <style>
+        :root {
+            --gold: {{ $primary }};
+            --gold2: {{ $primary }};
+            --plum: {{ $accent }};
+        }
+        @if ($branding?->font_family)
+            body { font-family: {{ json_encode($branding->font_family) }}, sans-serif; }
+        @endif
+    </style>
 </head>
-<body class="{{$isAdmin?'admin-body':''}}">
+<body class="{{ $isAdmin ? 'admin-body' : '' }}">
 <header class="site-header">
-<div class="container header-inner">
-<a class="brand" href="{{\App\Support\MountUrl::to('/')}}">
-@if($tenant)
-    @if($branding?->logo_path)
-        <img class="brand-logo" src="{{\App\Support\MountUrl::to($branding->logo_path)}}" alt="{{$tenant->name}} logo">
-    @else
-        <span class="brand-mark">{{strtoupper(substr($tenant->name,0,1))}}</span>
-    @endif
-    <span>{{$tenant->name}}</span>
-@else
-    <img class="brand-logo platform-brand-logo" src="{{$platformLogo}}" alt="{{$platformName}} logo">
-    <span>{{$platformName}}</span>
-@endif
-</a>
-<nav class="nav-links" aria-label="Primary">
-@if($tenant&&$headerNav->isNotEmpty())
-    @foreach($headerNav as $item)
-        <a href="{{\App\Support\MountUrl::to($item->url)}}">{{$item->label}}</a>
-    @endforeach
-@else
-    <a href="{{route('site.events')}}">Events</a>
-    @if(!$tenant&&$isHosted)<a href="{{route('site.organizations')}}">Clubs & Organizers</a>@endif
-    <a href="{{route('site.about')}}">About</a>
-@endif
-@if(auth()->check())
-    <a href="{{route('messages.index')}}">Messages</a>
-@endif
-</nav>
-<div class="header-actions">
-@if(auth()->check())
-    @if($isPlatformAdmin)
-        <a class="button button-ghost" href="{{route('admin.home')}}">Admin Backend</a>
-    @endif
-    @if($canManage)
-        <a class="button button-ghost" href="{{route('tenant.dashboard')}}">Manage</a>
-    @elseif(!$tenant&&$isHosted)
-        <a class="button button-ghost" href="{{route('organizations.index')}}">My Sites</a>
-    @endif
-    <a class="button button-primary" href="{{route('dashboard')}}">Account</a>
-@else
-    <a class="button button-ghost" href="{{route('login')}}">Log in</a>
-    @if($canRegister)<a class="button button-primary" href="{{\App\Support\MountUrl::to($siteSettings['header_cta_url']??route('register'))}}">{{$siteSettings['header_cta_label']??'Join Private Gather'}}</a>@endif
-@endif
-</div>
-</div>
+    <div class="container header-inner">
+        <a class="brand" href="{{ \App\Support\MountUrl::to('/') }}">
+            @if ($tenant)
+                @if ($branding?->logo_path)
+                    <img class="brand-logo" src="{{ \App\Support\MountUrl::to($branding->logo_path) }}" alt="{{ $tenant->name }} logo">
+                @else
+                    <span class="brand-mark">{{ strtoupper(substr($tenant->name, 0, 1)) }}</span>
+                @endif
+                <span>{{ $tenant->name }}</span>
+            @else
+                <img class="brand-logo platform-brand-logo" src="{{ $platformLogo }}" alt="{{ $platformName }} logo">
+                <span>{{ $platformName }}</span>
+            @endif
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+            @if ($tenant && $headerNav->isNotEmpty())
+                @foreach ($headerNav as $item)
+                    <a href="{{ \App\Support\MountUrl::to($item->url) }}">{{ $item->label }}</a>
+                @endforeach
+            @else
+                <a href="{{ route('site.events') }}">Events</a>
+                @if (! $tenant && $isHosted)
+                    <a href="{{ route('site.organizations') }}">Clubs &amp; Organizers</a>
+                @endif
+                <a href="{{ route('site.about') }}">About</a>
+            @endif
+
+            @if (auth()->check())
+                <a href="{{ route('messages.index') }}">Messages</a>
+            @endif
+        </nav>
+
+        <div class="header-actions">
+            @if (auth()->check())
+                @if ($isPlatformAdmin)
+                    <a class="button button-ghost" href="{{ route('admin.home') }}">Admin Backend</a>
+                @endif
+
+                @if ($canManage)
+                    <a class="button button-ghost" href="{{ route('tenant.dashboard') }}">Manage</a>
+                @elseif (! $tenant && $isHosted)
+                    <a class="button button-ghost" href="{{ route('organizations.index') }}">My Sites</a>
+                @endif
+
+                <a class="button button-primary" href="{{ route('dashboard') }}">Account</a>
+            @else
+                <a class="button button-ghost" href="{{ route('login') }}">Log in</a>
+
+                @if ($canRegister)
+                    <a class="button button-primary" href="{{ \App\Support\MountUrl::to($siteSettings['header_cta_url'] ?? route('register')) }}">
+                        {{ $siteSettings['header_cta_label'] ?? 'Join Private Gather' }}
+                    </a>
+                @endif
+            @endif
+        </div>
+    </div>
 </header>
-@if($isAdmin)
-<nav class="admin-nav"><div class="container"><a href="{{route('admin.home')}}">Private Gather</a><a href="{{route('admin.users.index')}}">Users</a>@if($isHosted)<a href="{{route('admin.tenants.index')}}">Organizations</a><a href="{{route('admin.plans.index')}}">Plans</a><a href="{{route('admin.content.edit')}}">Website</a>@endif<a href="{{route('admin.moderation.index')}}">Moderation</a><a href="{{route('admin.upgrades.index')}}">Upgrades</a><a href="{{route('admin.health.index')}}">Health</a></div></nav>
+
+@if ($isAdmin)
+    <nav class="admin-nav">
+        <div class="container">
+            <a href="{{ route('admin.home') }}">Private Gather</a>
+            <a href="{{ route('admin.users.index') }}">Users</a>
+
+            @if ($isHosted)
+                <a href="{{ route('admin.tenants.index') }}">Organizations</a>
+                <a href="{{ route('admin.plans.index') }}">Plans</a>
+                <a href="{{ route('admin.content.edit') }}">Website</a>
+            @endif
+
+            <a href="{{ route('admin.moderation.index') }}">Moderation</a>
+            <a href="{{ route('admin.upgrades.index') }}">Upgrades</a>
+            <a href="{{ route('admin.health.index') }}">Health</a>
+        </div>
+    </nav>
 @endif
+
 <main>
-@if(session('status'))<div class="container flash"><div class="notice">{{session('status')}}</div></div>@endif
-@yield('content')
+    @if (session('status'))
+        <div class="container flash">
+            <div class="notice">{{ session('status') }}</div>
+        </div>
+    @endif
+
+    @yield('content')
 </main>
+
 <footer class="site-footer">
-<div class="container footer-grid">
-<div>
-<div class="brand footer-brand">
-@if($tenant)
-    @if($branding?->logo_path)
-        <img class="brand-logo" src="{{\App\Support\MountUrl::to($branding->logo_path)}}" alt="{{$tenant->name}} logo">
-    @else
-        <span class="brand-mark">{{strtoupper(substr($tenant->name,0,1))}}</span>
+    <div class="container footer-grid">
+        <div>
+            <div class="brand footer-brand">
+                @if ($tenant)
+                    @if ($branding?->logo_path)
+                        <img class="brand-logo" src="{{ \App\Support\MountUrl::to($branding->logo_path) }}" alt="{{ $tenant->name }} logo">
+                    @else
+                        <span class="brand-mark">{{ strtoupper(substr($tenant->name, 0, 1)) }}</span>
+                    @endif
+                    <span>{{ $tenant->name }}</span>
+                @else
+                    <img class="brand-logo platform-brand-logo footer-platform-logo" src="{{ $platformLogo }}" alt="{{ $platformName }} logo">
+                    <span>{{ $platformName }}</span>
+                @endif
+            </div>
+
+            <p class="muted">
+                {{ $siteSettings['footer_text'] ?? $siteSettings['tagline'] ?? config('brand.tagline', 'Exclusive connections. Private by nature.') }}
+            </p>
+        </div>
+
+        <div>
+            <strong>Explore</strong>
+
+            @if ($tenant && $footerNav->isNotEmpty())
+                @foreach ($footerNav as $item)
+                    <a href="{{ \App\Support\MountUrl::to($item->url) }}">{{ $item->label }}</a>
+                @endforeach
+            @else
+                <a href="{{ route('site.events') }}">Events</a>
+                <a href="{{ route('site.about') }}">About</a>
+            @endif
+        </div>
+
+        <div>
+            <strong>Account</strong>
+
+            @if (auth()->check())
+                @if ($isPlatformAdmin)
+                    <a href="{{ route('admin.home') }}">Admin Backend</a>
+                @endif
+
+                <a href="{{ route('dashboard') }}">Dashboard</a>
+                <form method="post" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="footer-link" type="submit">Log out</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}">Log in</a>
+
+                @if ($canRegister)
+                    <a href="{{ route('register') }}">Create account</a>
+                @endif
+            @endif
+        </div>
+    </div>
+
+    @if ($tenant && ($branding?->show_platform_branding ?? true))
+        <div class="container powered">
+            Powered by <a href="{{ config('brand.url', 'https://privategather.com') }}" rel="noopener">Private Gather</a>
+            @if (! $isHosted)
+                · Self-Hosted Edition
+            @endif
+        </div>
+    @elseif (! $tenant)
+        <div class="container powered">
+            Private Gather · <a href="https://privategather.com">privategather.com</a> · Exclusive connections. Private by nature.
+        </div>
     @endif
-    <span>{{$tenant->name}}</span>
-@else
-    <img class="brand-logo platform-brand-logo footer-platform-logo" src="{{$platformLogo}}" alt="{{$platformName}} logo">
-    <span>{{$platformName}}</span>
-@endif
-</div>
-<p class="muted">{{$siteSettings['footer_text']??$siteSettings['tagline']??config('brand.tagline','Exclusive connections. Private by nature.')}}</p>
-</div>
-<div>
-<strong>Explore</strong>
-@if($tenant&&$footerNav->isNotEmpty())
-    @foreach($footerNav as $item)<a href="{{\App\Support\MountUrl::to($item->url)}}">{{$item->label}}</a>@endforeach
-@else
-    <a href="{{route('site.events')}}">Events</a>
-    <a href="{{route('site.about')}}">About</a>
-@endif
-</div>
-<div>
-<strong>Account</strong>
-@if(auth()->check())
-    @if($isPlatformAdmin)
-        <a href="{{route('admin.home')}}">Admin Backend</a>
-    @endif
-    <a href="{{route('dashboard')}}">Dashboard</a>
-    <form method="post" action="{{route('logout')}}">@csrf<button class="footer-link">Log out</button></form>
-@else
-    <a href="{{route('login')}}">Log in</a>
-    @if($canRegister)<a href="{{route('register')}}">Create account</a>@endif
-@endif
-</div>
-</div>
-@if($tenant&&($branding?->show_platform_branding??true))
-<div class="container powered">Powered by <a href="{{config('brand.url','https://privategather.com')}}" rel="noopener">Private Gather</a>@if(!$isHosted) · Self-Hosted Edition@endif</div>
-@elseif(!$tenant)
-<div class="container powered">Private Gather · <a href="https://privategather.com">privategather.com</a> · Exclusive connections. Private by nature.</div>
-@endif
 </footer>
 </body>
 </html>
