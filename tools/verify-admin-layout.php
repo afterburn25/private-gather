@@ -12,8 +12,10 @@ $expect = static function (bool $ok, string $message) use (&$failures): void {
 
 $layoutPath = $root.'/resources/views/layouts/admin.blade.php';
 $cssPath = $root.'/public/assets/admin.css';
+$publicLayoutPath = $root.'/resources/views/layouts/app.blade.php';
 $expect(is_file($layoutPath), 'Dedicated admin Blade layout is missing');
 $expect(is_file($cssPath), 'Dedicated admin stylesheet is missing');
+$expect(is_file($publicLayoutPath), 'Public application layout is missing');
 
 $protectedViews = [
     'resources/views/admin/dashboard.blade.php',
@@ -36,6 +38,7 @@ foreach ($protectedViews as $relative) {
 
 $layout = is_file($layoutPath) ? (string) file_get_contents($layoutPath) : '';
 $css = is_file($cssPath) ? (string) file_get_contents($cssPath) : '';
+$publicLayout = is_file($publicLayoutPath) ? (string) file_get_contents($publicLayoutPath) : '';
 $expect(str_contains($layout, "route('admin.home')"), 'Admin layout dashboard navigation is missing');
 $expect(str_contains($layout, "route('admin.users.index')"), 'Admin layout user navigation is missing');
 $expect(str_contains($layout, "route('admin.tenants.index')"), 'Admin layout organization navigation is missing');
@@ -47,6 +50,9 @@ $expect(str_contains($layout, 'View public website'), 'Admin layout lacks an exp
 $expect(str_contains($css, '.pg-admin-shell'), 'Admin stylesheet lacks the backend shell');
 $expect(str_contains($css, '.pg-admin-sidebar'), 'Admin stylesheet lacks the backend sidebar');
 $expect(str_contains($css, '.pg-admin-toolbar'), 'Admin stylesheet lacks the backend toolbar');
+$expect(str_contains($publicLayout, '$isPlatformAdmin=auth()->check()'), 'Public layout does not explicitly identify platform administrators');
+$expect(str_contains($publicLayout, "route('admin.home')"), 'Public layout lacks an administrator entry link to the backend');
+$expect(str_contains($publicLayout, '>Admin Backend</a>'), 'Public layout lacks the visible Admin Backend button/entry label');
 
 if ($failures !== []) {
     fwrite(STDERR, "ADMIN LAYOUT VERIFY: FAIL\n - ".implode("\n - ", $failures)."\n");
