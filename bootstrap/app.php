@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\ResolveTenantByDomain;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,10 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [
-            ResolveTenantByDomain::class,
-            EnsureActiveAccount::class,
-        ]);
+        // Prepend so the browser-security boundary wraps tenant/account
+        // middleware and every successful web response produced beneath it.
+        $middleware->web(
+            prepend: [SecurityHeaders::class],
+            append: [
+                ResolveTenantByDomain::class,
+                EnsureActiveAccount::class,
+            ],
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Exception reporting customization will be added as the platform grows.
