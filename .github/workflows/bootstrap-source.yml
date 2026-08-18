@@ -34,6 +34,7 @@ jobs:
           rm -rf .bootstrap
           tar -xJf /tmp/private-gather-source.tar.xz -C .
           rm -f .github/workflows/bootstrap-source.yml
+          rm -f .github/workflows/private-gather-ci.yml
           mkdir -p public/assets/branding
           curl -fL --retry 3 --retry-delay 2 'https://demo.privoralabs.com/private-gather/assets/branding/private-gather-logo.png' -o public/assets/branding/private-gather-logo.png
           echo '4440eaf43a929325d859bf6fe9dc922f0bd0de7eb0bb240abdd20e24a04ceda2  public/assets/branding/private-gather-logo.png' | sha256sum -c -
