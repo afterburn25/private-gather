@@ -1,8 +1,68 @@
 <?php
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;use App\Tenancy\TenantContext;use Illuminate\Http\RedirectResponse;use Illuminate\Http\Request;use Illuminate\Support\Facades\Auth;use Illuminate\View\View;
-class AdminAuthController extends Controller{
- public function create(TenantContext $context):View{abort_if($context->check(),404);return view('admin.auth.login');}
- public function store(Request $request,TenantContext $context):RedirectResponse{abort_if($context->check(),404);$credentials=$request->validate(['email'=>['required','email'],'password'=>['required','string']]);if(!Auth::attempt(array_merge($credentials,['status'=>'active']),$request->boolean('remember')))return back()->withErrors(['email'=>'The administrator credentials were not accepted.'])->onlyInput('email');$user=$request->user();if(!$user?->is_platform_admin){Auth::logout();return back()->withErrors(['email'=>'This account does not have platform administration access.']);}if($user->two_factor_confirmed_at){$request->session()->put(['auth.2fa_user'=>$user->id,'auth.2fa_remember'=>$request->boolean('remember'),'auth.2fa_intended'=>'/admin']);Auth::logout();return redirect()->route('two-factor.challenge');}$request->session()->regenerate();return redirect()->intended(route('admin.home'));}
- public function destroy(Request $request):RedirectResponse{Auth::logout();$request->session()->invalidate();$request->session()->regenerateToken();return redirect()->route('admin.login');}
+
+use App\Http\Controllers\Controller;
+use App\Tenancy\TenantContext;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+
+class AdminAuthController extends Controller
+{
+    public function create(TenantContext $context): View
+    {
+        abort_if($context->check(), 404);
+
+        return view('admin.auth.login');
+    }
+
+    public function store(Request $request, TenantContext $context): RedirectResponse
+    {
+        abort_if($context->check(), 404);
+        $request->merge([
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (! Auth::attempt(array_merge($credentials, ['status' => 'active']), $request->boolean('remember'))) {
+            return back()->withErrors(['email' => 'The administrator credentials were not accepted.'])->onlyInput('email');
+        }
+
+        $user = $request->user();
+        if (! $user?->is_platform_admin) {
+            Auth::logout();
+
+            return back()->withErrors(['email' => 'This account does not have platform administration access.']);
+        }
+
+        // Rotate the session as soon as primary credentials are accepted so
+        // privileged 2FA challenge state is never attached to a pre-login ID.
+        $request->session()->regenerate();
+
+        if ($user->two_factor_confirmed_at) {
+            $request->session()->put([
+                'auth.2fa_user' => $user->id,
+                'auth.2fa_remember' => $request->boolean('remember'),
+                'auth.2fa_intended' => '/admin',
+            ]);
+            Auth::logout();
+
+            return redirect()->route('two-factor.challenge');
+        }
+
+        return redirect()->intended(route('admin.home'));
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login');
+    }
 }
