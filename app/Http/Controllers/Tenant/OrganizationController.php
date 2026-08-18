@@ -6,6 +6,7 @@ use App\Http\Controllers\SiteController;
 use App\Models\Tenant;
 use App\Services\PlatformContent;
 use App\Services\TenantProvisioner;
+use App\Support\Edition;
 use App\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Http\RedirectResponse;
@@ -22,6 +23,14 @@ class OrganizationController extends Controller
         SiteController $site,
         PlatformContent $content,
     ): ViewContract|RedirectResponse {
+        if (Edition::isSelfHosted()) {
+            $tenant = $context->requireTenant();
+            $this->authorizeManagement($request, $tenant);
+            $request->session()->put('tenant.workspace_id', $tenant->id);
+
+            return redirect()->route('tenant.dashboard');
+        }
+
         if ($workspaceId = (int) $request->query('workspace', 0)) {
             $tenant = $this->tenantForUser($request, $workspaceId);
             $this->authorizeManagement($request, $tenant);
@@ -49,11 +58,15 @@ class OrganizationController extends Controller
 
     public function create(): ViewContract
     {
+        abort_unless(Edition::isHosted(), 404);
+
         return view('tenant.manage.create');
     }
 
     public function store(Request $request, TenantProvisioner $provisioner): RedirectResponse
     {
+        abort_unless(Edition::isHosted(), 404);
+
         // Human-friendly input such as "My Club" becomes a safe subdomain
         // instead of silently failing the lowercase-only validation rule.
         $request->merge([
