@@ -23,7 +23,7 @@ class MediaUploadSecurityTest extends TestCase
         [$tenant, $domain] = $this->createTenant('media-extension.test');
         $owner = $this->createUser('media-owner@example.test');
         $tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
-        $file = UploadedFile::fake()->createWithContent('payload.php', base64_decode(self::PNG_1X1, true));
+        $file = $this->realPngUpload('payload.php');
 
         $this->actingAs($owner)
             ->from('http://'.$domain.'/manage/media')
@@ -32,7 +32,8 @@ class MediaUploadSecurityTest extends TestCase
                 'visibility' => 'public',
                 'alt_text' => 'Safe image',
             ])
-            ->assertRedirect('http://'.$domain.'/manage/media');
+            ->assertRedirect('http://'.$domain.'/manage/media')
+            ->assertSessionHasNoErrors();
 
         $asset = MediaAsset::sole();
         $this->assertSame('public', $asset->disk);
@@ -105,12 +106,17 @@ class MediaUploadSecurityTest extends TestCase
             'metadata_stripped' => false,
         ]);
 
-        $this->actingAs($owner)
+        $response = $this->actingAs($owner)
             ->get('http://'.$domain.'/manage/media/'.$asset->id)
             ->assertOk()
             ->assertHeader('Content-Type', 'image/png')
-            ->assertHeader('X-Content-Type-Options', 'nosniff')
-            ->assertHeader('Cache-Control', 'private,no-store');
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+
+        // Symfony normalizes/cache-directive ordering, so validate the
+        // directives semantically rather than depending on comma order.
+        $cacheControl = (string) $response->headers->get('Cache-Control');
+        $this->assertStringContainsString('private', $cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
     }
 
     public function test_public_storage_has_executable_file_deny_rule(): void
@@ -120,6 +126,20 @@ class MediaUploadSecurityTest extends TestCase
         $this->assertStringContainsString('phtml', $rules);
         $this->assertStringContainsString('phar', $rules);
         $this->assertStringContainsString('nosniff', $rules);
+    }
+
+    private function realPngUpload(string $clientName): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'private-gather-png-');
+        if ($path === false) {
+            $this->fail('Unable to create temporary upload fixture.');
+        }
+
+        file_put_contents($path, base64_decode(self::PNG_1X1, true));
+
+        // Use a real temporary file so Fileinfo detects image/png from bytes,
+        // while the untrusted browser-supplied name remains deliberately .php.
+        return new UploadedFile($path, $clientName, 'image/png', null, true);
     }
 
     private function pngHeader(int $width, int $height): string
