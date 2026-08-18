@@ -1,0 +1,40 @@
+name: Resolve Composer Lock
+
+on:
+  push:
+    branches:
+      - debug/security-tenancy-workflows-1.0.8
+    paths:
+      - '.github/workflows/lock-composer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lock:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: debug/security-tenancy-workflows-1.0.8
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3, intl, curl, dom, fileinfo
+          coverage: none
+          tools: composer:v2
+      - name: Resolve dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+      - name: Validate lock
+        run: composer validate --strict
+      - name: Commit lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'Private Gather CI'
+          git config user.email 'private-gather-ci@users.noreply.github.com'
+          git add composer.lock
+          git diff --cached --quiet && exit 0
+          git commit -m 'Lock Private Gather 1.0.8 Composer dependencies'
+          git push origin HEAD:debug/security-tenancy-workflows-1.0.8
