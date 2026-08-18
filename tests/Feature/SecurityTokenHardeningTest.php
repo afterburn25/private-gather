@@ -21,6 +21,7 @@ class SecurityTokenHardeningTest extends TestCase
         $tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
 
         $response = $this->actingAs($owner)
+            ->from('http://'.$domain.'/manage/staff')
             ->post('http://'.$domain.'/manage/staff/invite', [
                 'email' => $invitee->email,
                 'role' => 'staff',
