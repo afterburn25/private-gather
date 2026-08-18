@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Middleware;
 
+use App\Models\Tenant;
 use App\Services\TenantDomainCache;
 use App\Support\DomainName;
 use App\Tenancy\TenantContext;
@@ -23,8 +24,6 @@ class ResolveTenantByDomain
         try {
             $host = DomainName::normalize($request->getHost());
         } catch (InvalidArgumentException|SuspiciousOperationException) {
-            // Never reflect an attacker-controlled Host value into an error
-            // page or allow malformed authority data to reach URL generation.
             abort(400, 'Invalid request host.');
         }
 
@@ -41,6 +40,25 @@ class ResolveTenantByDomain
 
         if (in_array($host, $centralDomains, true)) {
             $this->context->clear();
+
+            // Central/demo installs may not have wildcard tenant DNS available.
+            // For authenticated management routes only, restore the tenant that
+            // the user explicitly selected from My Sites. Authorization remains
+            // enforced by EnsureTenantManager / EnsureTenantStaff on every route.
+            if ($request->is('manage') || $request->is('manage/*')) {
+                $workspaceId = (int) $request->session()->get('tenant.workspace_id', 0);
+                if ($workspaceId > 0) {
+                    $tenant = Tenant::query()->find($workspaceId);
+                    if ($tenant && $tenant->isActive()) {
+                        $this->context->set($tenant);
+                        $request->attributes->set('tenant', $tenant);
+                        $request->attributes->set('tenant_workspace', true);
+                    } else {
+                        $request->session()->forget('tenant.workspace_id');
+                    }
+                }
+            }
+
             return $next($request);
         }
 
