@@ -16,9 +16,13 @@ class CreateWebsiteFlowTest extends TestCase
         parent::setUp();
 
         config([
-            'app.url' => 'http://platform.test',
+            'app.url' => 'http://platform.test/private-gather',
             'platform.root_domain' => 'privategather.test',
             'platform.central_domains' => ['platform.test'],
+            'platform.tenant_scheme' => 'https',
+            'platform.tenant_mount_path' => '/private-gather',
+            'platform.wildcard_enabled' => true,
+            'platform.wildcard_target' => 'platform.test',
         ]);
     }
 
@@ -52,7 +56,8 @@ class CreateWebsiteFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Demo Club')
             ->assertSeeText('Website & CMS')
-            ->assertSee('Preview Website');
+            ->assertSee('Preview Website')
+            ->assertSee('https://demo-club.privategather.test/private-gather/', false);
     }
 
     public function test_reserved_address_returns_visible_validation_error_instead_of_exception_page(): void
@@ -72,7 +77,7 @@ class CreateWebsiteFlowTest extends TestCase
         $this->assertDatabaseMissing('tenants', ['name' => 'Admin Club']);
     }
 
-    public function test_my_sites_can_reopen_management_and_preview_without_tenant_dns(): void
+    public function test_my_sites_can_reopen_management_preview_and_public_address_without_per_site_dns_records(): void
     {
         $owner = $this->createUser('reopen@example.test');
 
@@ -83,6 +88,13 @@ class CreateWebsiteFlowTest extends TestCase
         ]);
 
         $tenant = Tenant::query()->where('name', 'Preview Club')->firstOrFail();
+
+        $this->get('http://platform.test/my-organizations')
+            ->assertOk()
+            ->assertSee('Manage Website')
+            ->assertSee('Open Public Website')
+            ->assertSee('https://preview-club.privategather.test/private-gather/', false)
+            ->assertSee('*.privategather.test', false);
 
         $this->get('http://platform.test/my-organizations?workspace='.$tenant->id)
             ->assertRedirect();
