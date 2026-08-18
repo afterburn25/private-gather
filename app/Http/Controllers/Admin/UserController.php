@@ -1,7 +1,42 @@
 <?php
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;use App\Models\User;use Illuminate\Http\Request;
-class UserController extends Controller{
- public function index(Request $r){$q=User::query();if($s=trim((string)$r->query('q'))) $q->where(fn($x)=>$x->where('email','like','%'.$s.'%')->orWhere('display_name','like','%'.$s.'%')->orWhere('name','like','%'.$s.'%'));return view('admin.users.index',['users'=>$q->latest()->paginate(100)->withQueryString()]);}
- public function update(Request $r,User $user){$d=$r->validate(['status'=>'required|in:active,suspended,banned','is_platform_admin'=>'nullable|boolean']);abort_if($user->id===$r->user()->id&&$d['status']!=='active',422,'You cannot disable your own current administrator account.');$user->update(['status'=>$d['status'],'is_platform_admin'=>$r->boolean('is_platform_admin')]);return back()->with('status','User updated.');}
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = User::query();
+        if ($search = trim((string) $request->query('q'))) {
+            $query->where(fn ($q) => $q->where('email', 'like', '%'.$search.'%')
+                ->orWhere('display_name', 'like', '%'.$search.'%')
+                ->orWhere('name', 'like', '%'.$search.'%'));
+        }
+
+        return view('admin.users.index', ['users' => $query->latest()->paginate(100)->withQueryString()]);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'status' => 'required|in:active,suspended,banned',
+            'is_platform_admin' => 'nullable|boolean',
+        ]);
+        $platformAdmin = $request->boolean('is_platform_admin');
+
+        if ($user->id === $request->user()->id) {
+            abort_if($data['status'] !== 'active', 422, 'You cannot disable your own current administrator account.');
+            abort_unless($platformAdmin, 422, 'You cannot remove your own current platform administrator access.');
+        }
+
+        $user->update([
+            'status' => $data['status'],
+            'is_platform_admin' => $platformAdmin,
+        ]);
+
+        return back()->with('status', 'User updated.');
+    }
 }

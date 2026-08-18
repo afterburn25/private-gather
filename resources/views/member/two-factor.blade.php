@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Set Up Two-Factor Authentication')
+@section('content')<div class="container narrow"><h1>Authenticator Setup</h1><div class="panel"><p>Add this secret to your authenticator app:</p><code>{{$secret}}</code><p class="muted">{{$uri}}</p><form method="post" action="{{route('member.security.2fa.confirm')}}">@csrf<input name="code" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" required><button>Confirm</button></form></div></div>@endsection

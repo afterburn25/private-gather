@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Two-Factor Challenge')
+@section('content')<div class="auth-wrap"><form class="panel form-card" method="post">@csrf<h1>Two-factor verification</h1><p>Enter the 6-digit code from your authenticator app or an unused recovery code.</p><input name="code" autocomplete="one-time-code" autofocus required>@error('code')<p class="error">{{$message}}</p>@enderror<button class="button button-primary">Continue</button></form></div>@endsection

@@ -32,7 +32,7 @@ jobs:
         run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 
       - name: Composer metadata validation
-        run: composer validate --no-check-lock --strict
+        run: composer validate --strict
 
       - name: Private Gather structural verification
         run: |
@@ -71,15 +71,8 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: Resolve dependencies
-        shell: bash
-        run: |
-          if [ -f composer.lock ]; then
-            composer install --prefer-dist --no-interaction --no-progress
-          else
-            echo 'composer.lock is not committed yet; resolving the declared constraints for this run.'
-            composer update --prefer-dist --no-interaction --no-progress
-          fi
+      - name: Install locked dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Dependency security audit
         run: composer audit --locked
@@ -117,14 +110,8 @@ jobs:
           extensions: mbstring, pdo_sqlite, sqlite3, intl, curl, dom, fileinfo
           coverage: none
           tools: composer:v2
-      - name: Resolve dependencies without scripts
-        shell: bash
-        run: |
-          if [ -f composer.lock ]; then
-            composer install --prefer-dist --no-interaction --no-progress --no-scripts
-          else
-            composer update --prefer-dist --no-interaction --no-progress --no-scripts
-          fi
+      - name: Install locked dependencies without scripts
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
       - name: Platform requirement check
         run: composer check-platform-reqs
       - name: Application syntax

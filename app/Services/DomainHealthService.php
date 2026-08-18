@@ -6,7 +6,7 @@ final class DomainHealthService{
  public function verify(TenantDomain $domain):array{
   if($domain->type===TenantDomain::TYPE_PLATFORM_SUBDOMAIN){$result=['verified'=>true,'dns_status'=>'active','records'=>[]];}
   else{
-   $record='_platform-verification.'.$domain->domain;$records=function_exists('dns_get_record')?(dns_get_record($record,DNS_TXT)?:[]):[];$values=[];
+   $record=(string)config('platform.domain_verification.txt_prefix').'.'.$domain->domain;$records=function_exists('dns_get_record')?(dns_get_record($record,DNS_TXT)?:[]):[];$values=[];
    foreach($records as $r)foreach(($r['entries']??[($r['txt']??'')]) as $v)if($v!=='')$values[]=$v;
    $verified=in_array((string)$domain->verification_token,$values,true);
    $result=['verified'=>$verified,'dns_status'=>$verified?'verified':'waiting','records'=>$values];

@@ -1,6 +1,6 @@
 <?php
 namespace App\Http\Controllers\Tenant;
-use App\Models\Event;use App\Models\EventInvitation;use App\Tenancy\TenantContext;use App\Support\Audit;use Illuminate\Http\Request;use Illuminate\Support\Facades\DB;use Illuminate\Support\Str;
+use App\Models\Event;use App\Models\EventInvitation;use App\Models\EventRsvp;use App\Tenancy\TenantContext;use App\Support\Audit;use Illuminate\Http\Request;use Illuminate\Support\Facades\DB;use Illuminate\Support\Str;
 class EventManageController{
  public function index(TenantContext $c){$t=$c->requireTenant();return view('tenant.manage.events.index',['tenant'=>$t,'events'=>$t->events()->whereNull('parent_event_id')->latest('starts_at')->paginate(25)]);}
  public function create(){return view('tenant.manage.events.edit',['event'=>new Event,'questions'=>collect()]);}
@@ -10,7 +10,21 @@ class EventManageController{
  public function duplicate(TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);$copy=$event->replicate(['parent_event_id']);$copy->title=$event->title.' Copy';$copy->slug=$this->uniqueSlug($c->id(),$event->slug.'-copy');$copy->status='draft';$copy->recurrence_rule=null;$copy->recurrence_until=null;$copy->save();foreach($event->ticketTypes as $type)$copy->ticketTypes()->create($type->only(['name','description','price_cents','currency','quantity','max_per_order','sales_start_at','sales_end_at','active']));return redirect()->route('tenant.events.edit',$copy)->with('status','Event duplicated as a draft.');}
  public function destroy(TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);abort_if($event->orders()->exists(),422,'Events with orders are retained for financial/audit integrity. Cancel the event instead.');$event->delete();return redirect()->route('tenant.events.index')->with('status','Event deleted.');}
  public function attendees(TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);return view('tenant.manage.events.attendees',['event'=>$event,'rsvps'=>$event->rsvps()->with('user')->latest()->paginate(100)]);}
- public function rsvpStatus(Request $r,TenantContext $c,Event $event,$rsvp){abort_unless($event->tenant_id===$c->id(),404);$rv=$event->rsvps()->findOrFail($rsvp);$d=$r->validate(['status'=>'required|in:pending,approved,rejected,cancelled']);$rv->update(['status'=>$d['status'],'approved_at'=>$d['status']==='approved'?now():null]);return back()->with('status','RSVP updated.');}
+ public function rsvpStatus(Request $r,TenantContext $c,Event $event,$rsvp){
+  abort_unless($event->tenant_id===$c->id(),404);
+  $d=$r->validate(['status'=>'required|in:pending,approved,rejected,cancelled']);
+  DB::transaction(function()use($event,$rsvp,$d){
+   $lockedEvent=Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
+   $rv=EventRsvp::where('event_id',$lockedEvent->id)->whereKey($rsvp)->lockForUpdate()->firstOrFail();
+   if($d['status']==='approved'&&$lockedEvent->capacity!==null){
+    $approved=(int)EventRsvp::where('event_id',$lockedEvent->id)->where('status','approved')->whereKeyNot($rv->id)->sum('guest_count');
+    abort_if($approved+(int)$rv->guest_count>(int)$lockedEvent->capacity,422,'This approval would exceed the event capacity.');
+   }
+   $rv->update(['status'=>$d['status'],'approved_at'=>$d['status']==='approved'?now():null]);
+   if($d['status']==='approved')DB::table('event_waitlist')->where('event_id',$lockedEvent->id)->where('user_id',$rv->user_id)->delete();
+  });
+  return back()->with('status','RSVP updated.');
+ }
  public function addQuestion(Request $r,TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);$d=$r->validate(['label'=>'required|string|max:255','type'=>'required|in:text,textarea,select,checkbox','required'=>'nullable|boolean']);DB::table('event_questions')->insert(['event_id'=>$event->id,'label'=>$d['label'],'type'=>$d['type'],'options'=>null,'required'=>$r->boolean('required'),'sort_order'=>(int)DB::table('event_questions')->where('event_id',$event->id)->max('sort_order')+10,'created_at'=>now(),'updated_at'=>now()]);return back()->with('status','RSVP question added.');}
  public function deleteQuestion(TenantContext $c,Event $event,int $question){abort_unless($event->tenant_id===$c->id(),404);DB::table('event_questions')->where('event_id',$event->id)->where('id',$question)->delete();return back()->with('status','RSVP question removed.');}
  public function invite(Request $r,TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);$d=$r->validate(['email'=>'nullable|email|max:255','max_guests'=>'required|integer|min:1|max:10','expires_at'=>'nullable|date|after:now']);$invite=EventInvitation::create(['event_id'=>$event->id,'created_by'=>$r->user()->id,'email'=>isset($d['email'])&&trim((string)$d['email'])!==''?strtolower(trim((string)$d['email'])):null,'token'=>Str::random(64),'status'=>'pending','max_guests'=>$d['max_guests'],'expires_at'=>$d['expires_at']??null]);Audit::write('event.invitation.created',$invite,after:$invite->only(['event_id','email','status','max_guests','expires_at']),tenantId:$c->id(),request:$r);return back()->with('status','Invitation created. Copy its secure invitation link below.');}

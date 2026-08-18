@@ -1,4 +1,4 @@
-# Private Gather 1.0.7
+# Private Gather 1.0.8
 Private Gather is a multi-tenant event, membership, ticketing, website and operations platform for adult social clubs, independent organizers, venues and private hosts.
 
 This repository is source-available for development and debugging, but the application remains proprietary; public repository visibility does not grant an open-source license.
@@ -51,7 +51,7 @@ The browser installer verifies critical requirements before modifying the site.
 
 ## Existing 0.1.2 installations
 
-Do not overwrite an installed site manually. Use the administrator Upgrade Center. Existing installations should use versioned backend upgrade packages. Private Gather 1.0.7 hardens deployment support for mounting the complete application below a web root, including `/private-gather`, while retaining root and subdomain-root deployment support. Each package declares its source version and is rejected when installed from an unsupported version.
+Do not overwrite an installed site manually. Use the administrator Upgrade Center. Existing installations should use versioned backend upgrade packages. Private Gather 1.0.8 retains the hardened deployment support for mounting the complete application below a web root, including `/private-gather`, while retaining root and subdomain-root deployment support. Each package declares its source version and is rejected when installed from an unsupported version.
 
 ## Domain model
 
