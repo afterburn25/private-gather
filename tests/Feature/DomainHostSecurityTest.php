@@ -71,8 +71,9 @@ class DomainHostSecurityTest extends TestCase
 
     public function test_malformed_host_fails_with_bad_request_before_tenant_resolution(): void
     {
-        $this->withHeader('Host', 'bad_host')
-            ->get('/')
+        // An absolute URL populates Symfony's HTTP_HOST server value. Laravel's
+        // withHeader('Host', ...) helper does not replace that authority value.
+        $this->get('http://bad_host/')
             ->assertBadRequest();
     }
 
