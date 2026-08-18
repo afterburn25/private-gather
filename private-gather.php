@@ -52,7 +52,7 @@ function private_gather_mount_path(string $base): string
 }
 
 $mount = private_gather_mount_path($base);
-header('X-Private-Gather-Entry: reliable-front-controller-107');
+header('X-Private-Gather-Entry: reliable-front-controller-108');
 
 if (! $installed) {
     // Render the installer at the URL the visitor requested. There is no
@@ -65,14 +65,18 @@ if (! $installed) {
 }
 
 /*
- * Present a stable canonical script name to Laravel. Internal Apache rewrites
- * may execute private-gather.php, but generated application URLs must retain
- * the real application mount (e.g. /private-gather), never expose this helper
- * filename and never collapse to the domain root.
+ * Present a stable canonical script identity to Laravel. Internal Apache
+ * rewrites execute private-gather.php, but Symfony's Request base-path detector
+ * compares SCRIPT_NAME/PHP_SELF with the basename of SCRIPT_FILENAME. If only
+ * the browser-facing script names are changed, a subdirectory request such as
+ * /private-gather/ can be misread as route /private-gather/ instead of route /.
+ * Keep all three values aligned on the real compatibility index.php so Laravel
+ * strips the application mount correctly while URLs remain clean.
  */
 $canonicalScript = ($mount === '' ? '' : $mount).'/index.php';
 $_SERVER['SCRIPT_NAME'] = $canonicalScript;
 $_SERVER['PHP_SELF'] = $canonicalScript;
+$_SERVER['SCRIPT_FILENAME'] = $base.'/index.php';
 
 // Rewrite-independent compatibility route, modeled after the working Model Hub
 // fallback. This is diagnostic/fallback only; normal visitors keep clean URLs.
