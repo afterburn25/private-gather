@@ -5,10 +5,11 @@ use App\Http\Controllers\Controller;
 use App\Models\SecurityEvent;
 use App\Models\User;
 use App\Services\TotpService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class TwoFactorChallengeController extends Controller
 {
@@ -42,20 +43,43 @@ class TwoFactorChallengeController extends Controller
         }
 
         if (! $valid) {
-            try {
-                $codes = json_decode(Crypt::decryptString((string) $user->two_factor_recovery_codes), true) ?: [];
-                $needle = strtolower(trim($data['code']));
-                $index = array_search($needle, $codes, true);
-                if ($index !== false) {
-                    unset($codes[$index]);
-                    $user->forceFill([
-                        'two_factor_recovery_codes' => Crypt::encryptString(json_encode(array_values($codes))),
-                    ])->save();
-                    $valid = true;
-                    $recoveryUsed = true;
+            $needle = strtolower(trim($data['code']));
+            $recoveryUsed = DB::transaction(function () use ($user, $needle): bool {
+                // A recovery code is a one-time credential. Lock the account row
+                // while reading/removing it so parallel challenge requests cannot
+                // both consume the same code from an identical encrypted list.
+                $locked = User::whereKey($user->id)
+                    ->where('status', 'active')
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                try {
+                    $codes = json_decode(
+                        Crypt::decryptString((string) $locked->two_factor_recovery_codes),
+                        true,
+                        flags: JSON_THROW_ON_ERROR,
+                    );
+                } catch (\Throwable) {
+                    return false;
                 }
-            } catch (\Throwable) {
-            }
+
+                if (! is_array($codes)) {
+                    return false;
+                }
+
+                $index = array_search($needle, $codes, true);
+                if ($index === false) {
+                    return false;
+                }
+
+                unset($codes[$index]);
+                $locked->forceFill([
+                    'two_factor_recovery_codes' => Crypt::encryptString(json_encode(array_values($codes), JSON_THROW_ON_ERROR)),
+                ])->save();
+
+                return true;
+            });
+            $valid = $recoveryUsed;
         }
 
         if (! $valid) {
