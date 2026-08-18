@@ -33,6 +33,8 @@ final class EnforceSelfHostedPrivacy
         if ($request->routeIs(
             'login',
             'login.store',
+            'admin.login',
+            'admin.login.store',
             'password.request',
             'password.email',
             'password.reset',
