@@ -41,15 +41,10 @@ function installer_detect_base_uri(): string
     $requestPath = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/install/'), PHP_URL_PATH) ?: '/install/';
     $requestPath = '/'.ltrim(str_replace('\\', '/', $requestPath), '/');
 
-    // The browser-visible /.../install/ path is authoritative for the installer.
-    // Evaluate it BEFORE document-root values because shared hosts can report the
-    // application directory itself as DOCUMENT_ROOT for a nested application.
     if (preg_match('#^(.+?)/install(?:/|$)#i', $requestPath, $m)) {
         return '/'.trim($m[1], '/');
     }
 
-    // Also infer the mount from the application's physical directory name when
-    // the request URL contains it, e.g. .../private-gather/.
     if ($appRoot !== false) {
         $physicalName = basename(str_replace('\\', '/', $appRoot));
         if ($physicalName !== '') {
@@ -153,6 +148,9 @@ function installer_write_env(array $input): void
     $appUrl = rtrim((string) $input['app_url'], '/');
     $rootDomain = installer_normalize_host((string) $input['platform_root_domain']);
     $mailHost = $rootDomain ?: 'example.test';
+    $edition = (string) ($input['edition'] ?? 'hosted');
+    $selfHosted = $edition === 'self_hosted';
+    $tenantId = $selfHosted ? (string) ((int) ($input['self_hosted_tenant_id'] ?? 0)) : '';
 
     $lines = [
         'APP_NAME='.installer_quote_env((string) $input['app_name']),
@@ -164,9 +162,17 @@ function installer_write_env(array $input): void
         'APP_INSTALLED=true',
         'PRIVATE_GATHER_DOMAIN=privategather.com',
         'PRIVATE_GATHER_URL=https://privategather.com',
+        'PRIVATE_GATHER_EDITION='.$edition,
+        'SELF_HOSTED_TENANT_ID='.$tenantId,
+        'SELF_HOSTED_VISIBILITY='.(string) ($input['self_hosted_visibility'] ?? 'private'),
+        'SELF_HOSTED_REGISTRATION='.(string) ($input['self_hosted_registration'] ?? 'approval'),
         '',
         'PLATFORM_ROOT_DOMAIN='.$rootDomain,
         'PLATFORM_DOMAIN_TARGET=domains.'.$rootDomain,
+        'PLATFORM_WILDCARD_ENABLED='.($selfHosted ? 'false' : 'true'),
+        'PLATFORM_WILDCARD_TARGET='.$rootDomain,
+        'PLATFORM_TENANT_SCHEME='.(parse_url($appUrl, PHP_URL_SCHEME) ?: 'https'),
+        'PLATFORM_TENANT_MOUNT_PATH='.(string) (parse_url($appUrl, PHP_URL_PATH) ?: ''),
         'PLATFORM_RESERVED_SUBDOMAINS=www,admin,api,mail,support,help,billing,account,login,signup,status,cdn,assets,static,domains,install',
         'PLATFORM_TERMS_VERSION=1.0',
         'PLATFORM_PRIVACY_VERSION=1.0',
@@ -251,12 +257,8 @@ function installer_import_schema(PDO $pdo): void
         throw new RuntimeException('Installer schema is missing.');
     }
 
-    // Remove full-line SQL comments before splitting. A comment immediately before
-    // an ALTER/CREATE statement must not cause the whole statement to be skipped.
     $schema = (string) preg_replace('/^\s*--.*$/m', '', $schema);
 
-    // MySQL/MariaDB DDL can implicitly commit. Do not wrap the fresh-install
-    // schema in a transaction and then claim it is atomically reversible.
     $number = 0;
     foreach (preg_split('/;\s*(?:\r?\n|$)/', $schema) ?: [] as $statement) {
         $statement = trim($statement);
@@ -276,7 +278,7 @@ function installer_import_schema(PDO $pdo): void
     }
 }
 
-function installer_create_admin(PDO $pdo, array $input): void
+function installer_create_admin(PDO $pdo, array $input): int
 {
     $email = strtolower(trim((string) $input['admin_email']));
     $name = trim((string) $input['admin_name']);
@@ -295,6 +297,88 @@ function installer_create_admin(PDO $pdo, array $input): void
     $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
     $stmt = $pdo->prepare('INSERT INTO users (name, display_name, email, status, is_platform_admin, password, created_at, updated_at) VALUES (?, ?, ?, ?, 1, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE name=VALUES(name), display_name=VALUES(display_name), status="active", is_platform_admin=1, password=VALUES(password), updated_at=NOW()');
     $stmt->execute([$name, $name, $email, 'active', $hash]);
+
+    $lookup = $pdo->prepare('SELECT id FROM users WHERE email=? LIMIT 1');
+    $lookup->execute([$email]);
+    $id = (int) $lookup->fetchColumn();
+    if ($id <= 0) {
+        throw new RuntimeException('Administrator account was created but could not be resolved.');
+    }
+
+    return $id;
+}
+
+function installer_create_self_hosted_tenant(PDO $pdo, array $input, int $adminId): ?int
+{
+    if (($input['edition'] ?? 'hosted') !== 'self_hosted') {
+        return null;
+    }
+
+    $name = trim((string) ($input['organization_name'] ?? $input['app_name'] ?? 'Private Gather'));
+    if ($name === '') {
+        throw new InvalidArgumentException('Organization name is required for Self-Hosted Edition.');
+    }
+
+    $type = (string) ($input['organization_type'] ?? 'private_host');
+    if (! in_array($type, ['club', 'organizer', 'private_host'], true)) {
+        throw new InvalidArgumentException('Invalid organization type.');
+    }
+
+    $slug = strtolower(trim((string) preg_replace('/[^a-z0-9]+/i', '-', $name), '-')) ?: 'private-gather-site';
+    $baseSlug = $slug;
+    $suffix = 2;
+    $exists = $pdo->prepare('SELECT COUNT(*) FROM tenants WHERE slug=?');
+    while (true) {
+        $exists->execute([$slug]);
+        if ((int) $exists->fetchColumn() === 0) {
+            break;
+        }
+        $slug = $baseSlug.'-'.$suffix++;
+    }
+
+    $settings = json_encode([
+        'marketplace_enabled' => false,
+        'self_hosted' => true,
+        'privacy_mode' => (string) ($input['self_hosted_visibility'] ?? 'private'),
+    ], JSON_UNESCAPED_SLASHES);
+
+    $stmt = $pdo->prepare('INSERT INTO tenants (name,slug,type,status,plan,settings,created_at,updated_at) VALUES (?,?,?,"active","self_hosted",?,NOW(),NOW())');
+    $stmt->execute([$name, $slug, $type, $settings]);
+    $tenantId = (int) $pdo->lastInsertId();
+
+    $stmt = $pdo->prepare('INSERT INTO tenant_users (tenant_id,user_id,role,status,created_at,updated_at) VALUES (?, ?, "owner", "active", NOW(), NOW())');
+    $stmt->execute([$tenantId, $adminId]);
+
+    $host = installer_normalize_host((string) parse_url((string) $input['app_url'], PHP_URL_HOST));
+    if ($host !== '') {
+        $stmt = $pdo->prepare('INSERT INTO tenant_domains (tenant_id,domain,type,is_primary,status,verified_at,ssl_status,redirect_to_primary,dns_status,dns_last_checked_at,created_at,updated_at) VALUES (?, ?, "custom_domain", 1, "active", NOW(), "host_managed", 0, "active", NOW(), NOW(), NOW())');
+        $stmt->execute([$tenantId, $host]);
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO cms_pages (tenant_id,slug,title,status,is_homepage,published_at,created_at,updated_at) VALUES (?,"home","Home","published",1,NOW(),NOW(),NOW())');
+    $stmt->execute([$tenantId]);
+    $homeId = (int) $pdo->lastInsertId();
+
+    $sections = [
+        ['hero', 'Homepage Hero', 10, ['eyebrow' => 'WELCOME', 'heading' => $name, 'body' => 'Private events and member access for our community.', 'primary_label' => 'View Events', 'primary_url' => '/events']],
+        ['event_grid', 'Upcoming Events', 20, ['heading' => 'Upcoming Events', 'limit' => 6]],
+        ['cta', 'Member Access', 30, ['heading' => 'Member access', 'body' => 'Sign in to view private event information and manage your attendance.', 'button_label' => 'Member Login', 'button_url' => '/login']],
+    ];
+    $insertSection = $pdo->prepare('INSERT INTO cms_sections (cms_page_id,type,name,content,settings,sort_order,is_enabled,created_at,updated_at) VALUES (?,?,?,?,?, ?,1,NOW(),NOW())');
+    foreach ($sections as [$typeName, $sectionName, $sort, $content]) {
+        $insertSection->execute([$homeId, $typeName, $sectionName, json_encode($content, JSON_UNESCAPED_SLASHES), '{}', $sort]);
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO cms_pages (tenant_id,slug,title,status,is_homepage,published_at,created_at,updated_at) VALUES (?,"about","About","published",0,NOW(),NOW(),NOW())');
+    $stmt->execute([$tenantId]);
+    $aboutId = (int) $pdo->lastInsertId();
+    $insertSection->execute([$aboutId, 'rich_text', 'About Us', json_encode(['heading' => 'About '.$name, 'body' => 'Use Website & CMS to customize this private organization website.'], JSON_UNESCAPED_SLASHES), '{}', 10]);
+
+    $setting = $pdo->prepare('INSERT INTO site_settings (tenant_id,`group`,`key`,value,type,is_public,created_at,updated_at) VALUES (?,"general",?,?,"string",1,NOW(),NOW())');
+    $setting->execute([$tenantId, 'tagline', 'Private events and member access.']);
+    $setting->execute([$tenantId, 'footer_text', 'Private Gather Self-Hosted · Events and member access managed on this installation.']);
+
+    return $tenantId;
 }
 
 function installer_write_receipt(array $input): void
@@ -303,6 +387,10 @@ function installer_write_receipt(array $input): void
     $receipt = [
         'installed_at' => gmdate('c'),
         'app_url' => (string) $input['app_url'],
+        'edition' => (string) ($input['edition'] ?? 'hosted'),
+        'self_hosted_tenant_id' => $input['self_hosted_tenant_id'] ?? null,
+        'self_hosted_visibility' => $input['self_hosted_visibility'] ?? null,
+        'self_hosted_registration' => $input['self_hosted_registration'] ?? null,
         'platform_root_domain' => installer_normalize_host((string) $input['platform_root_domain']),
         'database' => (string) $input['db_database'],
         'installer_version' => is_file($base.'/VERSION') ? trim((string) file_get_contents($base.'/VERSION')) : '1.0.8',
@@ -346,8 +434,6 @@ function installer_disable_self(): bool
         return true;
     }
 
-    // Fallback: move the installer out of the public /install path. Root .htaccess
-    // blocks dot-prefixed files and normal routing will no longer expose /install.
     $target = dirname($dir).'/.install-disabled-'.bin2hex(random_bytes(6));
     return @rename($dir, $target);
 }
