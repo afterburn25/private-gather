@@ -1,23 +1,26 @@
-# Initial Test Deployment — demo.privoralabs.com
+# Initial Test Deployment — demo.privoralabs.com/private-gather
 
-This build is designed so the application files can live directly in the document root assigned to `demo.privoralabs.com`.
+The Private Gather certification deployment lives in the `/private-gather` subdirectory beneath the `demo.privoralabs.com` document root.
 
 ## Expected browser flow
 
-Before install:
+Before installation:
 
-`https://demo.privoralabs.com/` → `https://demo.privoralabs.com/install/`
+`https://demo.privoralabs.com/private-gather/` → the Private Gather installer is rendered inline while the browser remains under `/private-gather/`.
 
-During install the detected defaults should be:
+The application must not redirect the bare application root to the domain-root path `/install/`.
 
-- Application URL: `https://demo.privoralabs.com`
-- Platform root domain: `demo.privoralabs.com`
+During installation the detected defaults should be:
 
-After install:
+- Application URL: `https://demo.privoralabs.com/private-gather`
+- Platform host/domain: detected from the current deployment configuration
+- Application filesystem root: the directory containing `composer.json`, `artisan`, `app/`, `bootstrap/`, `install/`, and `public/`
 
-`https://demo.privoralabs.com/` → application homepage (no `/install` redirect)
+After installation:
 
-`https://demo.privoralabs.com/install/` → unavailable because the installer directory is removed/disabled.
+`https://demo.privoralabs.com/private-gather/` → application homepage.
+
+The installer becomes unavailable after successful installation according to the installer lock/disable procedure.
 
 ## Hosting prerequisites
 
@@ -26,21 +29,32 @@ After install:
 - Mbstring
 - OpenSSL
 - Fileinfo
-- Apache with `.htaccess`/mod_rewrite support for the direct-document-root deployment mode
+- Apache with `.htaccess`/mod_rewrite support
 - MySQL/MariaDB database account
 - Writable project root during install (for `.env`)
 - Writable `storage/` and `bootstrap/cache/`
-- Deployable package containing Composer `vendor/`
+- Composer dependencies installed in the Private Gather application root
 
-## Client platform subdomains later
+For this certification host the Composer dependency directory belongs at:
 
-If `PLATFORM_ROOT_DOMAIN=demo.privoralabs.com`, a client platform subdomain can be generated as:
+`/home/velvetvixftp/demo.privoralabs.com/private-gather/vendor`
 
-`client.demo.privoralabs.com`
+and the required autoloader is:
 
-Those hostnames will require DNS coverage (typically a wildcard or equivalent routing record) before they can resolve publicly.
+`/home/velvetvixftp/demo.privoralabs.com/private-gather/vendor/autoload.php`
 
+Composer must be run from:
+
+`/home/velvetvixftp/demo.privoralabs.com/private-gather`
+
+## Hosted tenant subdomains
+
+Production hosted tenant URLs use the Private Gather platform domain model, such as:
+
+`client.privategather.com`
+
+Test tenant hostnames beneath `demo.privoralabs.com` require matching DNS and web-server routing before they can resolve publicly.
 
 ## Private Gather production identity
 
-The production brand domain is `privategather.com`. The initial certification environment may use `demo.privoralabs.com`; the browser installer auto-detects that hostname so tenant test subdomains can be created beneath the demo root without changing the production brand identity.
+The production brand domain is `privategather.com`. The certification environment uses `demo.privoralabs.com/private-gather`; that deployment path does not change the production brand identity.
