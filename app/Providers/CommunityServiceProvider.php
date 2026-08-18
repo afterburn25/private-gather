@@ -30,11 +30,10 @@ final class CommunityServiceProvider extends ServiceProvider
             Route::post('/community/chat', [LiveChatController::class, 'store'])->middleware('throttle:60,1')->name('community.chat.store');
             Route::delete('/community/chat/{message}', [LiveChatController::class, 'destroy'])->name('community.chat.destroy');
 
-            Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-            Route::post('/messages/start', [MessageController::class, 'start'])->middleware('throttle:30,1')->name('messages.start');
-            Route::get('/messages/{conversation}', [MessageController::class, 'show'])->name('messages.show');
+            // Existing message index/start/show/store routes remain in web.php for
+            // upgrade compatibility. These extra endpoints add live delivery and
+            // mute controls; MessageController itself enforces tenant membership.
             Route::get('/messages/{conversation}/poll', [MessageController::class, 'poll'])->middleware('throttle:120,1')->name('messages.poll');
-            Route::post('/messages/{conversation}', [MessageController::class, 'store'])->middleware('throttle:60,1')->name('messages.store');
             Route::patch('/messages/{conversation}/mute', [MessageController::class, 'mute'])->name('messages.mute');
         });
     }
