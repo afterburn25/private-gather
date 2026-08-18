@@ -1,0 +1,10 @@
+# Defense in depth for the public storage symlink. Private Gather generates
+# image-only filenames, but legacy or manually placed executable files must
+# never run from a web-reachable upload directory.
+<FilesMatch "\.(?:php[0-9]?|phtml|phar|cgi|pl|py|sh)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+</IfModule>
