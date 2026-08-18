@@ -72,7 +72,10 @@ Route::middleware('auth')->group(function():void{
  Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
 
  Route::get('/email/verify',[EmailVerificationController::class,'notice'])->name('verification.notice');
- Route::get('/email/verify/{id}/{hash}',[EmailVerificationController::class,'verify'])->middleware('signed')->name('verification.verify');
+ // Verification signatures are intentionally relative so the signed payload
+ // cannot be poisoned by a request Host. Notification generation pins the
+ // delivered URL to canonical APP_URL.
+ Route::get('/email/verify/{id}/{hash}',[EmailVerificationController::class,'verify'])->middleware('signed:relative')->name('verification.verify');
  Route::post('/email/verification-notification',[EmailVerificationController::class,'send'])->middleware('throttle:6,1')->name('verification.send');
 
  Route::get('/security',[SecurityController::class,'index'])->name('member.security');
