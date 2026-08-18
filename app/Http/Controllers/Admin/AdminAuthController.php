@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\Edition;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,14 +13,17 @@ class AdminAuthController extends Controller
 {
     public function create(TenantContext $context): View
     {
-        abort_if($context->check(), 404);
+        // Hosted Edition deliberately hides the platform-admin login from tenant
+        // domains. Self-Hosted always has a tenant context, so its local admin
+        // login must remain reachable on that one customer-owned site.
+        abort_if(Edition::isHosted() && $context->check(), 404);
 
         return view('admin.auth.login');
     }
 
     public function store(Request $request, TenantContext $context): RedirectResponse
     {
-        abort_if($context->check(), 404);
+        abort_if(Edition::isHosted() && $context->check(), 404);
         $request->merge([
             'email' => strtolower(trim((string) $request->input('email'))),
         ]);
@@ -36,7 +40,9 @@ class AdminAuthController extends Controller
         if (! $user?->is_platform_admin) {
             Auth::logout();
 
-            return back()->withErrors(['email' => 'This account does not have platform administration access.']);
+            return back()->withErrors(['email' => Edition::isSelfHosted()
+                ? 'This account does not have local administration access.'
+                : 'This account does not have platform administration access.']);
         }
 
         $request->session()->regenerate();
