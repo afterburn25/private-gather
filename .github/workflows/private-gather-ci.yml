@@ -43,6 +43,7 @@ jobs:
           php tools/verify-upgrader.php
           php tools/verify-v1-structure.php
           php tools/verify-private-gather-brand.php
+          php tools/verify-editions.php
           php tools/test-domain-name.php
           php tools/test-upgrade-path.php
 
@@ -57,9 +58,11 @@ jobs:
           fi
 
   laravel-runtime:
-    name: Laravel runtime and PHPUnit
+    name: Hosted Edition runtime and PHPUnit
     runs-on: ubuntu-24.04
     needs: source-integrity
+    env:
+      PRIVATE_GATHER_EDITION: hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -81,6 +84,7 @@ jobs:
       - name: Prepare test environment
         run: |
           cp .env.example .env
+          sed -i 's/^PRIVATE_GATHER_EDITION=.*/PRIVATE_GATHER_EDITION=hosted/' .env
           php artisan key:generate --force
           php artisan config:clear
           touch database/database.sqlite
@@ -96,8 +100,55 @@ jobs:
           DB_DATABASE: database/database.sqlite
         run: php artisan migrate:fresh --force
 
-      - name: PHPUnit
+      - name: Hosted PHPUnit
         run: php artisan test
+
+  self-hosted-runtime:
+    name: Self-Hosted Edition runtime and policy tests
+    runs-on: ubuntu-24.04
+    needs: source-integrity
+    env:
+      PRIVATE_GATHER_EDITION: self_hosted
+      SELF_HOSTED_VISIBILITY: private
+      SELF_HOSTED_REGISTRATION: approval
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3, intl, curl, dom, fileinfo
+          coverage: none
+          tools: composer:v2
+
+      - name: Install locked dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare Self-Hosted environment
+        run: |
+          cp .env.example .env
+          sed -i 's/^PRIVATE_GATHER_EDITION=.*/PRIVATE_GATHER_EDITION=self_hosted/' .env
+          sed -i 's/^SELF_HOSTED_VISIBILITY=.*/SELF_HOSTED_VISIBILITY=private/' .env
+          sed -i 's/^SELF_HOSTED_REGISTRATION=.*/SELF_HOSTED_REGISTRATION=approval/' .env
+          php artisan key:generate --force
+          php artisan config:clear
+          touch database/database.sqlite
+
+      - name: Self-Hosted boot smoke test
+        run: |
+          php artisan about
+          php artisan route:list --except-vendor
+
+      - name: Self-Hosted database migration smoke test
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan migrate:fresh --force
+
+      - name: Self-Hosted edition PHPUnit
+        run: php artisan test --filter='EditionTest|SelfHostedEditionTest'
 
   php-83-compatibility:
     name: PHP 8.3 minimum compatibility
