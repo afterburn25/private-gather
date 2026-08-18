@@ -22,14 +22,14 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'status' => 'required|in:active,suspended,banned',
+            'status' => 'required|in:pending,active,suspended,banned',
             'is_platform_admin' => 'nullable|boolean',
         ]);
         $platformAdmin = $request->boolean('is_platform_admin');
 
         if ($user->id === $request->user()->id) {
             abort_if($data['status'] !== 'active', 422, 'You cannot disable your own current administrator account.');
-            abort_unless($platformAdmin, 422, 'You cannot remove your own current platform administrator access.');
+            abort_unless($platformAdmin, 422, 'You cannot remove your own current administrator access.');
         }
 
         $user->update([
