@@ -19,6 +19,8 @@ $expect(! preg_match('/header\s*\(\s*[\'\"]Location:/i', $frontController), 'rel
 $expect(str_contains($frontController, "require \$base.'/install/index.php'"), 'inline installer include missing');
 $expect(str_contains($frontController, 'private_gather_mount_path'), 'physical mount detector missing');
 $expect(str_contains($frontController, "\$_SERVER['SCRIPT_NAME'] = \$canonicalScript"), 'installed-mode SCRIPT_NAME canonicalization missing');
+$expect(str_contains($frontController, "\$_SERVER['PHP_SELF'] = \$canonicalScript"), 'installed-mode PHP_SELF canonicalization missing');
+$expect(str_contains($frontController, "\$_SERVER['SCRIPT_FILENAME'] = \$base.'/index.php'"), 'installed-mode SCRIPT_FILENAME canonicalization missing');
 $expect(str_contains($htaccess, 'DirectoryIndex private-gather.php index.php'), 'reliable controller is not first DirectoryIndex');
 $expect(str_contains($htaccess, 'RewriteRule ^$ private-gather.php [QSA,L]'), 'application-root rewrite to reliable controller missing');
 $expect(str_contains($htaccess, 'RewriteRule ^index\\.php$ private-gather.php [QSA,L,NC]'), 'explicit index rewrite to reliable controller missing');
