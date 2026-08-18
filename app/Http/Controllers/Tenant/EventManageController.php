@@ -27,7 +27,24 @@ class EventManageController{
  }
  public function addQuestion(Request $r,TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);$d=$r->validate(['label'=>'required|string|max:255','type'=>'required|in:text,textarea,select,checkbox','required'=>'nullable|boolean']);DB::table('event_questions')->insert(['event_id'=>$event->id,'label'=>$d['label'],'type'=>$d['type'],'options'=>null,'required'=>$r->boolean('required'),'sort_order'=>(int)DB::table('event_questions')->where('event_id',$event->id)->max('sort_order')+10,'created_at'=>now(),'updated_at'=>now()]);return back()->with('status','RSVP question added.');}
  public function deleteQuestion(TenantContext $c,Event $event,int $question){abort_unless($event->tenant_id===$c->id(),404);DB::table('event_questions')->where('event_id',$event->id)->where('id',$question)->delete();return back()->with('status','RSVP question removed.');}
- public function invite(Request $r,TenantContext $c,Event $event){abort_unless($event->tenant_id===$c->id(),404);$d=$r->validate(['email'=>'nullable|email|max:255','max_guests'=>'required|integer|min:1|max:10','expires_at'=>'nullable|date|after:now']);$invite=EventInvitation::create(['event_id'=>$event->id,'created_by'=>$r->user()->id,'email'=>isset($d['email'])&&trim((string)$d['email'])!==''?strtolower(trim((string)$d['email'])):null,'token'=>Str::random(64),'status'=>'pending','max_guests'=>$d['max_guests'],'expires_at'=>$d['expires_at']??null]);Audit::write('event.invitation.created',$invite,after:$invite->only(['event_id','email','status','max_guests','expires_at']),tenantId:$c->id(),request:$r);return back()->with('status','Invitation created. Copy its secure invitation link below.');}
+ public function invite(Request $r,TenantContext $c,Event $event){
+  abort_unless($event->tenant_id===$c->id(),404);
+  $d=$r->validate(['email'=>'nullable|email|max:255','max_guests'=>'required|integer|min:1|max:10','expires_at'=>'nullable|date|after:now']);
+  $rawToken=bin2hex(random_bytes(32));
+  $invite=EventInvitation::create([
+   'event_id'=>$event->id,
+   'created_by'=>$r->user()->id,
+   'email'=>isset($d['email'])&&trim((string)$d['email'])!==''?strtolower(trim((string)$d['email'])):null,
+   'token'=>'sha256:'.hash('sha256',$rawToken),
+   'status'=>'pending',
+   'max_guests'=>$d['max_guests'],
+   'expires_at'=>$d['expires_at']??null,
+  ]);
+  Audit::write('event.invitation.created',$invite,after:$invite->only(['event_id','email','status','max_guests','expires_at']),tenantId:$c->id(),request:$r);
+  return back()
+   ->with('status','Invitation created. Copy the secure invitation link now; for security it will not be shown again.')
+   ->with('event_invitation_url',route('event-invitations.show',$rawToken));
+ }
  public function revokeInvite(Request $r,TenantContext $c,Event $event,EventInvitation $invitation){abort_unless($event->tenant_id===$c->id()&&$invitation->event_id===$event->id,404);abort_if($invitation->status==='accepted',422,'Accepted invitations are retained for audit history.');$invitation->update(['status'=>'revoked']);Audit::write('event.invitation.revoked',$invitation,tenantId:$c->id(),request:$r);return back()->with('status','Invitation revoked.');}
  private function data(Request $r):array{return $r->validate(['title'=>'required|string|max:180','slug'=>'nullable|string|max:180','summary'=>'nullable|string|max:1000','description'=>'nullable|string|max:30000','category'=>'nullable|string|max:80','visibility'=>'required|in:public,members,unlisted,invite_only,private','rsvp_mode'=>'required|in:instant,approval,application,invite_only','status'=>'required|in:draft,published,cancelled','starts_at'=>'required|date','ends_at'=>'nullable|date|after:starts_at','timezone'=>'required|string|max:80','capacity'=>'nullable|integer|min:1|max:100000','city'=>'nullable|string|max:120','region'=>'nullable|string|max:120','public_location_label'=>'nullable|string|max:190','exact_address'=>'nullable|string|max:500','exact_address_visibility'=>'required|in:approved_attendees,organizer_only,public','dress_code'=>'nullable|string|max:500','rules'=>'nullable|string|max:10000','waitlist_enabled'=>'nullable|boolean','requires_verified_profile'=>'nullable|boolean','registration_opens_at'=>'nullable|date','registration_closes_at'=>'nullable|date|after:registration_opens_at','recurrence_rule'=>'nullable|in:weekly,monthly','recurrence_until'=>'nullable|date|after:starts_at'])+['waitlist_enabled'=>$r->boolean('waitlist_enabled'),'requires_verified_profile'=>$r->boolean('requires_verified_profile')];}
  private function uniqueSlug(int $tenantId,string $value,?int $ignore=null):string{$base=Str::slug($value)?:'event';$slug=$base;$i=2;while(Event::where('tenant_id',$tenantId)->where('slug',$slug)->when($ignore,fn($q)=>$q->whereKeyNot($ignore))->exists())$slug=$base.'-'.$i++;return $slug;}
