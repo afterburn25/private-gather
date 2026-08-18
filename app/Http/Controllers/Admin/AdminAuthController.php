@@ -20,11 +20,13 @@ class AdminAuthController extends Controller
     public function store(Request $request, TenantContext $context): RedirectResponse
     {
         abort_if($context->check(), 404);
+        $request->merge([
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
-        $credentials['email'] = strtolower(trim((string) $credentials['email']));
 
         if (! Auth::attempt(array_merge($credentials, ['status' => 'active']), $request->boolean('remember'))) {
             return back()->withErrors(['email' => 'The administrator credentials were not accepted.'])->onlyInput('email');
