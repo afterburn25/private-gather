@@ -50,7 +50,7 @@ $editionLabel=$isHosted?'Hosted Edition':'Self-Hosted Edition';
         </nav>
 
         <div class="pg-admin-sidebar-footer">
-            <a class="pg-admin-site-link" href="{{\App\Support\MountUrl::to('/')}}" target="_blank" rel="noopener"><span>View website</span><strong>↗</strong></a>
+            <a class="pg-admin-site-link" href="{{\App\Support\MountUrl::to('/')}}" target="_blank" rel="noopener"><span>View public website</span><strong>↗</strong></a>
             @if($version!=='')<div class="pg-admin-version"><span>{{$editionLabel}}</span><strong>v{{$version}}</strong></div>@endif
         </div>
     </aside>
