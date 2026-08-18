@@ -4,6 +4,12 @@ on:
   push:
     paths:
       - '.bootstrap/READY'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.bootstrap/**'
+      - '.github/workflows/bootstrap-source.yml'
   workflow_dispatch:
 
 permissions:
@@ -17,6 +23,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Reassemble and import source
         shell: bash
@@ -34,4 +41,4 @@ jobs:
           git config user.email 'private-gather-ci@users.noreply.github.com'
           git add -A
           git commit -m 'Import Private Gather 1.0.8 hardened source'
-          git push origin HEAD
+          git push origin HEAD:${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
