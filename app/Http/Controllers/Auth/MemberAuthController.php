@@ -36,10 +36,6 @@ class MemberAuthController extends Controller
         }
 
         $user = $request->user();
-
-        // Rotate the anonymous/pre-authentication session immediately after
-        // primary credentials succeed. The 2FA challenge state must never be
-        // attached to a session identifier supplied before authentication.
         $request->session()->regenerate();
 
         if ($user->two_factor_confirmed_at) {
@@ -47,6 +43,7 @@ class MemberAuthController extends Controller
                 'auth.2fa_user' => $user->id,
                 'auth.2fa_remember' => $request->boolean('remember'),
                 'auth.2fa_intended' => $request->session()->pull('url.intended', '/dashboard'),
+                'auth.2fa_issued_at' => now()->timestamp,
             ]);
             Auth::logout();
 

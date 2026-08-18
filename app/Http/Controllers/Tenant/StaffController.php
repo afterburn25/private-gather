@@ -46,7 +46,9 @@ class StaffController extends Controller
             'tenant_id' => $tenant->id,
             'email' => $email,
             'role' => $data['role'],
-            'token' => $token,
+            // The invitation URL is a bearer credential. Persist only its
+            // SHA-256 digest so a database read does not reveal usable links.
+            'token' => hash('sha256', $token),
             'expires_at' => now()->addDays(7),
             'created_at' => now(),
             'updated_at' => now(),
@@ -71,10 +73,18 @@ class StaffController extends Controller
 
     public function accept(Request $request, string $token)
     {
+        abort_unless(preg_match('/^[a-f0-9]{64}$/i', $token) === 1, 404);
+
         $tenantId = DB::transaction(function () use ($request, $token): int {
+            $digest = hash('sha256', strtolower($token));
             $invite = DB::table('tenant_invitations')
-                ->where('token', $token)
                 ->whereNull('accepted_at')
+                ->where(function ($query) use ($digest, $token): void {
+                    $query->where('token', $digest)
+                        // Backward compatibility for invitations created by
+                        // 1.0.8 and earlier, which stored the raw token.
+                        ->orWhere('token', $token);
+                })
                 ->lockForUpdate()
                 ->first();
 
