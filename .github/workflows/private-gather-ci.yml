@@ -112,7 +112,29 @@ jobs:
         run: php artisan migrate:fresh --force
 
       - name: PHPUnit
-        run: php artisan test
+        id: phpunit
+        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          php artisan test --stop-on-failure > phpunit-output.txt 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          cat phpunit-output.txt
+          exit $code
+
+      - name: Preserve PHPUnit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phpunit-output-php84
+          path: phpunit-output.txt
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Enforce PHPUnit success
+        if: ${{ steps.phpunit.outcome == 'failure' }}
+        run: exit 1
 
   php-83-compatibility:
     name: PHP 8.3 minimum compatibility
