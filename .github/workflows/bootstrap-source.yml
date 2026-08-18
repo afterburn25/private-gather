@@ -22,10 +22,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .bootstrap/chunk-* | base64 --decode > /tmp/private-gather-source.zip
-          echo 'fab4991cb53b1e1d7d1e72709a57b3f8a42481915d20bc5ae5d00e1c9ae3cf64  /tmp/private-gather-source.zip' | sha256sum -c -
+          cat .bootstrap/chunk-* | base64 --decode > /tmp/private-gather-source.tar.xz
+          echo '72a23d29b2f1a04c23feadb5f7b295b11ecee24c1cab64b223bf714ef04cc41b  /tmp/private-gather-source.tar.xz' | sha256sum -c -
           rm -rf .bootstrap
-          unzip -oq /tmp/private-gather-source.zip -d .
+          tar -xJf /tmp/private-gather-source.tar.xz -C .
           rm -f .github/workflows/bootstrap-source.yml
           mkdir -p public/assets/branding
           curl -fL --retry 3 --retry-delay 2 'https://demo.privoralabs.com/private-gather/assets/branding/private-gather-logo.png' -o public/assets/branding/private-gather-logo.png
