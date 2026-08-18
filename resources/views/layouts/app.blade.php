@@ -5,6 +5,8 @@ $primary=($branding?->primary_color&&preg_match('/^#[0-9A-Fa-f]{6}$/',$branding-
 $accent=($branding?->accent_color&&preg_match('/^#[0-9A-Fa-f]{6}$/',$branding->accent_color))?$branding->accent_color:'#7d3b69';
 $isAdmin=request()->routeIs('admin.*')&&!request()->routeIs('admin.login*');
 $isPlatformAdmin=auth()->check()&&(bool)auth()->user()->is_platform_admin;
+$isHosted=\App\Support\Edition::isHosted();
+$canRegister=\App\Support\Edition::registrationEnabled();
 $canManage=false;
 if(auth()->check()&&$tenant){$membership=auth()->user()->tenants()->whereKey($tenant->id)->first()?->pivot;$canManage=$isPlatformAdmin||($membership&&in_array($membership->role,['owner','admin','manager','staff','checkin'],true));}
 $headerNav=$tenant?($tenantNavigation['header']??collect()):collect();
@@ -52,7 +54,7 @@ $platformLogo=\App\Support\MountUrl::to($siteSettings['logo_url']??config('brand
     @endforeach
 @else
     <a href="{{route('site.events')}}">Events</a>
-    @if(!$tenant)<a href="{{route('site.organizations')}}">Clubs & Organizers</a>@endif
+    @if(!$tenant&&$isHosted)<a href="{{route('site.organizations')}}">Clubs & Organizers</a>@endif
     <a href="{{route('site.about')}}">About</a>
 @endif
 @if(auth()->check())
@@ -66,19 +68,19 @@ $platformLogo=\App\Support\MountUrl::to($siteSettings['logo_url']??config('brand
     @endif
     @if($canManage)
         <a class="button button-ghost" href="{{route('tenant.dashboard')}}">Manage</a>
-    @elseif(!$tenant)
+    @elseif(!$tenant&&$isHosted)
         <a class="button button-ghost" href="{{route('organizations.index')}}">My Sites</a>
     @endif
     <a class="button button-primary" href="{{route('dashboard')}}">Account</a>
 @else
     <a class="button button-ghost" href="{{route('login')}}">Log in</a>
-    <a class="button button-primary" href="{{\App\Support\MountUrl::to($siteSettings['header_cta_url']??route('register'))}}">{{$siteSettings['header_cta_label']??'Join Private Gather'}}</a>
+    @if($canRegister)<a class="button button-primary" href="{{\App\Support\MountUrl::to($siteSettings['header_cta_url']??route('register'))}}">{{$siteSettings['header_cta_label']??'Join Private Gather'}}</a>@endif
 @endif
 </div>
 </div>
 </header>
 @if($isAdmin)
-<nav class="admin-nav"><div class="container"><a href="{{route('admin.home')}}">Private Gather</a><a href="{{route('admin.users.index')}}">Users</a><a href="{{route('admin.tenants.index')}}">Organizations</a><a href="{{route('admin.moderation.index')}}">Moderation</a><a href="{{route('admin.plans.index')}}">Plans</a><a href="{{route('admin.content.edit')}}">Website</a><a href="{{route('admin.upgrades.index')}}">Upgrades</a><a href="{{route('admin.health.index')}}">Health</a></div></nav>
+<nav class="admin-nav"><div class="container"><a href="{{route('admin.home')}}">Private Gather</a><a href="{{route('admin.users.index')}}">Users</a>@if($isHosted)<a href="{{route('admin.tenants.index')}}">Organizations</a><a href="{{route('admin.plans.index')}}">Plans</a><a href="{{route('admin.content.edit')}}">Website</a>@endif<a href="{{route('admin.moderation.index')}}">Moderation</a><a href="{{route('admin.upgrades.index')}}">Upgrades</a><a href="{{route('admin.health.index')}}">Health</a></div></nav>
 @endif
 <main>
 @if(session('status'))<div class="container flash"><div class="notice">{{session('status')}}</div></div>@endif
@@ -121,12 +123,12 @@ $platformLogo=\App\Support\MountUrl::to($siteSettings['logo_url']??config('brand
     <form method="post" action="{{route('logout')}}">@csrf<button class="footer-link">Log out</button></form>
 @else
     <a href="{{route('login')}}">Log in</a>
-    <a href="{{route('register')}}">Create account</a>
+    @if($canRegister)<a href="{{route('register')}}">Create account</a>@endif
 @endif
 </div>
 </div>
 @if($tenant&&($branding?->show_platform_branding??true))
-<div class="container powered">Powered by <a href="{{config('brand.url','https://privategather.com')}}" rel="noopener">Private Gather</a></div>
+<div class="container powered">Powered by <a href="{{config('brand.url','https://privategather.com')}}" rel="noopener">Private Gather</a>@if(!$isHosted) · Self-Hosted Edition@endif</div>
 @elseif(!$tenant)
 <div class="container powered">Private Gather · <a href="https://privategather.com">privategather.com</a> · Exclusive connections. Private by nature.</div>
 @endif
