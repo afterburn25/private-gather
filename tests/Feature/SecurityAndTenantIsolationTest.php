@@ -81,6 +81,19 @@ class SecurityAndTenantIsolationTest extends TestCase
         $this->assertTrue($admin->fresh()->is_platform_admin);
     }
 
+    public function test_platform_admin_login_normalizes_email_case(): void
+    {
+        $admin = $this->createUser('admin-case@example.test');
+        $admin->update(['is_platform_admin' => true]);
+
+        $this->post('/admin/login', [
+            'email' => 'ADMIN-CASE@EXAMPLE.TEST',
+            'password' => 'Password123',
+        ])->assertRedirect(route('admin.home'));
+
+        $this->assertAuthenticatedAs($admin);
+    }
+
     public function test_two_factor_setup_requires_current_password(): void
     {
         $user = $this->createUser('2fa@example.test');
@@ -90,6 +103,20 @@ class SecurityAndTenantIsolationTest extends TestCase
             ->post('/security/two-factor', [])
             ->assertRedirect('/security')
             ->assertSessionHasErrors('password');
+    }
+
+    public function test_primary_login_moves_two_factor_user_into_guest_challenge_state(): void
+    {
+        $user = $this->createUser('challenge@example.test');
+        $user->update(['two_factor_confirmed_at' => now()]);
+
+        $this->post('/login', [
+            'email' => ' CHALLENGE@EXAMPLE.TEST ',
+            'password' => 'Password123',
+        ])->assertRedirect(route('two-factor.challenge'))
+            ->assertSessionHas('auth.2fa_user', $user->id);
+
+        $this->assertGuest();
     }
 
     public function test_manager_cannot_invite_or_remove_tenant_staff(): void
@@ -149,6 +176,71 @@ class SecurityAndTenantIsolationTest extends TestCase
             ->assertForbidden();
 
         $this->assertDatabaseMissing('messages', ['conversation_id' => $conversation->id, 'body' => 'must not be delivered']);
+    }
+
+    public function test_report_rejects_nonexistent_target(): void
+    {
+        $member = $this->createUser('reporter@example.test');
+
+        $this->actingAs($member)
+            ->post('/reports', [
+                'reportable_type' => 'event',
+                'reportable_id' => 999999,
+                'category' => 'safety',
+                'details' => 'This target does not exist.',
+            ])
+            ->assertNotFound();
+
+        $this->assertDatabaseCount('reports', 0);
+    }
+
+    public function test_member_cannot_report_message_from_conversation_they_do_not_participate_in(): void
+    {
+        $sender = $this->createUser('message-sender@example.test');
+        $recipient = $this->createUser('message-recipient@example.test');
+        $outsider = $this->createUser('message-outsider@example.test');
+        $conversation = Conversation::create(['type' => 'direct']);
+        $conversation->participants()->attach([$sender->id, $recipient->id]);
+        $message = $conversation->messages()->create([
+            'user_id' => $sender->id,
+            'body' => 'private conversation message',
+            'status' => 'sent',
+        ]);
+
+        $this->actingAs($outsider)
+            ->post('/reports', [
+                'reportable_type' => 'message',
+                'reportable_id' => $message->id,
+                'category' => 'harassment',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('reports', 0);
+    }
+
+    public function test_event_report_uses_reported_events_tenant_not_request_host(): void
+    {
+        [$reportedTenant] = $this->createTenant('reported-event.test');
+        [, $requestDomain] = $this->createTenant('request-host.test');
+        $event = $this->createEvent($reportedTenant, 'Reported Event', 'public');
+        $member = $this->createUser('tenant-report@example.test');
+
+        $this->actingAs($member)
+            ->from('http://'.$requestDomain.'/events')
+            ->post('http://'.$requestDomain.'/reports', [
+                'reportable_type' => 'event',
+                'reportable_id' => $event->id,
+                'category' => 'privacy',
+                'details' => 'Moderation should route to the event tenant.',
+            ])
+            ->assertRedirect('http://'.$requestDomain.'/events');
+
+        $this->assertDatabaseHas('reports', [
+            'reporter_id' => $member->id,
+            'tenant_id' => $reportedTenant->id,
+            'reportable_type' => 'event',
+            'reportable_id' => $event->id,
+        ]);
     }
 
     public function test_anonymous_tenant_listing_hides_members_and_unlisted_events(): void
