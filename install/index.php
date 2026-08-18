@@ -77,6 +77,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo = installer_connect_database($installInput);
         installer_import_schema($pdo);
+
+        // Fresh installs already contain no legacy plaintext event-invitation
+        // rows, so this one-way data-hardening migration is a no-op. Register
+        // it explicitly so the browser-installed database and Artisan's
+        // migration ledger remain synchronized.
+        $migration = '2026_08_18_021500_hash_existing_event_invitation_tokens';
+        $stmt = $pdo->prepare('INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)');
+        $stmt->execute([$migration, $migration]);
+
         installer_create_admin($pdo, $installInput);
         installer_write_env($installInput);
         installer_write_receipt($installInput);
