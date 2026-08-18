@@ -19,14 +19,16 @@ class MemberAuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->merge([
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
         $data = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
         ]);
 
-        $email = strtolower(trim((string) $data['email']));
         if (! Auth::attempt([
-            'email' => $email,
+            'email' => $data['email'],
             'password' => $data['password'],
             'status' => 'active',
         ], $request->boolean('remember'))) {
@@ -64,6 +66,9 @@ class MemberAuthController extends Controller
 
     public function register(Request $request)
     {
+        $request->merge([
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
         $data = $request->validate([
             'name' => 'required|string|max:120',
             'display_name' => 'required|string|max:80',
@@ -78,7 +83,7 @@ class MemberAuthController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'display_name' => $data['display_name'],
-            'email' => strtolower(trim((string) $data['email'])),
+            'email' => $data['email'],
             'date_of_birth' => $data['date_of_birth'],
             'password' => $data['password'],
             'status' => 'active',
