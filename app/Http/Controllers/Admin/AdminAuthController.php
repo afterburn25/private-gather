@@ -39,8 +39,6 @@ class AdminAuthController extends Controller
             return back()->withErrors(['email' => 'This account does not have platform administration access.']);
         }
 
-        // Rotate the session as soon as primary credentials are accepted so
-        // privileged 2FA challenge state is never attached to a pre-login ID.
         $request->session()->regenerate();
 
         if ($user->two_factor_confirmed_at) {
@@ -48,6 +46,7 @@ class AdminAuthController extends Controller
                 'auth.2fa_user' => $user->id,
                 'auth.2fa_remember' => $request->boolean('remember'),
                 'auth.2fa_intended' => '/admin',
+                'auth.2fa_issued_at' => now()->timestamp,
             ]);
             Auth::logout();
 
