@@ -37,7 +37,7 @@ final class TenantUrl
 
     public static function wildcardPattern(): string
     {
-        return '*. '.config('platform.root_domain');
+        return '*.'.(string) config('platform.root_domain');
     }
 
     public static function wildcardTarget(): string
