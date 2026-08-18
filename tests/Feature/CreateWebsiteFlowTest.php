@@ -51,7 +51,7 @@ class CreateWebsiteFlowTest extends TestCase
         $this->get('http://platform.test/manage')
             ->assertOk()
             ->assertSee('Demo Club')
-            ->assertSee('Website &amp; CMS', false)
+            ->assertSeeText('Website & CMS')
             ->assertSee('Preview Website');
     }
 
