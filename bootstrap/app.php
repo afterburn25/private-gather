@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnforceSelfHostedPrivacy;
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\ResolveTenantByDomain;
 use App\Http\Middleware\SecurityHeaders;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
             prepend: [SecurityHeaders::class],
             append: [
                 ResolveTenantByDomain::class,
+                EnforceSelfHostedPrivacy::class,
                 EnsureActiveAccount::class,
             ],
         );

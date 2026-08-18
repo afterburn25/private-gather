@@ -50,7 +50,10 @@ $expect(str_contains($layout, 'View public website'), 'Admin layout lacks an exp
 $expect(str_contains($css, '.pg-admin-shell'), 'Admin stylesheet lacks the backend shell');
 $expect(str_contains($css, '.pg-admin-sidebar'), 'Admin stylesheet lacks the backend sidebar');
 $expect(str_contains($css, '.pg-admin-toolbar'), 'Admin stylesheet lacks the backend toolbar');
-$expect(str_contains($publicLayout, '$isPlatformAdmin=auth()->check()'), 'Public layout does not explicitly identify platform administrators');
+$expect(
+    preg_match('/\$isPlatformAdmin\s*=\s*auth\(\)->check\(\)/', $publicLayout) === 1,
+    'Public layout does not explicitly identify platform administrators'
+);
 $expect(str_contains($publicLayout, "route('admin.home')"), 'Public layout lacks an administrator entry link to the backend');
 $expect(str_contains($publicLayout, '>Admin Backend</a>'), 'Public layout lacks the visible Admin Backend button/entry label');
 

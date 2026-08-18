@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\ConsentRecord;
 use App\Models\Profile;
+use App\Models\Tenant;
 use App\Models\User;
 use App\Support\Audit;
+use App\Support\Edition;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
@@ -58,11 +60,15 @@ class MemberAuthController extends Controller
 
     public function registerForm()
     {
+        abort_unless(Edition::registrationEnabled(), 404);
+
         return view('auth.register');
     }
 
     public function register(Request $request)
     {
+        abort_unless(Edition::registrationEnabled(), 404);
+
         $request->merge([
             'email' => strtolower(trim((string) $request->input('email'))),
         ]);
@@ -77,13 +83,14 @@ class MemberAuthController extends Controller
             'privacy' => 'accepted',
         ]);
         $now = now();
+        $requiresApproval = Edition::isSelfHosted() && Edition::selfHostedRegistration() === 'approval';
         $user = User::create([
             'name' => $data['name'],
             'display_name' => $data['display_name'],
             'email' => $data['email'],
             'date_of_birth' => $data['date_of_birth'],
             'password' => $data['password'],
-            'status' => 'active',
+            'status' => $requiresApproval ? 'pending' : 'active',
             'adult_confirmed_at' => $now,
             'terms_accepted_at' => $now,
             'privacy_accepted_at' => $now,
@@ -105,13 +112,28 @@ class MemberAuthController extends Controller
                 'recorded_at' => $now,
             ]);
         }
-        Auth::login($user);
-        $request->session()->regenerate();
+
+        if (Edition::isSelfHosted()) {
+            $tenant = $this->selfHostedTenant();
+            if ($tenant) {
+                $tenant->users()->syncWithoutDetaching([
+                    $user->id => ['role' => 'member', 'status' => 'active'],
+                ]);
+            }
+        }
+
         try {
             $user->sendEmailVerificationNotification();
         } catch (\Throwable) {
         }
         Audit::write('auth.register', $user, request: $request);
+
+        if ($requiresApproval) {
+            return redirect()->route('login')->with('status', 'Account created and awaiting administrator approval.');
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
 
         return redirect()->route('dashboard')->with('status', 'Account created. Check your email for a verification link if email delivery is configured.');
     }
@@ -124,5 +146,16 @@ class MemberAuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('site.home');
+    }
+
+    private function selfHostedTenant(): ?Tenant
+    {
+        $query = Tenant::query()->where('status', 'active');
+
+        if ($tenantId = Edition::selfHostedTenantId()) {
+            return $query->whereKey($tenantId)->first();
+        }
+
+        return $query->orderBy('id')->first();
     }
 }
