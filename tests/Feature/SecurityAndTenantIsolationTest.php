@@ -108,7 +108,7 @@ class SecurityAndTenantIsolationTest extends TestCase
     public function test_primary_login_moves_two_factor_user_into_guest_challenge_state(): void
     {
         $user = $this->createUser('challenge@example.test');
-        $user->update(['two_factor_confirmed_at' => now()]);
+        $user->forceFill(['two_factor_confirmed_at' => now()])->save();
 
         $this->post('/login', [
             'email' => ' CHALLENGE@EXAMPLE.TEST ',
