@@ -1,0 +1,5 @@
+@extends('layouts.app')
+@section('title','Plans')
+@section('content')<div class="container"><h1>SaaS Plans</h1>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif
+@foreach($plans as $p)<form class="panel form-stack" method="post" action="{{route('admin.plans.update',$p)}}">@csrf @method('patch')<h2>{{$p->code}}</h2><input name="name" value="{{$p->name}}"><input name="price_monthly_cents" type="number" value="{{$p->price_monthly_cents}}"><textarea name="features_json" rows="7">{{json_encode($p->features,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)}}</textarea><label><input type="checkbox" name="active" value="1" @checked($p->active)> Active</label><button>Save</button></form>@endforeach
+<h2>Add plan</h2><form class="panel form-stack" method="post" action="{{route('admin.plans.store')}}">@csrf<input name="code" placeholder="business"><input name="name" placeholder="Business"><input name="price_monthly_cents" type="number" value="0"><textarea name="features_json">{}</textarea><button>Create Plan</button></form></div>@endsection

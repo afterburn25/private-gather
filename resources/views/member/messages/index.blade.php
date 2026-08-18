@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Messages')
+@section('content')<div class="container section"><h1>Messages</h1><form class="panel form-stack" method="post" action="{{route('messages.start')}}">@csrf<h2>New message</h2><input type="number" name="recipient_id" placeholder="Recipient member ID" required><textarea name="body" rows="3" placeholder="Message" required></textarea><button class="button button-primary">Send</button></form><div class="panel">@forelse($conversations as $c)<div class="row-between"><div><strong>{{$c->subject?:'Conversation #'.$c->id}}</strong><small>{{$c->messages->first()?->body}}</small></div><a href="{{route('messages.show',$c)}}">Open</a></div>@empty<p>No conversations yet.</p>@endforelse</div></div>@endsection

@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Moderation')
+@section('content')<div class="container"><h1>Moderation</h1>@foreach($reports as $r)<div class="panel"><strong>#{{$r->id}} {{$r->category}}</strong> · {{$r->status}}<p>{{$r->details}}</p><form method="post" action="{{route('admin.moderation.update',$r)}}">@csrf @method('patch')<select name="status">@foreach(['open','reviewing','resolved','dismissed'] as $s)<option @selected($r->status===$s)>{{$s}}</option>@endforeach</select><button>Update</button></form></div>@endforeach{{$reports->links()}}</div>@endsection

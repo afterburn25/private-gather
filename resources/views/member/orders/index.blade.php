@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','My Orders')
+@section('content')<div class="container section"><h1>My Orders</h1><div class="panel">@forelse($orders as $o)<div class="row-between"><div><strong>{{$o->event?->title}}</strong><small>#{{$o->public_id}} · {{$o->status}}</small></div><div>${{number_format($o->total_cents/100,2)}} <a href="{{route('member.orders.show',$o)}}">View</a></div></div>@empty<p>No orders yet.</p>@endforelse</div>{{$orders->links()}}</div>@endsection

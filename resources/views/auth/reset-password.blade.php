@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Choose New Password')
+@section('content')<div class="auth-wrap"><form class="panel form-card" method="post">@csrf<input type="hidden" name="token" value="{{$token}}"><h1>Choose a new password</h1><input name="email" type="email" value="{{old('email',$email)}}" required><input name="password" type="password" placeholder="New password" required><input name="password_confirmation" type="password" placeholder="Confirm new password" required>@foreach($errors->all() as $e)<p class="error">{{$e}}</p>@endforeach<button class="button button-primary">Reset Password</button></form></div>@endsection

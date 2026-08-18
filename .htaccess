@@ -1,0 +1,55 @@
+DirectoryIndex private-gather.php index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # MODEL-HUB-PARITY RULE: route the application directory root through the
+    # reliable front controller BEFORE any real-file/real-directory bypass.
+    # This is what prevents Apache/LiteSpeed bare-directory behavior from taking
+    # ownership of /private-gather/.
+    RewriteRule ^$ private-gather.php [QSA,L]
+
+    # Even an explicit /index.php request is internally sent to the reliable
+    # controller. The browser URL is unchanged; this also bypasses stale cached
+    # bytecode/behavior tied to the old index.php entry file.
+    RewriteRule ^index\.php$ private-gather.php [QSA,L,NC]
+
+    # Preserve auth headers for API/authenticated requests when Apache/FastCGI strips them.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    RewriteCond %{HTTP:X-XSRF-TOKEN} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-TOKEN}]
+
+    # Never expose application internals.
+    RewriteRule ^(?:app|bootstrap|config|database|docs|resources|routes|storage|tests|tools|vendor)(?:/|$) - [F,L,NC]
+    RewriteRule ^\.install-disabled- - [F,L,NC]
+    RewriteRule ^(?:\.env(?:\..*)?|artisan|composer\.(?:json|lock)|phpunit\.xml|README\.md|RELEASE-.*\.md|VERSION|MANIFEST-SHA256\.txt)$ - [F,L,NC]
+
+    # During first-run installation, /install is a real standalone folder relative
+    # to this application directory. Normal visitors do not need to use it.
+    RewriteRule ^install(?:/.*)?$ - [L,NC]
+
+    # Public assets remain browser-visible without /public in the URL.
+    RewriteRule ^(assets|build|uploads|storage)/(.*)$ public/$1/$2 [L,NC]
+    RewriteRule ^(robots\.txt|favicon\.ico|site\.webmanifest|manifest\.webmanifest)$ public/$1 [L,NC]
+
+    # Serve genuine files/directories normally only AFTER the application-root rule.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # All virtual application URLs use the same reliable front controller.
+    RewriteRule ^ private-gather.php [QSA,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "^(?:private-gather|index)\.php$">
+        Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+    </FilesMatch>
+</IfModule>
+
+<FilesMatch "^(\.env|artisan|composer\.(json|lock)|phpunit\.xml|README\.md|RELEASE-.*\.md|VERSION|MANIFEST-SHA256\.txt)$">
+    Require all denied
+</FilesMatch>

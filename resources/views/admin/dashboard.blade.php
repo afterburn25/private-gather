@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Private Gather Administration')
+@section('content')<div class="container"><h1>Private Gather Dashboard</h1><div class="stats">@foreach($stats as $label=>$value)<div class="stat"><strong>{{$value}}</strong><span>{{str_replace('_',' ',ucfirst($label))}}</span></div>@endforeach</div><h2>Recent organizations</h2><div class="panel">@foreach($recentTenants as $t)<div>{{$t->name}} · {{$t->type}} · {{$t->status}}</div>@endforeach</div></div>@endsection
