@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 session_start();
 require __DIR__.'/lib.php';
+require __DIR__.'/community-schema.php';
 
 if (installer_is_installed()) {
     http_response_code(410);
@@ -104,10 +105,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo = installer_connect_database($installInput);
         installer_import_schema($pdo);
+        installer_import_private_community($pdo);
 
-        $migration = '2026_08_18_021500_hash_existing_event_invitation_tokens';
+        $registeredMigrations = [
+            '2026_08_18_021500_hash_existing_event_invitation_tokens',
+            '2026_08_18_210000_create_private_community',
+        ];
         $stmt = $pdo->prepare('INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)');
-        $stmt->execute([$migration, $migration]);
+        foreach ($registeredMigrations as $migration) {
+            $stmt->execute([$migration, $migration]);
+        }
 
         $adminId = installer_create_admin($pdo, $installInput);
         $tenantId = installer_create_self_hosted_tenant($pdo, $installInput, $adminId);
