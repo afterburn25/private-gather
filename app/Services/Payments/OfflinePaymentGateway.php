@@ -1,0 +1,2 @@
+<?php
+namespace App\Services\Payments;use App\Contracts\PaymentGateway;use App\Models\Order;class OfflinePaymentGateway implements PaymentGateway{public function name():string{return'offline';}public function begin(Order $order):array{return['status'=>'pending','instructions'=>'Payment will be collected by the organizer.'];}public function refund(Order $order,int $amountCents):array{return['status'=>'manual_required'];}}

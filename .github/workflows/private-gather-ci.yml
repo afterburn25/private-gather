@@ -1,0 +1,131 @@
+name: Private Gather CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-gather-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-integrity:
+    name: Source integrity and structural gates
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+
+      - name: PHP syntax
+        run: find . -type f -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+
+      - name: Composer metadata validation
+        run: composer validate --no-check-lock --strict
+
+      - name: Private Gather structural verification
+        run: |
+          php tools/verify-foundation.php
+          php tools/verify-installer.php
+          php tools/verify-subdirectory-install.php
+          php tools/verify-upgrader.php
+          php tools/verify-v1-structure.php
+          php tools/verify-private-gather-brand.php
+          php tools/test-domain-name.php
+          php tools/test-upgrade-path.php
+
+      - name: Reject committed secrets and deployment state
+        shell: bash
+        run: |
+          test ! -f .env
+          test ! -f storage/app/installed.lock
+          if git ls-files | grep -Eq '(^|/)(\.env|auth\.json)$'; then
+            echo 'A secret-bearing environment/auth file is tracked.' >&2
+            exit 1
+          fi
+
+  laravel-runtime:
+    name: Laravel runtime and PHPUnit
+    runs-on: ubuntu-24.04
+    needs: source-integrity
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3, intl, curl, dom, fileinfo
+          coverage: none
+          tools: composer:v2
+
+      - name: Resolve dependencies
+        shell: bash
+        run: |
+          if [ -f composer.lock ]; then
+            composer install --prefer-dist --no-interaction --no-progress
+          else
+            echo 'composer.lock is not committed yet; resolving the declared constraints for this run.'
+            composer update --prefer-dist --no-interaction --no-progress
+          fi
+
+      - name: Dependency security audit
+        run: composer audit --locked
+
+      - name: Prepare test environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate --force
+          php artisan config:clear
+          touch database/database.sqlite
+
+      - name: Laravel boot smoke test
+        run: |
+          php artisan about
+          php artisan route:list --except-vendor
+
+      - name: Database migration smoke test
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan migrate:fresh --force
+
+      - name: PHPUnit
+        run: php artisan test
+
+  php-83-compatibility:
+    name: PHP 8.3 minimum compatibility
+    runs-on: ubuntu-24.04
+    needs: source-integrity
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3, intl, curl, dom, fileinfo
+          coverage: none
+          tools: composer:v2
+      - name: Resolve dependencies without scripts
+        shell: bash
+        run: |
+          if [ -f composer.lock ]; then
+            composer install --prefer-dist --no-interaction --no-progress --no-scripts
+          else
+            composer update --prefer-dist --no-interaction --no-progress --no-scripts
+          fi
+      - name: Platform requirement check
+        run: composer check-platform-reqs
+      - name: Application syntax
+        run: find app bootstrap config database routes tests tools install public -type f -name '*.php' -print0 | xargs -0 -n1 php -l
