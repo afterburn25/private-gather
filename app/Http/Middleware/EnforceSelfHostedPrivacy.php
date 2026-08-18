@@ -13,19 +13,27 @@ final class EnforceSelfHostedPrivacy
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! Edition::isSelfHosted() || Edition::selfHostedVisibility() === 'public' || $request->user()) {
+        if (! Edition::isSelfHosted() || Edition::selfHostedVisibility() === 'public') {
             return $next($request);
         }
 
-        if ($this->isGuestAccessRoute($request)) {
-            return $next($request);
+        if ($request->user() || $this->isGuestAccessRoute($request)) {
+            return $this->privateResponse($next($request));
         }
 
         if ($request->expectsJson()) {
-            return response()->json(['message' => 'Authentication required.'], 401);
+            return $this->privateResponse(response()->json(['message' => 'Authentication required.'], 401));
         }
 
-        return redirect()->guest(route('login'));
+        return $this->privateResponse(redirect()->guest(route('login')));
+    }
+
+    private function privateResponse(Response $response): Response
+    {
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
+
+        return $response;
     }
 
     private function isGuestAccessRoute(Request $request): bool
