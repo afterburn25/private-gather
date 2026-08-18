@@ -41,6 +41,7 @@ $assertions = [
     ['installer receipt identity present', str_contains($installLib, "'installer_version'")],
     ['installer avoids false DDL transaction', ! str_contains($installLib, '$pdo->beginTransaction()') && str_contains($installLib, "preg_replace('/^\\s*--.*$/m'")],
     ['schema migration registry', str_contains($schema, 'CREATE TABLE IF NOT EXISTS migrations')],
+    ['browser installer registers invite token data hardening', str_contains($installIndex, '2026_08_18_021500_hash_existing_event_invitation_tokens')],
     ['platform admin schema', str_contains($schema, 'is_platform_admin') && str_contains($userMigration, 'is_platform_admin')],
     ['fresh 1.0 security schema', str_contains($schema, 'two_factor_secret') && str_contains($schema, 'consent_records')],
     ['fresh 1.0 commerce schema', str_contains($schema, 'ticket_types') && str_contains($schema, 'orders') && str_contains($schema, 'tickets')],
@@ -59,8 +60,11 @@ foreach ($assertions as [$label, $ok]) {
 $migrations = glob($base.'/database/migrations/*.php') ?: [];
 foreach ($migrations as $file) {
     $name = basename($file, '.php');
-    if (! str_contains($schema, $name)) {
-        $errors[] = 'Installer schema does not register migration '.$name;
+    // Most fresh-install migrations are represented directly in schema.sql.
+    // Data-only migrations that are a no-op on an empty fresh database may be
+    // explicitly registered by install/index.php after the schema import.
+    if (! str_contains($schema, $name) && ! str_contains($installIndex, $name)) {
+        $errors[] = 'Installer does not register migration '.$name;
     }
 }
 
