@@ -12,12 +12,14 @@
     $isHosted = \App\Support\Edition::isHosted();
     $canRegister = \App\Support\Edition::registrationEnabled();
     $canManage = false;
+    $isCommunityMember = false;
 
     if (auth()->check() && $tenant) {
         $membership = auth()->user()->tenants()->whereKey($tenant->id)->first()?->pivot;
-        $canManage = $isPlatformAdmin || (
-            $membership
-            && in_array($membership->role, ['owner', 'admin', 'manager', 'staff', 'checkin'], true)
+        $isCommunityMember = $membership && $membership->status === 'active';
+        $canManage = $isCommunityMember && (
+            $isPlatformAdmin
+            || in_array($membership->role, ['owner', 'admin', 'manager', 'staff', 'checkin'], true)
         );
     }
 
@@ -86,7 +88,9 @@
                 <a href="{{ route('site.about') }}">About</a>
             @endif
 
-            @if (auth()->check())
+            @if ($isCommunityMember)
+                <a href="{{ route('community.index') }}">Community</a>
+                <a href="{{ route('community.chat') }}">Live Chat</a>
                 <a href="{{ route('messages.index') }}">Messages</a>
             @endif
         </nav>
@@ -178,6 +182,11 @@
             @else
                 <a href="{{ route('site.events') }}">Events</a>
                 <a href="{{ route('site.about') }}">About</a>
+            @endif
+            @if ($isCommunityMember)
+                <a href="{{ route('community.index') }}">Community</a>
+                <a href="{{ route('community.chat') }}">Live Chat</a>
+                <a href="{{ route('messages.index') }}">Messages</a>
             @endif
         </div>
 
