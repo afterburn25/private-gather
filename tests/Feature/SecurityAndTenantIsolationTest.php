@@ -159,9 +159,13 @@ class SecurityAndTenantIsolationTest extends TestCase
 
     public function test_block_applies_to_an_existing_direct_conversation(): void
     {
+        [$tenant, $domain] = $this->createTenant('blocked-messages.test');
         $sender = $this->createUser('sender@example.test');
         $recipient = $this->createUser('recipient@example.test');
-        $conversation = Conversation::create(['type' => 'direct']);
+        $tenant->users()->attach($sender->id, ['role' => 'member', 'status' => 'active']);
+        $tenant->users()->attach($recipient->id, ['role' => 'member', 'status' => 'active']);
+
+        $conversation = Conversation::create(['tenant_id' => $tenant->id, 'type' => 'direct']);
         $conversation->participants()->attach([$sender->id, $recipient->id], ['last_read_at' => now()]);
         $conversation->messages()->create(['user_id' => $sender->id, 'body' => 'before block', 'status' => 'sent']);
         DB::table('user_blocks')->insert([
@@ -172,7 +176,7 @@ class SecurityAndTenantIsolationTest extends TestCase
         ]);
 
         $this->actingAs($sender)
-            ->post('/messages/'.$conversation->id, ['body' => 'must not be delivered'])
+            ->post('http://'.$domain.'/messages/'.$conversation->id, ['body' => 'must not be delivered'])
             ->assertForbidden();
 
         $this->assertDatabaseMissing('messages', ['conversation_id' => $conversation->id, 'body' => 'must not be delivered']);
