@@ -29,7 +29,11 @@ class MediaController extends Controller
     {
         $tenant = $ctx->requireTenant();
         $d = $r->validate([
-            'file' => 'required|file|max:15360|mimetypes:image/jpeg,image/png,image/webp,image/gif',
+            // Do not use an extension-sensitive image/mime validation rule
+            // here. The browser-supplied filename is untrusted and may be
+            // deliberately misleading. The strict Fileinfo allowlist below,
+            // followed by an actual image decode, is authoritative.
+            'file' => 'required|file|max:15360',
             'visibility' => 'required|in:public,tenant,private',
             'alt_text' => 'nullable|string|max:255',
         ]);
