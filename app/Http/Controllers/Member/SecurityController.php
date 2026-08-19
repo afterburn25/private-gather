@@ -90,12 +90,25 @@ class SecurityController extends Controller
 
     public function dataRequest(Request $request)
     {
-        $data = $request->validate(['type' => 'required|in:export,delete']);
+        $data = $request->validate([
+            'type' => 'required|in:export,delete',
+            'password' => 'nullable|string',
+        ]);
 
-        DataRequest::firstOrCreate(
+        if ($data['type'] === 'delete') {
+            $request->validate([
+                'password' => 'required|current_password',
+            ]);
+        }
+
+        $privacyRequest = DataRequest::firstOrCreate(
             ['user_id' => $request->user()->id, 'type' => $data['type'], 'status' => 'pending'],
             ['requested_at' => now()]
         );
+
+        if ($privacyRequest->wasRecentlyCreated) {
+            $this->recordSecurityEvent($request, 'privacy.'.$data['type'].'.requested');
+        }
 
         return back()->with('status', 'Privacy request submitted.');
     }
