@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -8,33 +9,42 @@ use App\Models\Report;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Support\Edition;
+use App\Tenancy\TenantContext;
 
 class PlatformDashboardController extends Controller
 {
-    public function __invoke()
+    public function __invoke(TenantContext $context)
     {
-        $stats = Edition::isHosted()
-            ? [
-                'users' => User::count(),
-                'tenants' => Tenant::count(),
-                'events' => Event::count(),
-                'orders' => Order::count(),
-                'open_reports' => Report::where('status', 'open')->count(),
-            ]
-            : [
-                'members' => User::count(),
-                'pending_members' => User::where('status', 'pending')->count(),
-                'events' => Event::count(),
-                'orders' => Order::count(),
-                'open_reports' => Report::where('status', 'open')->count(),
-            ];
+        if (Edition::isHosted()) {
+            return view('admin.dashboard', [
+                'stats' => [
+                    'users' => User::count(),
+                    'tenants' => Tenant::count(),
+                    'events' => Event::count(),
+                    'orders' => Order::count(),
+                    'open_reports' => Report::where('status', 'open')->count(),
+                ],
+                'recentTenants' => Tenant::latest()->limit(8)->get(),
+                'localTenant' => null,
+            ]);
+        }
+
+        $tenant = $context->requireTenant();
+        $members = User::query()->whereHas(
+            'tenants',
+            fn ($tenantQuery) => $tenantQuery->whereKey($tenant->id)
+        );
 
         return view('admin.dashboard', [
-            'stats' => $stats,
-            'recentTenants' => Edition::isHosted() ? Tenant::latest()->limit(8)->get() : collect(),
-            'localTenant' => Edition::isSelfHosted()
-                ? Tenant::query()->when(Edition::selfHostedTenantId(), fn ($q, $id) => $q->whereKey($id))->where('status', 'active')->first()
-                : null,
+            'stats' => [
+                'members' => (clone $members)->count(),
+                'pending_members' => (clone $members)->where('users.status', 'pending')->count(),
+                'events' => Event::where('tenant_id', $tenant->id)->count(),
+                'orders' => Order::where('tenant_id', $tenant->id)->count(),
+                'open_reports' => Report::where('tenant_id', $tenant->id)->where('status', 'open')->count(),
+            ],
+            'recentTenants' => collect(),
+            'localTenant' => $tenant,
         ]);
     }
 }
