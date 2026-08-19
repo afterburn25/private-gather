@@ -16,7 +16,9 @@ class MemberManageController extends Controller
         abort_unless(Edition::isSelfHosted(), 404);
 
         $tenant = $context->requireTenant();
-        $query = $tenant->users()->orderByRaw("CASE users.status WHEN 'pending' THEN 0 ELSE 1 END")
+        $query = $tenant->users()
+            ->wherePivot('role', 'member')
+            ->orderByRaw("CASE users.status WHEN 'pending' THEN 0 ELSE 1 END")
             ->orderBy('users.display_name')
             ->orderBy('users.name');
 
@@ -40,15 +42,11 @@ class MemberManageController extends Controller
 
         $tenant = $context->requireTenant();
         $membership = $tenant->users()->whereKey($user->id)->first()?->pivot;
-        abort_unless($membership, 404);
+        abort_unless($membership && $membership->role === 'member', 404);
 
         $data = $request->validate([
             'status' => 'required|in:pending,active,suspended,banned',
         ]);
-
-        if ($user->is($request->user())) {
-            abort_if($data['status'] !== 'active', 422, 'You cannot disable your own current account.');
-        }
 
         $before = ['status' => $user->status];
         $user->update(['status' => $data['status']]);
