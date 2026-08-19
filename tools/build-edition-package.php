@@ -43,7 +43,7 @@ $includeRoots = [
     'resources', 'routes', 'storage', 'vendor',
 ];
 
-$excludedBasenames = ['.env', 'auth.json', 'installed.lock', 'install-record.json', '.DS_Store'];
+$excludedBasenames = ['installed.lock', 'install-record.json', '.DS_Store'];
 $runtimePrefixes = [
     'storage/app/public/',
     'storage/app/private/',
@@ -67,7 +67,15 @@ $addFile = static function (string $absolute, string $relative) use (
     $edition
 ): void {
     $relative = str_replace('\\', '/', ltrim($relative, '/'));
-    if ($relative === '' || in_array(basename($relative), $excludedBasenames, true)) {
+    $basename = basename($relative);
+    $lowerBasename = strtolower($basename);
+    if (
+        $relative === ''
+        || in_array($basename, $excludedBasenames, true)
+        || $lowerBasename === 'auth.json'
+        || $lowerBasename === '.env'
+        || (str_starts_with($lowerBasename, '.env.') && $lowerBasename !== '.env.example')
+    ) {
         return;
     }
 
