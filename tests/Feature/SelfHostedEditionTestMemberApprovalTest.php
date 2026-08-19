@@ -58,6 +58,33 @@ class SelfHostedEditionTestMemberApprovalTest extends TestCase
         $this->assertSame('active', $pending->fresh()->status);
     }
 
+    public function test_pending_member_cannot_login_until_local_approval(): void
+    {
+        $owner = $this->createUser('owner@example.test');
+        $pending = $this->createUser('pending@example.test', 'pending');
+        $this->tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
+        $this->tenant->users()->attach($pending->id, ['role' => 'member', 'status' => 'active']);
+
+        $this->post('http://platform.test/login', [
+            'email' => 'pending@example.test',
+            'password' => 'Password1234',
+        ])->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        $this->actingAs($owner)
+            ->patch('http://platform.test/manage/members/'.$pending->id, ['status' => 'active'])
+            ->assertRedirect();
+
+        $this->post('http://platform.test/logout')->assertRedirect();
+        $this->assertGuest();
+
+        $this->post('http://platform.test/login', [
+            'email' => 'pending@example.test',
+            'password' => 'Password1234',
+        ])->assertRedirect();
+        $this->assertAuthenticatedAs($pending->fresh());
+    }
+
     public function test_manager_can_approve_member_but_regular_member_cannot_manage_accounts(): void
     {
         $manager = $this->createUser('manager@example.test');
