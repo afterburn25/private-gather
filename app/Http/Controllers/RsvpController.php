@@ -22,7 +22,7 @@ class RsvpController extends Controller
 
         if ($event->visibility === 'members') {
             abort_unless(
-                TenantMembership::canAccessMembersContent($request->user(), (int) $event->tenant_id),
+                TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
                 403
             );
         }
@@ -61,7 +61,7 @@ class RsvpController extends Controller
             }
             if ($lockedEvent->visibility === 'members') {
                 abort_unless(
-                    TenantMembership::canAccessMembersContent($user, (int) $lockedEvent->tenant_id),
+                    TenantMembership::hasActiveMembership($user, (int) $lockedEvent->tenant_id),
                     403
                 );
             }
