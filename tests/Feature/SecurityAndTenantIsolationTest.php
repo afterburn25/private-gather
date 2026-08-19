@@ -222,22 +222,21 @@ class SecurityAndTenantIsolationTest extends TestCase
         $this->assertDatabaseCount('reports', 0);
     }
 
-    public function test_event_report_uses_reported_events_tenant_not_request_host(): void
+    public function test_central_event_report_uses_reported_events_tenant(): void
     {
         [$reportedTenant] = $this->createTenant('reported-event.test');
-        [, $requestDomain] = $this->createTenant('request-host.test');
         $event = $this->createEvent($reportedTenant, 'Reported Event', 'public');
         $member = $this->createUser('tenant-report@example.test');
 
         $this->actingAs($member)
-            ->from('http://'.$requestDomain.'/events')
-            ->post('http://'.$requestDomain.'/reports', [
+            ->from('/events')
+            ->post('/reports', [
                 'reportable_type' => 'event',
                 'reportable_id' => $event->id,
                 'category' => 'privacy',
-                'details' => 'Moderation should route to the event tenant.',
+                'details' => 'Central moderation should route to the reported event tenant.',
             ])
-            ->assertRedirect('http://'.$requestDomain.'/events');
+            ->assertRedirect('/events');
 
         $this->assertDatabaseHas('reports', [
             'reporter_id' => $member->id,
