@@ -23,20 +23,36 @@ class ReportController extends Controller
 
         $reporter = $request->user();
         $reportableId = (int) $data['reportable_id'];
-        $tenantId = $context->tenant()?->id;
+        $currentTenantId = $context->check() ? $context->id() : null;
+        $tenantId = $currentTenantId;
 
         switch ($data['reportable_type']) {
             case 'user':
                 User::query()->findOrFail($reportableId);
+                if ($currentTenantId !== null) {
+                    abort_unless(
+                        DB::table('tenant_users')
+                            ->where('tenant_id', $currentTenantId)
+                            ->where('user_id', $reportableId)
+                            ->exists(),
+                        404
+                    );
+                }
                 break;
 
             case 'event':
                 $event = Event::query()->findOrFail($reportableId);
+                if ($currentTenantId !== null) {
+                    abort_unless((int) $event->tenant_id === (int) $currentTenantId, 404);
+                }
                 $tenantId = $event->tenant_id;
                 break;
 
             case 'tenant':
                 $tenant = Tenant::query()->findOrFail($reportableId);
+                if ($currentTenantId !== null) {
+                    abort_unless((int) $tenant->id === (int) $currentTenantId, 404);
+                }
                 $tenantId = $tenant->id;
                 break;
 
@@ -44,6 +60,9 @@ class ReportController extends Controller
                 $message = Message::query()->findOrFail($reportableId);
                 $conversation = DB::table('conversations')->where('id', $message->conversation_id)->first();
                 abort_unless($conversation, 404);
+                if ($currentTenantId !== null) {
+                    abort_unless((int) $conversation->tenant_id === (int) $currentTenantId, 404);
+                }
                 abort_unless(
                     DB::table('conversation_participants')
                         ->where('conversation_id', $message->conversation_id)

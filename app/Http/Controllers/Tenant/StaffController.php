@@ -71,11 +71,12 @@ class StaffController extends Controller
         return back()->with('status', 'Staff access removed.');
     }
 
-    public function accept(Request $request, string $token)
+    public function accept(Request $request, TenantContext $context, string $token)
     {
         abort_unless(preg_match('/^[a-f0-9]{64}$/i', $token) === 1, 404);
+        $activeTenantId = $context->check() ? $context->id() : null;
 
-        $tenantId = DB::transaction(function () use ($request, $token): int {
+        $tenantId = DB::transaction(function () use ($request, $token, $activeTenantId): int {
             $digest = hash('sha256', strtolower($token));
             $invite = DB::table('tenant_invitations')
                 ->whereNull('accepted_at')
@@ -89,6 +90,9 @@ class StaffController extends Controller
                 ->first();
 
             abort_unless($invite && now()->lte($invite->expires_at), 404);
+            if ($activeTenantId !== null) {
+                abort_unless((int) $invite->tenant_id === (int) $activeTenantId, 404);
+            }
             abort_unless(strtolower($request->user()->email) === strtolower($invite->email), 403, 'Sign in with the invited email address.');
 
             $current = DB::table('tenant_users')
