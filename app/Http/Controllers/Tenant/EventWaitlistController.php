@@ -7,13 +7,17 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventRsvp;
+use App\Models\TenantDomain;
 use App\Models\User;
+use App\Notifications\WaitlistPromotedNotification;
 use App\Support\Audit;
 use App\Support\TenantMembership;
+use App\Support\TenantUrl;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Throwable;
 
 final class EventWaitlistController extends Controller
 {
@@ -147,11 +151,45 @@ final class EventWaitlistController extends Controller
             request: $request,
         );
 
+        if (! $promotion['already_approved']) {
+            $this->notifyPromotedMember($event, $promotion);
+        }
+
         return back()->with(
             'status',
             $promotion['already_approved']
                 ? 'The member was already approved; the stale waitlist entry was removed.'
                 : 'Waitlisted member promoted to an approved RSVP.'
         );
+    }
+
+    private function notifyPromotedMember(Event $event, array $promotion): void
+    {
+        $user = User::query()->find($promotion['user_id']);
+        if (! $user) {
+            return;
+        }
+
+        try {
+            $event->loadMissing('tenant');
+            $domain = TenantDomain::query()
+                ->where('tenant_id', $event->tenant_id)
+                ->where('is_primary', true)
+                ->where('status', TenantDomain::STATUS_ACTIVE)
+                ->first();
+
+            $eventUrl = $domain
+                ? TenantUrl::to($domain, '/events/'.$event->id)
+                : rtrim((string) config('app.url'), '/').'/events/'.$event->id;
+
+            $user->notify(new WaitlistPromotedNotification(
+                eventTitle: (string) $event->title,
+                eventUrl: $eventUrl,
+                guestCount: (int) $promotion['guest_count'],
+                startsAt: $event->starts_at?->toIso8601String(),
+            ));
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }
