@@ -102,18 +102,26 @@ class RsvpController extends Controller
         });
     }
 
-    public function cancel(Request $request, Event $event)
+    public function cancel(Request $request, TenantContext $context, Event $event)
     {
-        DB::transaction(function () use ($request, $event): void {
-            Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
+        $tenantId = $context->check() ? $context->id() : null;
+        if ($tenantId !== null) {
+            abort_unless((int) $event->tenant_id === (int) $tenantId, 404);
+        }
 
-            EventRsvp::where('event_id', $event->id)
+        DB::transaction(function () use ($request, $event, $tenantId): void {
+            $lockedEvent = Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
+            if ($tenantId !== null) {
+                abort_unless((int) $lockedEvent->tenant_id === (int) $tenantId, 404);
+            }
+
+            EventRsvp::where('event_id', $lockedEvent->id)
                 ->where('user_id', $request->user()->id)
                 ->whereNotIn('status', ['cancelled'])
                 ->update(['status' => 'cancelled', 'approved_at' => null]);
 
             DB::table('event_waitlist')
-                ->where('event_id', $event->id)
+                ->where('event_id', $lockedEvent->id)
                 ->where('user_id', $request->user()->id)
                 ->delete();
         });
