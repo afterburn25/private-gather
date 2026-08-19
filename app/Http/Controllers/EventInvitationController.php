@@ -5,34 +5,41 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventInvitation;
 use App\Models\EventRsvp;
+use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class EventInvitationController extends Controller
 {
-    public function show(Request $request, string $token)
+    public function show(Request $request, TenantContext $context, string $token)
     {
         $invite = $this->findInvite($token, false)->load('event.tenant');
         abort_unless($invite->isUsable(), 410, 'This invitation is no longer available.');
         abort_unless($invite->event->status === 'published', 404);
+        $this->assertTenantContext($context, (int) $invite->event->tenant_id);
         $this->assertRecipient($request, $invite);
 
         return view('events.invitation', ['invite' => $invite, 'invitationToken' => $token]);
     }
 
-    public function accept(Request $request, string $token)
+    public function accept(Request $request, TenantContext $context, string $token)
     {
         $invite = $this->findInvite($token, true)->load('event');
         abort_unless($invite->isUsable(), 410, 'This invitation is no longer available.');
+        $this->assertTenantContext($context, (int) $invite->event->tenant_id);
         $this->assertRecipient($request, $invite);
         abort_unless($request->user()->isAdult(), 403, 'An adult account is required.');
         $validated = $request->validate(['guest_count' => 'required|integer|min:1|max:'.max(1, (int) $invite->max_guests)]);
+        $tenantId = $context->check() ? $context->id() : null;
 
-        DB::transaction(function () use ($request, $invite, $validated): void {
+        DB::transaction(function () use ($request, $invite, $validated, $tenantId): void {
             $locked = EventInvitation::whereKey($invite->id)->lockForUpdate()->firstOrFail();
             abort_unless($locked->isUsable(), 410, 'This invitation is no longer available.');
             $event = Event::whereKey($locked->event_id)->lockForUpdate()->firstOrFail();
             abort_unless($event->status === 'published', 404);
+            if ($tenantId !== null) {
+                abort_unless((int) $event->tenant_id === (int) $tenantId, 404);
+            }
             if ($event->capacity !== null) {
                 $approved = (int) EventRsvp::where('event_id', $event->id)->where('status', 'approved')->sum('guest_count');
                 $existing = EventRsvp::where('event_id', $event->id)->where('user_id', $request->user()->id)->first();
@@ -78,6 +85,13 @@ class EventInvitationController extends Controller
         }
 
         return $query->firstOrFail();
+    }
+
+    private function assertTenantContext(TenantContext $context, int $tenantId): void
+    {
+        if ($context->check()) {
+            abort_unless((int) $context->id() === $tenantId, 404);
+        }
     }
 
     private function assertRecipient(Request $request, EventInvitation $invite): void
