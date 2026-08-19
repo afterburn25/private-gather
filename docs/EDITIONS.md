@@ -26,12 +26,22 @@ Self-Hosted does not use Create Website or the multi-site switcher. The same `/m
 
 ### Registration
 
-`SELF_HOSTED_REGISTRATION=approval` is the default. New members are created with pending account status and cannot log in until the local administrator activates them in Admin Backend → Users.
+`SELF_HOSTED_REGISTRATION=approval` is the default. New members are created with pending account status and cannot log in until a local owner, administrator, or manager activates them in **Manage → Members & Approvals**.
+
+The member-management screen is tenant-scoped and does not expose Hosted Edition platform administration. Local managers can review/search member-role accounts and change account status between pending, active, suspended, and banned. Users outside the Self-Hosted organization and privileged owner/admin/manager/staff accounts cannot be changed through the member endpoint.
 
 Other modes:
 
 - `open` — account is active immediately.
 - `disabled` — public registration is unavailable.
+
+### Local administration
+
+The installer-created local administrator can use `/admin` for installation-level operations when that account is both marked as an installation administrator and has an active `owner` or `admin` membership in the configured Self-Hosted organization.
+
+Self-Hosted Local Administration includes the local dashboard, user administration, moderation, System Health, and the Update Center. Hosted-only SaaS controls remain unavailable even by direct URL: Organizations, platform Plans, and Platform Website administration return 404 in Self-Hosted Edition.
+
+This keeps system maintenance and upgrades available to the customer who owns the installation without turning a single-site deployment into the multi-tenant Hosted control plane.
 
 ## Release rule
 
