@@ -5,6 +5,7 @@ use App\Models\CmsPage;
 use App\Models\Event;
 use App\Models\Tenant;
 use App\Services\PlatformContent;
+use App\Support\TenantMembership;
 use App\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -55,7 +56,7 @@ class SiteController extends Controller
         if ($context->check()) {
             $tenant = $context->requireTenant();
             $query->where('tenant_id', $tenant->id);
-            $this->applyTenantVisibility($query);
+            $this->applyTenantVisibility($query, $tenant->id);
             $view = 'tenant.events.index';
         } else {
             $tenant = null;
@@ -124,16 +125,21 @@ class SiteController extends Controller
         $query = Event::where('tenant_id', $tenantId)
             ->where('status', 'published')
             ->where('starts_at', '>=', now());
-        $this->applyTenantVisibility($query);
+        $this->applyTenantVisibility($query, $tenantId);
 
         return $query;
     }
 
-    private function applyTenantVisibility($query): void
+    private function applyTenantVisibility($query, int $tenantId): void
     {
-        // "members" means authenticated Private Gather members. It must not
-        // leak into tenant home/listing pages for anonymous visitors. Unlisted,
-        // invite-only, and private events are intentionally never discoverable.
-        $query->whereIn('visibility', auth()->check() ? ['public', 'members'] : ['public']);
+        // Members-only events belong to the organization, not merely to any
+        // authenticated Private Gather account. Unlisted, invite-only, and
+        // private events remain intentionally absent from discovery surfaces.
+        $query->whereIn(
+            'visibility',
+            TenantMembership::canAccessMembersContent(auth()->user(), $tenantId)
+                ? ['public', 'members']
+                : ['public']
+        );
     }
 }

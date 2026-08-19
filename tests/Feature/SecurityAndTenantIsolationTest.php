@@ -264,6 +264,7 @@ class SecurityAndTenantIsolationTest extends TestCase
     {
         [$tenant, $domain] = $this->createTenant('member-visibility.test');
         $member = $this->createUser('visible-member@example.test');
+        $tenant->users()->attach($member->id, ['role' => 'member', 'status' => 'active']);
         $this->createEvent($tenant, 'Public Event', 'public');
         $this->createEvent($tenant, 'Members Event', 'members');
         $this->createEvent($tenant, 'Secret Link Event', 'unlisted');

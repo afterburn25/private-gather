@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\TicketType;
 use App\Services\TicketIssuer;
+use App\Support\TenantMembership;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,10 +26,18 @@ class CheckoutController extends Controller
     ) {
         abort_unless($event->status === 'published' && $ticketType->event_id === $event->id && $ticketType->active, 404);
 
-        if ($context->check()) {
-            abort_unless($context->id() === $event->tenant_id, 404);
+        $tenantId = $context->check() ? $context->id() : null;
+        if ($tenantId !== null) {
+            abort_unless((int) $tenantId === (int) $event->tenant_id, 404);
         } else {
             abort_unless($event->visibility === 'public', 404);
+        }
+
+        if ($event->visibility === 'members') {
+            abort_unless(
+                TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
+                403
+            );
         }
 
         if (in_array($event->visibility, ['private', 'invite_only'], true)) {
@@ -42,9 +51,18 @@ class CheckoutController extends Controller
         $quantity = (int) $data['quantity'];
         abort_if($quantity > (int) $ticketType->max_per_order, 422, 'Quantity exceeds the ticket limit.');
 
-        $order = DB::transaction(function () use ($event, $ticketType, $quantity, $request, $gateway, $issuer) {
+        $order = DB::transaction(function () use ($event, $ticketType, $quantity, $request, $gateway, $issuer, $tenantId) {
             $type = TicketType::whereKey($ticketType->id)->lockForUpdate()->firstOrFail();
             abort_unless($type->event_id === $event->id && $type->active, 404);
+            if ($tenantId !== null) {
+                abort_unless((int) $event->tenant_id === (int) $tenantId, 404);
+            }
+            if ($event->visibility === 'members') {
+                abort_unless(
+                    TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
+                    403
+                );
+            }
 
             if ($type->sales_start_at && now()->lt($type->sales_start_at)) {
                 abort(422, 'Ticket sales have not started.');

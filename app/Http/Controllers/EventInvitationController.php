@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\EventInvitation;
 use App\Models\EventRsvp;
+use App\Support\TenantMembership;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,7 @@ class EventInvitationController extends Controller
         abort_unless($invite->event->status === 'published', 404);
         $this->assertTenantContext($context, (int) $invite->event->tenant_id);
         $this->assertRecipient($request, $invite);
+        $this->assertMembersEventAccess($request, $invite->event);
 
         return view('events.invitation', ['invite' => $invite, 'invitationToken' => $token]);
     }
@@ -28,6 +30,7 @@ class EventInvitationController extends Controller
         abort_unless($invite->isUsable(), 410, 'This invitation is no longer available.');
         $this->assertTenantContext($context, (int) $invite->event->tenant_id);
         $this->assertRecipient($request, $invite);
+        $this->assertMembersEventAccess($request, $invite->event);
         abort_unless($request->user()->isAdult(), 403, 'An adult account is required.');
         $validated = $request->validate(['guest_count' => 'required|integer|min:1|max:'.max(1, (int) $invite->max_guests)]);
         $tenantId = $context->check() ? $context->id() : null;
@@ -40,6 +43,7 @@ class EventInvitationController extends Controller
             if ($tenantId !== null) {
                 abort_unless((int) $event->tenant_id === (int) $tenantId, 404);
             }
+            $this->assertMembersEventAccess($request, $event);
             if ($event->capacity !== null) {
                 $approved = (int) EventRsvp::where('event_id', $event->id)->where('status', 'approved')->sum('guest_count');
                 $existing = EventRsvp::where('event_id', $event->id)->where('user_id', $request->user()->id)->first();
@@ -104,5 +108,18 @@ class EventInvitationController extends Controller
         if ($invite->email) {
             abort_unless(strcasecmp($invite->email, (string) $user->email) === 0, 403, 'This invitation belongs to another email address.');
         }
+    }
+
+    private function assertMembersEventAccess(Request $request, Event $event): void
+    {
+        if ($event->visibility !== 'members') {
+            return;
+        }
+
+        abort_unless(
+            TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
+            403,
+            'This event is available only to active organization members.'
+        );
     }
 }

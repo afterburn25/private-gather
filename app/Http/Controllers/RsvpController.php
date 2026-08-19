@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\EventRsvp;
+use App\Support\TenantMembership;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,10 +13,18 @@ class RsvpController extends Controller
     public function store(Request $request, TenantContext $context, Event $event)
     {
         abort_unless($event->status === 'published', 404);
-        if ($context->check()) {
-            abort_unless($context->id() === $event->tenant_id, 404);
+        $tenantId = $context->check() ? $context->id() : null;
+        if ($tenantId !== null) {
+            abort_unless((int) $tenantId === (int) $event->tenant_id, 404);
         } else {
             abort_unless($event->visibility === 'public', 404);
+        }
+
+        if ($event->visibility === 'members') {
+            abort_unless(
+                TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
+                403
+            );
         }
 
         abort_if(in_array($event->visibility, ['private', 'invite_only'], true), 403, 'This event requires an organizer invitation.');
@@ -42,11 +51,20 @@ class RsvpController extends Controller
         ]);
         $user = $request->user();
 
-        return DB::transaction(function () use ($event, $user, $data) {
+        return DB::transaction(function () use ($event, $user, $data, $tenantId) {
             // Serialize capacity decisions for this event. Without an event-row
             // lock, simultaneous instant RSVPs can both see the same free seats.
             $lockedEvent = Event::whereKey($event->id)->lockForUpdate()->firstOrFail();
             abort_unless($lockedEvent->status === 'published', 404);
+            if ($tenantId !== null) {
+                abort_unless((int) $lockedEvent->tenant_id === (int) $tenantId, 404);
+            }
+            if ($lockedEvent->visibility === 'members') {
+                abort_unless(
+                    TenantMembership::hasActiveMembership($user, (int) $lockedEvent->tenant_id),
+                    403
+                );
+            }
 
             $existing = EventRsvp::where('event_id', $lockedEvent->id)
                 ->where('user_id', $user->id)
