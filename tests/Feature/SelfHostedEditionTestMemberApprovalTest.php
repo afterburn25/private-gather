@@ -58,10 +58,19 @@ class SelfHostedEditionTestMemberApprovalTest extends TestCase
         $this->assertSame('active', $pending->fresh()->status);
     }
 
-    public function test_regular_member_cannot_manage_member_accounts(): void
+    public function test_manager_can_approve_member_but_regular_member_cannot_manage_accounts(): void
     {
+        $manager = $this->createUser('manager@example.test');
         $member = $this->createUser('member@example.test');
+        $pending = $this->createUser('pending@example.test', 'pending');
+        $this->tenant->users()->attach($manager->id, ['role' => 'manager', 'status' => 'active']);
         $this->tenant->users()->attach($member->id, ['role' => 'member', 'status' => 'active']);
+        $this->tenant->users()->attach($pending->id, ['role' => 'member', 'status' => 'active']);
+
+        $this->actingAs($manager)
+            ->patch('http://platform.test/manage/members/'.$pending->id, ['status' => 'active'])
+            ->assertRedirect();
+        $this->assertSame('active', $pending->fresh()->status);
 
         $this->actingAs($member)
             ->get('http://platform.test/manage/members')
@@ -70,26 +79,33 @@ class SelfHostedEditionTestMemberApprovalTest extends TestCase
 
     public function test_manager_cannot_change_user_outside_self_hosted_tenant(): void
     {
-        $owner = $this->createUser('owner@example.test');
+        $manager = $this->createUser('manager@example.test');
         $outsider = $this->createUser('outside@example.test', 'pending');
-        $this->tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
+        $this->tenant->users()->attach($manager->id, ['role' => 'manager', 'status' => 'active']);
 
-        $this->actingAs($owner)
+        $this->actingAs($manager)
             ->patch('http://platform.test/manage/members/'.$outsider->id, ['status' => 'active'])
             ->assertNotFound();
 
         $this->assertSame('pending', $outsider->fresh()->status);
     }
 
-    public function test_owner_cannot_disable_their_own_current_account(): void
+    public function test_member_screen_cannot_change_owner_or_staff_accounts(): void
     {
         $owner = $this->createUser('owner@example.test');
+        $staff = $this->createUser('staff@example.test');
         $this->tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
+        $this->tenant->users()->attach($staff->id, ['role' => 'staff', 'status' => 'active']);
+
+        $this->actingAs($owner)
+            ->patch('http://platform.test/manage/members/'.$staff->id, ['status' => 'suspended'])
+            ->assertNotFound();
 
         $this->actingAs($owner)
             ->patch('http://platform.test/manage/members/'.$owner->id, ['status' => 'suspended'])
-            ->assertStatus(422);
+            ->assertNotFound();
 
+        $this->assertSame('active', $staff->fresh()->status);
         $this->assertSame('active', $owner->fresh()->status);
     }
 
