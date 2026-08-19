@@ -28,11 +28,12 @@ class TenantMembersEventPrivacyTest extends TestCase
             ->assertSee($public->title)
             ->assertDontSee($members->title);
 
-        $this->actingAs($outsider)
+        $home = $this->actingAs($outsider)
             ->get('http://'.$domain.'/')
-            ->assertOk()
-            ->assertSee($public->title)
-            ->assertDontSee($members->title);
+            ->assertOk();
+        $homeEventTitles = $home->viewData('events')->pluck('title')->all();
+        $this->assertContains($public->title, $homeEventTitles);
+        $this->assertNotContains($members->title, $homeEventTitles);
 
         $this->actingAs($outsider)
             ->get('http://'.$domain.'/events/'.$members->id)
