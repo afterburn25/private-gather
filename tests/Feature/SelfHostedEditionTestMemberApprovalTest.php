@@ -136,7 +136,41 @@ class SelfHostedEditionTestMemberApprovalTest extends TestCase
         $this->assertSame('active', $owner->fresh()->status);
     }
 
-    private function createUser(string $email, string $status = 'active'): User
+    public function test_self_hosted_installation_admin_can_access_local_operations(): void
+    {
+        $owner = $this->createUser('local-admin@example.test', 'active', true);
+        $this->tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
+
+        foreach (['/admin', '/admin/users', '/admin/moderation', '/admin/system-health', '/admin/upgrades'] as $path) {
+            $this->actingAs($owner)
+                ->get('http://platform.test'.$path)
+                ->assertOk();
+        }
+    }
+
+    public function test_self_hosted_local_admin_cannot_open_hosted_platform_controls(): void
+    {
+        $owner = $this->createUser('local-admin@example.test', 'active', true);
+        $this->tenant->users()->attach($owner->id, ['role' => 'owner', 'status' => 'active']);
+
+        foreach (['/admin/organizations', '/admin/plans', '/admin/website-content'] as $path) {
+            $this->actingAs($owner)
+                ->get('http://platform.test'.$path)
+                ->assertNotFound();
+        }
+    }
+
+    public function test_self_hosted_admin_flag_also_requires_local_owner_or_admin_membership(): void
+    {
+        $manager = $this->createUser('manager-admin@example.test', 'active', true);
+        $this->tenant->users()->attach($manager->id, ['role' => 'manager', 'status' => 'active']);
+
+        $this->actingAs($manager)
+            ->get('http://platform.test/admin')
+            ->assertForbidden();
+    }
+
+    private function createUser(string $email, string $status = 'active', bool $platformAdmin = false): User
     {
         return User::create([
             'name' => 'Test User',
@@ -145,7 +179,7 @@ class SelfHostedEditionTestMemberApprovalTest extends TestCase
             'password' => 'Password1234',
             'date_of_birth' => now()->subYears(30)->toDateString(),
             'status' => $status,
-            'is_platform_admin' => false,
+            'is_platform_admin' => $platformAdmin,
             'adult_confirmed_at' => now(),
             'terms_accepted_at' => now(),
             'privacy_accepted_at' => now(),
