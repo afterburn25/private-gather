@@ -129,6 +129,40 @@ class TenantInvitationIsolationTest extends TestCase
         ]);
     }
 
+    public function test_staff_invitation_redirect_preserves_tenant_scheme_and_mount_path(): void
+    {
+        config([
+            'platform.tenant_scheme' => 'http',
+            'platform.tenant_mount_path' => '/private-gather',
+        ]);
+
+        [$tenant, $domain] = $this->createTenant('mounted-staff-invite.test');
+        $invitee = $this->createUser('mounted-staff-invite@example.test');
+        $token = str_repeat('c', 64);
+
+        DB::table('tenant_invitations')->insert([
+            'tenant_id' => $tenant->id,
+            'email' => $invitee->email,
+            'role' => 'manager',
+            'token' => hash('sha256', $token),
+            'expires_at' => now()->addDay(),
+            'accepted_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($invitee)
+            ->get('http://platform.test/staff-invite/'.$token)
+            ->assertRedirect('http://'.$domain.'/private-gather/manage');
+
+        $this->assertDatabaseHas('tenant_users', [
+            'tenant_id' => $tenant->id,
+            'user_id' => $invitee->id,
+            'role' => 'manager',
+            'status' => 'active',
+        ]);
+    }
+
     private function createUser(string $email): User
     {
         return User::create([
