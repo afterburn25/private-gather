@@ -38,14 +38,16 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
         $name = (string) $zip->getNameIndex($i);
         $names[] = $name;
         $lower = strtolower($name);
+        $lowerBasename = strtolower(basename($name));
 
         if (
-            $lower === '.env'
-            || str_ends_with($lower, '/.env')
-            || str_ends_with($lower, '/auth.json')
-            || str_contains($lower, 'installed.lock')
-            || str_contains($lower, 'install-record.json')
-            || str_ends_with($lower, 'database/database.sqlite')
+            $lowerBasename === 'auth.json'
+            || $lowerBasename === '.env'
+            || (str_starts_with($lowerBasename, '.env.') && $lowerBasename !== '.env.example')
+            || $lowerBasename === 'installed.lock'
+            || $lowerBasename === 'install-record.json'
+            || $lower === 'database/database.sqlite'
+            || str_ends_with($lower, '/database/database.sqlite')
         ) {
             $failures[] = basename($path).' contains protected deployment state: '.$name;
         }
