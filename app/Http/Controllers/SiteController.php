@@ -5,6 +5,7 @@ use App\Models\CmsPage;
 use App\Models\Event;
 use App\Models\Tenant;
 use App\Services\PlatformContent;
+use App\Support\TenantMembership;
 use App\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -136,24 +137,9 @@ class SiteController extends Controller
         // private events remain intentionally absent from discovery surfaces.
         $query->whereIn(
             'visibility',
-            $this->canSeeMembersEvents($tenantId) ? ['public', 'members'] : ['public']
+            TenantMembership::canAccessMembersContent(auth()->user(), $tenantId)
+                ? ['public', 'members']
+                : ['public']
         );
-    }
-
-    private function canSeeMembersEvents(int $tenantId): bool
-    {
-        $user = auth()->user();
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->is_platform_admin) {
-            return true;
-        }
-
-        return $user->tenants()
-            ->whereKey($tenantId)
-            ->wherePivot('status', 'active')
-            ->exists();
     }
 }
