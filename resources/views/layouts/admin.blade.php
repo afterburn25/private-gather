@@ -44,6 +44,7 @@ $editionLabel=$isHosted?'Hosted Edition':'Self-Hosted Edition';
             <div class="pg-admin-nav-group">
                 <span class="pg-admin-nav-label">Operations</span>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.moderation.*')?'active':''}}" href="{{route('admin.moderation.index')}}"><span class="pg-admin-nav-icon">MD</span><span>Moderation</span></a>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.privacy-requests.*')?'active':''}}" href="{{route('admin.privacy-requests.index')}}"><span class="pg-admin-nav-icon">PR</span><span>Privacy Requests</span></a>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.health.*')?'active':''}}" href="{{route('admin.health.index')}}"><span class="pg-admin-nav-icon">HL</span><span>System Health</span></a>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.upgrades.*')?'active':''}}" href="{{route('admin.upgrades.index')}}"><span class="pg-admin-nav-icon">UP</span><span>Update Center</span></a>
             </div>
