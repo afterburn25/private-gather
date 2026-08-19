@@ -7,6 +7,7 @@ use App\Models\SecurityEvent;
 use App\Services\TotpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class SecurityController extends Controller
 {
@@ -14,7 +15,14 @@ class SecurityController extends Controller
 
     public function index(Request $request)
     {
-        return view('member.security', ['user' => $request->user()]);
+        return view('member.security', [
+            'user' => $request->user(),
+            'securityEvents' => SecurityEvent::query()
+                ->where('user_id', $request->user()->id)
+                ->latest('occurred_at')
+                ->limit(20)
+                ->get(),
+        ]);
     }
 
     public function beginTwoFactor(Request $request, TotpService $totp)
@@ -86,6 +94,26 @@ class SecurityController extends Controller
         $this->recordSecurityEvent($request, '2fa.disabled');
 
         return back()->with('status', 'Two-factor authentication disabled.');
+    }
+
+    public function revokeOtherSessions(Request $request)
+    {
+        $request->validate(['password' => 'required|current_password']);
+
+        $currentSessionId = (string) $request->session()->getId();
+        $query = DB::table('sessions')->where('user_id', $request->user()->id);
+        if ($currentSessionId !== '') {
+            $query->where('id', '!=', $currentSessionId);
+        }
+        $revoked = $query->delete();
+
+        // Rotate this browser's identifier after revoking the others. With the
+        // database driver, destroy the old current row rather than leaving a
+        // second valid identifier behind.
+        $request->session()->regenerate(true);
+        $this->recordSecurityEvent($request, 'sessions.revoked');
+
+        return back()->with('status', 'Signed out '.$revoked.' other session'.($revoked === 1 ? '' : 's').'.');
     }
 
     public function dataRequest(Request $request)
