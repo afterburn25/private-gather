@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Models\TenantDomain;
+use App\Support\TenantUrl;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -120,13 +122,14 @@ class StaffController extends Controller
             return (int) $invite->tenant_id;
         });
 
-        $domain = DB::table('tenant_domains')
+        $domain = TenantDomain::query()
             ->where('tenant_id', $tenantId)
-            ->where('is_primary', 1)
-            ->value('domain');
+            ->where('is_primary', true)
+            ->where('status', TenantDomain::STATUS_ACTIVE)
+            ->first();
 
         return $domain
-            ? redirect('https://'.$domain.'/manage')->with('status', 'Staff invitation accepted.')
+            ? redirect(TenantUrl::to($domain, '/manage'))->with('status', 'Staff invitation accepted.')
             : redirect()->route('organizations.index')->with('status', 'Staff invitation accepted.');
     }
 
