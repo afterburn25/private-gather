@@ -35,7 +35,7 @@ class CheckoutController extends Controller
 
         if ($event->visibility === 'members') {
             abort_unless(
-                TenantMembership::canAccessMembersContent($request->user(), (int) $event->tenant_id),
+                TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
                 403
             );
         }
@@ -59,7 +59,7 @@ class CheckoutController extends Controller
             }
             if ($event->visibility === 'members') {
                 abort_unless(
-                    TenantMembership::canAccessMembersContent($request->user(), (int) $event->tenant_id),
+                    TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
                     403
                 );
             }
