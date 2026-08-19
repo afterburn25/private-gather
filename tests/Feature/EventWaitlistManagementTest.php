@@ -7,8 +7,10 @@ use App\Models\EventRsvp;
 use App\Models\Tenant;
 use App\Models\TenantDomain;
 use App\Models\User;
+use App\Notifications\WaitlistPromotedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class EventWaitlistManagementTest extends TestCase
@@ -17,6 +19,12 @@ class EventWaitlistManagementTest extends TestCase
 
     public function test_organizer_can_see_and_promote_waitlist_after_capacity_reopens(): void
     {
+        Notification::fake();
+        config([
+            'platform.tenant_scheme' => 'http',
+            'platform.tenant_mount_path' => '/private-gather',
+        ]);
+
         [$tenant, $domain] = $this->createTenant('waitlist.test');
         $owner = $this->createUser('waitlist-owner@example.test');
         $approved = $this->createUser('approved@example.test');
@@ -45,6 +53,7 @@ class EventWaitlistManagementTest extends TestCase
             ->patch('http://'.$domain.'/manage/events/'.$event->id.'/waitlist/'.$waitlistId.'/promote')
             ->assertStatus(422);
 
+        Notification::assertNothingSent();
         $this->assertDatabaseHas('event_waitlist', ['id' => $waitlistId]);
         $this->assertDatabaseMissing('event_rsvps', [
             'event_id' => $event->id,
@@ -70,6 +79,15 @@ class EventWaitlistManagementTest extends TestCase
             'tenant_id' => $tenant->id,
             'action' => 'event.waitlist.promoted',
         ]);
+        Notification::assertSentTo(
+            $waiting,
+            WaitlistPromotedNotification::class,
+            function (WaitlistPromotedNotification $notification) use ($domain, $event): bool {
+                return $notification->eventTitle === 'Managed Waitlist Event'
+                    && $notification->guestCount === 1
+                    && $notification->eventUrl === 'http://'.$domain.'/private-gather/events/'.$event->id;
+            }
+        );
     }
 
     public function test_waitlist_promotion_is_tenant_scoped(): void
