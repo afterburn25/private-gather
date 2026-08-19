@@ -26,7 +26,9 @@ Self-Hosted does not use Create Website or the multi-site switcher. The same `/m
 
 ### Registration
 
-`SELF_HOSTED_REGISTRATION=approval` is the default. New members are created with pending account status and cannot log in until the local administrator activates them in Admin Backend → Users.
+`SELF_HOSTED_REGISTRATION=approval` is the default. New members are created with pending account status and cannot log in until a local owner, administrator, or manager activates them in **Manage → Members & Approvals**.
+
+The member-management screen is tenant-scoped and does not expose Hosted Edition platform administration. Local managers can review/search members and change account status between pending, active, suspended, and banned. They cannot change a user outside the Self-Hosted organization or disable their own currently signed-in account.
 
 Other modes:
 
