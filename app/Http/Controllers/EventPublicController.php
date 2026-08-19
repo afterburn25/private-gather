@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Services\Analytics;
+use App\Support\TenantMembership;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,10 @@ class EventPublicController extends Controller
             abort_unless((int) $event->tenant_id === (int) $context->id(), 404);
 
             if ($event->visibility === 'members') {
-                abort_unless($this->canSeeMembersEvent($request, (int) $event->tenant_id), 403);
+                abort_unless(
+                    TenantMembership::canAccessMembersContent($request->user(), (int) $event->tenant_id),
+                    403
+                );
             }
 
             if (in_array($event->visibility, ['private', 'invite_only'], true)) {
@@ -49,22 +53,5 @@ class EventPublicController extends Controller
             'remaining' => $event->remainingCapacity(),
             'questions' => $questions,
         ]);
-    }
-
-    private function canSeeMembersEvent(Request $request, int $tenantId): bool
-    {
-        $user = $request->user();
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->is_platform_admin) {
-            return true;
-        }
-
-        return $user->tenants()
-            ->whereKey($tenantId)
-            ->wherePivot('status', 'active')
-            ->exists();
     }
 }
