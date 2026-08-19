@@ -14,6 +14,12 @@ class EnsurePlatformAdmin
     {
         $context = app(TenantContext::class);
 
+        // Hosted tenant domains must never expose or redirect into the central
+        // platform-administration surface, regardless of authentication state.
+        if (Edition::isHosted() && $context->check()) {
+            abort(404);
+        }
+
         if (! $request->user()) {
             return redirect()->guest(route('admin.login'));
         }
@@ -36,10 +42,6 @@ class EnsurePlatformAdmin
             }
 
             return $next($request);
-        }
-
-        if ($context->check()) {
-            abort(404);
         }
 
         return $next($request);
