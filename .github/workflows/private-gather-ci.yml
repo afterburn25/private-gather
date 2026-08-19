@@ -52,8 +52,10 @@ jobs:
         run: |
           test ! -f .env
           test ! -f storage/app/installed.lock
-          if git ls-files | grep -Eq '(^|/)(\.env|auth\.json)$'; then
-            echo 'A secret-bearing environment/auth file is tracked.' >&2
+          bad="$(git ls-files | grep -Ei '(^|/)\.env($|\.)|(^|/)auth\.json$|^database/database\.sqlite$' | grep -Ev '(^|/)\.env\.example$' || true)"
+          if [ -n "$bad" ]; then
+            echo 'Secret-bearing environment/auth or live database state is tracked:' >&2
+            printf '%s\n' "$bad" >&2
             exit 1
           fi
 
@@ -168,3 +170,48 @@ jobs:
         run: composer check-platform-reqs
       - name: Application syntax
         run: find app bootstrap config database routes tests tools install public -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+  edition-packages:
+    name: Synchronized Hosted and Self-Hosted release packages
+    runs-on: ubuntu-24.04
+    needs: [source-integrity, laravel-runtime, self-hosted-runtime]
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v5
+
+      - name: Setup packaging PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: Build both editions from the same Core commit
+        run: |
+          mkdir -p dist
+          php tools/build-edition-package.php hosted "$GITHUB_SHA" dist
+          php tools/build-edition-package.php self_hosted "$GITHUB_SHA" dist
+
+      - name: Verify edition presets, protected state and Core parity
+        shell: bash
+        run: |
+          hosted="$(find dist -maxdepth 1 -type f -name 'Private-Gather-Hosted-*.zip' -print -quit)"
+          self_hosted="$(find dist -maxdepth 1 -type f -name 'Private-Gather-Self-Hosted-*.zip' -print -quit)"
+          test -n "$hosted"
+          test -n "$self_hosted"
+          php tools/verify-edition-packages.php "$hosted" "$self_hosted" "$GITHUB_SHA"
+          (cd dist && sha256sum -c ./*.sha256)
+
+      - name: Upload synchronized edition packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-gather-${{ github.sha }}-edition-packages
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error
+          retention-days: 14
