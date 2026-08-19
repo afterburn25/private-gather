@@ -26,6 +26,8 @@ class UpgradePathTest extends TestCase
     {
         return [
             ['VERSION', 'VERSION'],
+            ['.htaccess', '.htaccess'],
+            ['composer.lock', 'composer.lock'],
             ['app\\Example.php', 'app/Example.php'],
             ['database/migrations/test.php', 'database/migrations/test.php'],
         ];
@@ -36,8 +38,16 @@ class UpgradePathTest extends TestCase
         return [
             ['../.env'],
             ['.env'],
+            ['.env.example'],
+            ['.env.production'],
+            ['config/.env.backup'],
+            ['auth.json'],
+            ['vendor/private/auth.json'],
+            ['database/database.sqlite'],
             ['storage/app/test'],
+            ['storage/app/installed.lock'],
             ['install/index.php'],
+            ['.git/config'],
             ['public/uploads/file.jpg'],
             ['C:/windows/test'],
         ];

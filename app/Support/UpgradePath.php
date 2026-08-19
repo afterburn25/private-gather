@@ -35,10 +35,23 @@ final class UpgradePath
     public static function assertAllowed(string $path): void
     {
         $lower = strtolower($path);
+        $basename = basename($lower);
+
+        // Environment variants and Composer credential files are deployment
+        // secrets/state, not application release content. Protect every nested
+        // occurrence so a package cannot replace `.env.production`, an old
+        // `.env.backup`, or an `auth.json` credential file by choosing a less
+        // obvious directory.
+        if (
+            $basename === '.env'
+            || str_starts_with($basename, '.env.')
+            || $basename === 'auth.json'
+        ) {
+            throw new InvalidArgumentException("Upgrade packages may not replace protected file: {$path}");
+        }
 
         $blockedExact = [
-            '.env',
-            '.env.example',
+            'database/database.sqlite',
             'storage/app/installed.lock',
             'storage/app/install-record.json',
         ];
@@ -53,6 +66,7 @@ final class UpgradePath
             'storage/',
             'install/',
             '.install-disabled-',
+            '.git/',
             'public/uploads/',
             'public/storage/',
         ];
