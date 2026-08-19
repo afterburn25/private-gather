@@ -117,7 +117,7 @@ class EventInvitationController extends Controller
         }
 
         abort_unless(
-            TenantMembership::canAccessMembersContent($request->user(), (int) $event->tenant_id),
+            TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
             403,
             'This event is available only to active organization members.'
         );
