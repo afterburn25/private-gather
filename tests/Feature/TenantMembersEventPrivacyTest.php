@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventInvitation;
 use App\Models\Tenant;
 use App\Models\TenantDomain;
 use App\Models\TicketType;
@@ -54,6 +55,42 @@ class TenantMembersEventPrivacyTest extends TestCase
         $this->assertDatabaseMissing('orders', [
             'event_id' => $members->id,
             'user_id' => $outsider->id,
+        ]);
+    }
+
+    public function test_legacy_members_event_invitation_cannot_grant_nonmember_access(): void
+    {
+        [$tenant, $domain] = $this->createTenant('members-invite-private.test');
+        $outsider = $this->createUser('members-invite-outsider@example.test');
+        $event = $this->createEvent($tenant, 'Legacy Members Invitation Event', 'members');
+        $token = str_repeat('d', 64);
+
+        EventInvitation::create([
+            'event_id' => $event->id,
+            'user_id' => $outsider->id,
+            'email' => $outsider->email,
+            'token' => 'sha256:'.hash('sha256', $token),
+            'status' => 'pending',
+            'max_guests' => 1,
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $this->actingAs($outsider)
+            ->get('http://'.$domain.'/event-invite/'.$token)
+            ->assertForbidden();
+
+        $this->actingAs($outsider)
+            ->post('http://'.$domain.'/event-invite/'.$token, ['guest_count' => 1])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('event_rsvps', [
+            'event_id' => $event->id,
+            'user_id' => $outsider->id,
+        ]);
+        $this->assertDatabaseHas('event_invitations', [
+            'event_id' => $event->id,
+            'user_id' => $outsider->id,
+            'status' => 'pending',
         ]);
     }
 
