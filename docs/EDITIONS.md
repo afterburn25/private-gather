@@ -47,4 +47,6 @@ This keeps system maintenance and upgrades available to the customer who owns th
 
 Shared product work belongs in Core unless it is inherently edition-specific. Hosted-only infrastructure such as wildcard tenant DNS stays behind Hosted behavior. Self-Hosted-only deployment policy stays behind Self-Hosted behavior. CI runs Hosted runtime tests and a separate Self-Hosted policy/runtime lane on every branch and pull request.
 
-The Upgrade Center product ID remains `privategather/private-gather` for both editions so a shared release can deliver compatible Core updates to both products.
+Release packaging is also synchronized in CI. Hosted and Self-Hosted ZIPs are built from the exact same source commit, then a verifier confirms that every shared Core entry is byte-identical between the packages. Only the declared edition preset files may differ. The package gate also rejects deployment/runtime state such as environment secrets, Composer credentials, installer receipts, SQLite state, and runtime logs.
+
+The Upgrade Center product ID remains `privategather/private-gather` for both editions so a shared release can deliver compatible Core updates to both products. Each generated package records the same source commit and version in its package metadata and receives its own SHA-256 sidecar for release verification.
