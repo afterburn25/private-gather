@@ -33,6 +33,14 @@ Other modes:
 - `open` — account is active immediately.
 - `disabled` — public registration is unavailable.
 
+## Release packages
+
+Hosted and Self-Hosted release ZIPs are generated from the same checked-out Core commit with `tools/build-edition-package.php`. The packager includes production Composer dependencies, excludes runtime/deployment state, embeds the edition preset and source commit, and emits a SHA-256 sidecar for each ZIP.
+
+`tools/verify-edition-packages.php` treats only `.env.example`, `install/index.php`, `EDITION-PRESET`, and `PACKAGE-METADATA.json` as edition-specific. Every other packaged file is hashed and must match between the Hosted and Self-Hosted ZIPs. This makes accidental code drift between editions a CI failure rather than a release-time discovery.
+
+The CI package lane builds both ZIPs after Hosted and Self-Hosted runtime tests pass, verifies protected-state exclusion and shared-Core parity, checks the SHA-256 sidecars, and uploads the synchronized package pair as one workflow artifact.
+
 ## Release rule
 
 Shared product work belongs in Core unless it is inherently edition-specific. Hosted-only infrastructure such as wildcard tenant DNS stays behind Hosted behavior. Self-Hosted-only deployment policy stays behind Self-Hosted behavior. CI runs Hosted runtime tests and a separate Self-Hosted policy/runtime lane on every branch and pull request.
