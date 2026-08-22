@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 /* Additive compatibility and feature routes loaded after the mature route map. */
 if (! Route::has('clubs.index')) {
-    Route::middleware('web')->redirect('/clubs', '/organizations', 302)->name('clubs.index');
+    Route::middleware('web')->group(function (): void {
+        Route::redirect('/clubs', '/organizations', 302)->name('clubs.index');
+    });
 }
 
 if (! Route::has('member.badges.index')) {
