@@ -46,6 +46,9 @@ $assertions = [
     ['browser installer registers invite token data hardening', str_contains($installIndex, '2026_08_18_021500_hash_existing_event_invitation_tokens')],
     ['supplemental installer creates lifestyle membership applications', str_contains($communitySchema, 'CREATE TABLE IF NOT EXISTS tenant_membership_applications')],
     ['supplemental installer registers lifestyle membership migration', str_contains($communitySchema, '2026_08_22_230000_create_tenant_membership_applications')],
+    ['supplemental installer creates global and tenant badge definitions', str_contains($communitySchema, 'CREATE TABLE IF NOT EXISTS badges') && str_contains($communitySchema, 'scope VARCHAR(24)')],
+    ['supplemental installer creates badge assignment provenance', str_contains($communitySchema, 'CREATE TABLE IF NOT EXISTS user_badges') && str_contains($communitySchema, 'revocation_reason') && str_contains($communitySchema, 'issued_by')],
+    ['supplemental installer registers badge system migration', str_contains($communitySchema, '2026_08_22_232000_create_badge_system')],
     ['platform admin schema', str_contains($schema, 'is_platform_admin') && str_contains($userMigration, 'is_platform_admin')],
     ['fresh 1.0 security schema', str_contains($schema, 'two_factor_secret') && str_contains($schema, 'consent_records')],
     ['fresh 1.0 commerce schema', str_contains($schema, 'ticket_types') && str_contains($schema, 'orders') && str_contains($schema, 'tickets')],
@@ -64,10 +67,6 @@ foreach ($assertions as [$label, $ok]) {
 $migrations = glob($base.'/database/migrations/*.php') ?: [];
 foreach ($migrations as $file) {
     $name = basename($file, '.php');
-    // Most fresh-install migrations are represented directly in schema.sql.
-    // Supplemental fresh-install modules may create and register their matching
-    // migration in community-schema.php. Data-only migrations that are a no-op
-    // on an empty fresh database may be registered by install/index.php.
     if (! str_contains($schema, $name)
         && ! str_contains($installIndex, $name)
         && ! str_contains($communitySchema, $name)) {
@@ -81,4 +80,4 @@ if ($errors) {
 }
 
 echo "INSTALLER VERIFY: PASS\n";
-echo "Inline first-run installer, subdirectory-safe front controller, retry-safe fresh schema, supplemental schema modules, install lock, migration bookkeeping, and installer self-removal are structurally present.\n";
+echo "Inline first-run installer, subdirectory-safe front controller, retry-safe fresh schema, supplemental community/badge modules, install lock, migration bookkeeping, and installer self-removal are structurally present.\n";

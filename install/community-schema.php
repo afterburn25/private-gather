@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 /**
- * Create the Private Gather community and lifestyle membership tables during
- * browser-based fresh installs.
+ * Create the Private Gather community, lifestyle membership, and badge tables
+ * during browser-based fresh installs.
  *
  * Existing installations receive these same tables through the matching Laravel
  * migrations. Keeping this step separate from the mature base schema reduces the
@@ -111,6 +111,64 @@ CREATE TABLE IF NOT EXISTS tenant_membership_applications (
  CONSTRAINT tenant_membership_applications_reviewer_fk FOREIGN KEY(reviewed_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS badges (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ tenant_id BIGINT UNSIGNED NULL,
+ scope VARCHAR(24) NOT NULL DEFAULT 'tenant',
+ name VARCHAR(120) NOT NULL,
+ slug VARCHAR(120) NOT NULL,
+ description TEXT NULL,
+ icon VARCHAR(64) NULL,
+ badge_color VARCHAR(16) NOT NULL DEFAULT '#7d3b69',
+ text_color VARCHAR(16) NOT NULL DEFAULT '#ffffff',
+ category VARCHAR(32) NOT NULL DEFAULT 'custom',
+ visibility VARCHAR(32) NOT NULL DEFAULT 'members',
+ issuance_type VARCHAR(32) NOT NULL DEFAULT 'manual',
+ criteria JSON NULL,
+ expires_after_days INT UNSIGNED NULL,
+ is_active TINYINT(1) NOT NULL DEFAULT 1,
+ is_system_reserved TINYINT(1) NOT NULL DEFAULT 0,
+ created_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP NULL,
+ updated_at TIMESTAMP NULL,
+ PRIMARY KEY(id),
+ KEY badges_scope_index(scope),
+ KEY badges_category_index(category),
+ KEY badges_issuance_type_index(issuance_type),
+ KEY badges_is_active_index(is_active),
+ KEY badges_tenant_scope_active_idx(tenant_id,scope,is_active),
+ KEY badges_tenant_slug_idx(tenant_id,slug),
+ CONSTRAINT badges_tenant_fk FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+ CONSTRAINT badges_creator_fk FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS user_badges (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ badge_id BIGINT UNSIGNED NOT NULL,
+ user_id BIGINT UNSIGNED NOT NULL,
+ tenant_id BIGINT UNSIGNED NULL,
+ issued_by BIGINT UNSIGNED NULL,
+ issued_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ expires_at TIMESTAMP NULL,
+ revoked_at TIMESTAMP NULL,
+ revoked_by BIGINT UNSIGNED NULL,
+ revocation_reason TEXT NULL,
+ metadata JSON NULL,
+ created_at TIMESTAMP NULL,
+ updated_at TIMESTAMP NULL,
+ PRIMARY KEY(id),
+ KEY user_badges_user_revoked_expiry_idx(user_id,revoked_at,expires_at),
+ KEY user_badges_tenant_user_revoked_idx(tenant_id,user_id,revoked_at),
+ KEY user_badges_badge_user_revoked_idx(badge_id,user_id,revoked_at),
+ CONSTRAINT user_badges_badge_fk FOREIGN KEY(badge_id) REFERENCES badges(id) ON DELETE CASCADE,
+ CONSTRAINT user_badges_user_fk FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+ CONSTRAINT user_badges_tenant_fk FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+ CONSTRAINT user_badges_issuer_fk FOREIGN KEY(issued_by) REFERENCES users(id) ON DELETE SET NULL,
+ CONSTRAINT user_badges_revoker_fk FOREIGN KEY(revoked_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
     ];
 
     foreach ($statements as $number => $statement) {
@@ -125,8 +183,6 @@ SQL,
         }
     }
 
-    // ticket_types is created by install/schema.sql. Add the lifestyle-specific
-    // admission fields only when absent so browser installs remain retry-safe.
     installer_add_column_if_missing($pdo, 'ticket_types', 'profile_eligibility', "VARCHAR(24) NOT NULL DEFAULT 'any'");
     installer_add_column_if_missing($pdo, 'ticket_types', 'membership_required', 'TINYINT(1) NOT NULL DEFAULT 0');
     installer_add_column_if_missing($pdo, 'ticket_types', 'approval_required', 'TINYINT(1) NOT NULL DEFAULT 0');
@@ -134,6 +190,7 @@ SQL,
     $registeredMigrations = [
         '2026_08_22_230000_create_tenant_membership_applications',
         '2026_08_22_231000_add_lifestyle_ticket_eligibility',
+        '2026_08_22_232000_create_badge_system',
     ];
     $stmt = $pdo->prepare(
         'INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)'
