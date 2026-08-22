@@ -41,23 +41,41 @@ class Live120HomepageRegressionTest extends TestCase
 
     public function test_live_120_homepage_renders_for_authenticated_active_member(): void
     {
-        $member = User::create([
-            'name' => 'Production Repro Member',
-            'display_name' => 'Production Repro Member',
-            'email' => 'production-repro@example.test',
-            'password' => 'Password123',
-            'date_of_birth' => now()->subYears(30)->toDateString(),
-            'status' => 'active',
-            'adult_confirmed_at' => now(),
-            'terms_accepted_at' => now(),
-            'privacy_accepted_at' => now(),
-            'privacy_version' => '1.0',
-        ]);
+        $member = $this->member('production-repro@example.test');
 
         $this->actingAs($member)
             ->get('http://platform.test/')
             ->assertOk()
             ->assertSee('Exclusive events.', false)
             ->assertSee('My Clubs', false);
+    }
+
+    public function test_live_120_homepage_renders_for_authenticated_platform_admin(): void
+    {
+        $admin = $this->member('production-admin-repro@example.test', true);
+
+        $this->actingAs($admin)
+            ->get('http://platform.test/')
+            ->assertOk()
+            ->assertSee('Exclusive events.', false)
+            ->assertSee('Admin', false)
+            ->assertSee('My Clubs', false);
+    }
+
+    private function member(string $email, bool $platformAdmin = false): User
+    {
+        return User::create([
+            'name' => $platformAdmin ? 'Production Admin Repro' : 'Production Repro Member',
+            'display_name' => $platformAdmin ? 'Production Admin Repro' : 'Production Repro Member',
+            'email' => $email,
+            'password' => 'Password123',
+            'date_of_birth' => now()->subYears(30)->toDateString(),
+            'status' => 'active',
+            'is_platform_admin' => $platformAdmin,
+            'adult_confirmed_at' => now(),
+            'terms_accepted_at' => now(),
+            'privacy_accepted_at' => now(),
+            'privacy_version' => '1.0',
+        ]);
     }
 }
