@@ -9,7 +9,7 @@
         <div class="pg-club-detail-logo">@if($tenant?->branding?->logo_path)<img src="{{ \App\Support\MountUrl::to($tenant->branding->logo_path) }}" alt="{{ $profile->displayName() }} logo">@else<span class="pg-home-club-monogram">{{ strtoupper(substr($profile->displayName(),0,1)) }}</span>@endif</div>
         <div><span class="eyebrow">PRIVATE GATHER CLUB DIRECTORY</span><h1>{{ $profile->displayName() }}</h1><p>{{ collect([$profile->city,$profile->region,$profile->country_code])->filter()->implode(', ') }} @if($profile->verified_at) · Verified listing @endif</p></div>
     </div>
-    <div class="row-actions" style="margin-top:20px">@if($tenant->primaryDomain)<a class="button button-primary" href="https://{{ $tenant->primaryDomain->domain }}" rel="noopener">Visit Club Website</a>@endif<a class="button button-ghost" href="{{ route('clubs.index') }}">Back to Clubs</a></div>
+    <div class="row-actions" style="margin-top:20px">@auth @if(!$membershipStatus)<form method="post" action="{{route('clubs.apply',$tenant)}}">@csrf<button class="button button-primary">Join / Apply to {{ $profile->displayName() }}</button></form>@else<span class="status-pill {{$membershipStatus==='active'?'status-ok':'status-pending'}}">Membership: {{ucfirst($membershipStatus)}}</span>@endif @else<a class="button button-primary" href="{{route('login')}}">Sign in to Join</a>@endauth @if($tenant->primaryDomain)<a class="button button-ghost" href="https://{{ $tenant->primaryDomain->domain }}" rel="noopener">Visit Club Website</a>@endif<a class="button button-ghost" href="{{ route('clubs.index') }}">Back to Clubs</a></div>
 </div></section>
 <section class="section"><div class="container pg-club-detail-grid">
     <main>

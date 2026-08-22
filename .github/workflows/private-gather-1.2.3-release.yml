@@ -1,0 +1,133 @@
+name: Private Gather 1.2.3 Release Gate
+
+on:
+  push:
+    branches:
+      - release/private-gather-1.2.3
+  pull_request:
+    branches:
+      - release/private-gather-1.2.3
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-123:
+    name: Exact 1.2.3 release certification
+    runs-on: ubuntu-24.04
+    env:
+      PRIVATE_GATHER_EDITION: hosted
+      APP_ENV: testing
+      APP_DEBUG: true
+      APP_URL: http://platform.test
+      DB_CONNECTION: sqlite
+      DB_DATABASE: database/database.sqlite
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      AGE_VERIFICATION_ENABLED: true
+      AGE_VERIFICATION_DRIVER: persona
+      AGE_VERIFICATION_MINIMUM_AGE: 21
+      PERSONA_API_KEY: test-persona-api-key
+      PERSONA_INQUIRY_TEMPLATE_ID: itmpl_test
+      PERSONA_ENVIRONMENT_ID: env_test
+      PERSONA_WEBHOOK_SECRET: current-webhook-secret
+      PERSONA_WEBHOOK_PREVIOUS_SECRET: previous-webhook-secret
+      PERSONA_API_VERSION: 2025-10-27
+    steps:
+      - name: Checkout release source
+        uses: actions/checkout@v5
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_sqlite, sqlite3, intl, curl, dom, fileinfo, zip, sodium
+          coverage: none
+          tools: composer:v2
+
+      - name: Install locked dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: PHP syntax gate
+        run: find app bootstrap config database routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Prepare isolated environment
+        run: |
+          cp .env.example .env
+          sed -i 's/^PRIVATE_GATHER_EDITION=.*/PRIVATE_GATHER_EDITION=hosted/' .env || true
+          php artisan key:generate --force
+          php artisan config:clear
+          rm -f database/database.sqlite
+          touch database/database.sqlite
+
+      - name: Assert release identity
+        run: |
+          test "$(cat VERSION)" = "1.2.3"
+          php artisan about
+
+      - name: Fresh database
+        run: php artisan migrate:fresh --force
+
+      - name: Assert release routes
+        run: |
+          php artisan route:list --except-vendor > /tmp/routes.txt
+          for route in verification.index verification.start verification.return verification.webhooks.persona clubs.apply admin.age-verification.index; do
+            grep -F "$route" /tmp/routes.txt >/dev/null || { echo "Missing route: $route"; exit 1; }
+          done
+
+      - name: Compile every Blade view
+        run: |
+          php artisan view:cache
+          php artisan view:clear
+
+      - name: Re-run certified 1.2.0 homepage regression
+        run: php artisan test tests/Feature/Live120HomepageRegressionTest.php --stop-on-failure
+
+      - name: Re-run central route matrix
+        run: php artisan test tests/Feature/Live120RouteMatrixTest.php --stop-on-failure
+
+      - name: Re-run tenant subdomain regression
+        run: php artisan test tests/Feature/Live120TenantSubdomainRegressionTest.php --stop-on-failure
+
+      - name: Re-run tenant navigation matrix
+        run: php artisan test tests/Feature/Live120TenantLinkMatrixTest.php --stop-on-failure
+
+      - name: Run 1.2.3 identity and membership tests
+        run: php artisan test tests/Feature/V123IdentityVerificationTest.php --stop-on-failure
+
+      - name: Run 1.2.3 Persona provider tests
+        run: php artisan test tests/Feature/V123PersonaProviderTest.php --stop-on-failure
+
+      - name: Build exact browser upgrade
+        run: python3 tools/build-v123-upgrade.py
+
+      - name: Validate browser upgrade archive
+        run: |
+          ZIP=dist/Private-Gather-1.2.0-or-1.2.1-to-1.2.3-Upgrade.zip
+          unzip -t "$ZIP"
+          php artisan tinker --execute="App\\Services\\Upgrade\\UpgradePackage::open('$ZIP'); echo 'UpgradePackage validation PASS'.PHP_EOL;"
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib, json, zipfile
+          zpath = Path('dist/Private-Gather-1.2.0-or-1.2.1-to-1.2.3-Upgrade.zip')
+          with zipfile.ZipFile(zpath) as z:
+              names = z.namelist()
+              assert '.env' not in names
+              assert not any('/storage/' in ('/'+n) or n.startswith('storage/') for n in names)
+              manifest = json.loads(z.read('manifest.json'))
+              assert manifest['to_version'] == '1.2.3'
+              assert manifest['from_versions'] == ['1.2.0', '1.2.1']
+              assert len(manifest['files']) == 29
+          print('sha256=' + hashlib.sha256(zpath.read_bytes()).hexdigest())
+          PY
+
+      - name: Upload certified 1.2.3 upgrade
+        uses: actions/upload-artifact@v4
+        with:
+          name: Private-Gather-1.2.3-Certified-Upgrade
+          path: dist/Private-Gather-1.2.0-or-1.2.1-to-1.2.3-Upgrade.zip
+          if-no-files-found: error
+          retention-days: 30

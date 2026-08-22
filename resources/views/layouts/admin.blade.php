@@ -13,15 +13,16 @@ $editionLabel=$isHosted?'Hosted Edition':'Self-Hosted Edition';
     <meta name="color-scheme" content="dark">
     <meta name="csrf-token" content="{{csrf_token()}}">
     <title>@yield('title','Administration') — {{config('app.name','Private Gather')}}</title>
-    <link rel="icon" type="image/png" href="{{\App\Support\MountUrl::to('/assets/branding/private-gather-logo.png')}}">
+    <link rel="icon" type="image/webp" href="{{\App\Support\MountUrl::to('/assets/branding/private-gather-crest-gold.webp')}}">
     <link rel="stylesheet" href="{{\App\Support\MountUrl::to('/assets/app.css')}}">
     <link rel="stylesheet" href="{{\App\Support\MountUrl::to('/assets/admin.css')}}">
+    <link rel="stylesheet" href="{{\App\Support\MountUrl::to('/assets/private-gather-luxury-2026.css')}}?v=luxury-r12">
 </head>
-<body class="pg-admin">
+<body class="pg-admin pg-lux-admin">
 <div class="pg-admin-shell">
     <aside class="pg-admin-sidebar">
         <a class="pg-admin-brand" href="{{route('admin.home')}}">
-            <img src="{{\App\Support\MountUrl::to('/assets/branding/private-gather-logo.png')}}" alt="Private Gather">
+            <img src="{{\App\Support\MountUrl::to('/assets/branding/private-gather-crest-gold.webp')}}" alt="Private Gather">
             <span><strong>Private Gather</strong><small>{{$isHosted?'CONTROL CENTER':'SELF-HOSTED'}}</small></span>
         </a>
 
@@ -44,6 +45,7 @@ $editionLabel=$isHosted?'Hosted Edition':'Self-Hosted Edition';
             <div class="pg-admin-nav-group">
                 <span class="pg-admin-nav-label">Operations</span>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.moderation.*')?'active':''}}" href="{{route('admin.moderation.index')}}"><span class="pg-admin-nav-icon">MD</span><span>Moderation</span></a>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.age-verification.*')?'active':''}}" href="{{route('admin.age-verification.index')}}"><span class="pg-admin-nav-icon">ID</span><span>Age & Identity</span></a>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.privacy-requests.*')?'active':''}}" href="{{route('admin.privacy-requests.index')}}"><span class="pg-admin-nav-icon">PR</span><span>Privacy Requests</span></a>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.health.*')?'active':''}}" href="{{route('admin.health.index')}}"><span class="pg-admin-nav-icon">HL</span><span>System Health</span></a>
                 <a class="pg-admin-nav-link {{request()->routeIs('admin.upgrades.*')?'active':''}}" href="{{route('admin.upgrades.index')}}"><span class="pg-admin-nav-icon">UP</span><span>Update Center</span></a>

@@ -15,7 +15,7 @@
     <div class="pg-directory-filter-actions"><button class="button button-primary">Find Clubs</button><a class="button button-ghost" href="{{ route('clubs.index') }}">Clear</a></div>
 </form>
 
-<div class="section-heading" style="margin-top:28px"><div><span class="eyebrow">DIRECTORY RESULTS</span><h2>{{ number_format($clubs->total()) }} {{ \Illuminate\Support\Str::plural('club',$clubs->total()) }}</h2><p class="muted">@if(request('city'))Showing clubs in {{ request('city') }}.@elseif(request('region'))Showing clubs in {{ request('region') }}.@elseif(request('country'))Showing clubs in {{ request('country') }}.@else Browse all publicly listed clubs.@endif</p></div><a href="{{ route('site.events') }}">Browse events →</a></div>
+<div class="section-heading" style="margin-top:28px"><div><span class="eyebrow">DIRECTORY RESULTS</span><h2>{{ number_format($clubs->total()) }} {{ \Illuminate\Support\Str::plural('club',$clubs->total()) }}</h2><p class="muted">@if(request('city'))Showing clubs in {{ request('city') }}.@elseif(request('region'))Showing clubs in {{ request('region') }}.@elseif(request('country'))Showing clubs in {{ request('country') }}.@elseBrowse all publicly listed clubs.@endif</p></div><a href="{{ route('site.events') }}">Browse events →</a></div>
 <div class="pg-club-grid">
 @forelse($clubs as $profile)
     @php($org=$profile->tenant)
@@ -28,7 +28,7 @@
         <p class="pg-club-location">{{ collect([$profile->city,$profile->region,$profile->country_code])->filter()->implode(', ') ?: 'Location not published' }}</p>
         @if($profile->short_description)<p>{{ \Illuminate\Support\Str::limit($profile->short_description,180) }}</p>@endif
         @if($profile->amenities)<div class="pg-amenities">@foreach(array_slice($profile->amenities,0,5) as $amenity)<span>{{ $amenity }}</span>@endforeach</div>@endif
-        <div class="row-actions"><a class="button button-primary" href="{{ route('clubs.show',$org->slug) }}">View Club</a>@if($org->primaryDomain)<a class="button button-ghost" href="https://{{ $org->primaryDomain->domain }}" rel="noopener">Website</a>@endif</div>
+        <div class="row-actions"><a class="button button-primary" href="{{ route('clubs.show',$org->slug) }}">View Club</a>@auth @php($memberStatus=$membershipStatuses[(string)$org->id]??$membershipStatuses[$org->id]??null) @if(!$memberStatus)<form method="post" action="{{route('clubs.apply',$org)}}">@csrf<button class="button button-ghost">Join / Apply</button></form>@else<span class="status-pill {{$memberStatus==='active'?'status-ok':'status-pending'}}">{{ucfirst($memberStatus)}}</span>@endif @endauth @if($org->primaryDomain)<a class="button button-ghost" href="https://{{ $org->primaryDomain->domain }}" rel="noopener">Website</a>@endif</div>
     </article>
 @empty
     <div class="empty-state"><h3>No clubs match those filters.</h3><p>Try a broader location or clear one of the filters.</p><a class="button button-ghost" href="{{ route('clubs.index') }}">Show All Clubs</a></div>

@@ -14,6 +14,7 @@ use App\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class HostedDiscoveryController extends Controller
@@ -40,26 +41,15 @@ final class HostedDiscoveryController extends Controller
                     ->orWhereHas('tenant', fn ($tenant) => $tenant->where('name', 'like', '%'.$search.'%'));
             });
         }
-        if ($country !== '') {
-            $query->where('country_code', $country);
-        }
-        if ($region !== '') {
-            $query->where('region', $region);
-        }
-        if ($city !== '') {
-            $query->where('city', $city);
-        }
-        if ($clubType !== '') {
-            $query->where('club_type', $clubType);
-        }
+        if ($country !== '') $query->where('country_code', $country);
+        if ($region !== '') $query->where('region', $region);
+        if ($city !== '') $query->where('city', $city);
+        if ($clubType !== '') $query->where('club_type', $clubType);
 
         $clubs = $query
             ->orderByRaw('CASE WHEN featured_until IS NOT NULL AND featured_until > ? THEN 0 ELSE 1 END', [now()])
-            ->orderBy('region')
-            ->orderBy('city')
-            ->orderBy('listing_name')
-            ->paginate(24)
-            ->withQueryString();
+            ->orderBy('region')->orderBy('city')->orderBy('listing_name')
+            ->paginate(24)->withQueryString();
 
         $filters = [
             'countries' => ClubDirectoryProfile::query()->where('is_listed', true)->whereNotNull('country_code')->distinct()->orderBy('country_code')->pluck('country_code'),
@@ -69,38 +59,35 @@ final class HostedDiscoveryController extends Controller
         ];
 
         $affiliateOffers = $ads->forPlacement('club_directory', $country ?: null, $region ?: null, $city ?: null, 3);
+        $membershipStatuses = collect();
+        if ($request->user() && $clubs->isNotEmpty()) {
+            $membershipStatuses = DB::table('tenant_users')
+                ->where('user_id', $request->user()->id)
+                ->whereIn('tenant_id', $clubs->getCollection()->pluck('tenant_id')->all())
+                ->pluck('status', 'tenant_id');
+        }
 
-        return view('platform.clubs.index', compact('clubs', 'filters', 'affiliateOffers'));
+        return view('platform.clubs.index', compact('clubs', 'filters', 'affiliateOffers', 'membershipStatuses'));
     }
 
-    public function club(string $slug, TenantContext $context, AffiliateAds $ads): View
+    public function club(Request $request, string $slug, TenantContext $context, AffiliateAds $ads): View
     {
         abort_if($context->check(), 404);
 
-        $tenant = Tenant::query()
-            ->where('slug', $slug)
-            ->where('type', Tenant::TYPE_CLUB)
-            ->where('status', 'active')
-            ->with(['primaryDomain', 'branding'])
-            ->firstOrFail();
+        $tenant = Tenant::query()->where('slug', $slug)->where('type', Tenant::TYPE_CLUB)->where('status', 'active')
+            ->with(['primaryDomain', 'branding'])->firstOrFail();
 
-        $profile = ClubDirectoryProfile::query()
-            ->where('tenant_id', $tenant->id)
-            ->where('is_listed', true)
-            ->firstOrFail();
+        $profile = ClubDirectoryProfile::query()->where('tenant_id', $tenant->id)->where('is_listed', true)->firstOrFail();
 
-        $events = Event::query()
-            ->where('tenant_id', $tenant->id)
-            ->where('status', 'published')
-            ->where('visibility', 'public')
-            ->where('starts_at', '>=', now())
-            ->orderBy('starts_at')
-            ->limit(8)
-            ->get();
+        $events = Event::query()->where('tenant_id', $tenant->id)->where('status', 'published')->where('visibility', 'public')
+            ->where('starts_at', '>=', now())->orderBy('starts_at')->limit(8)->get();
 
         $affiliateOffers = $ads->forPlacement('club_detail', $profile->country_code, $profile->region, $profile->city, 2);
+        $membershipStatus = $request->user()
+            ? DB::table('tenant_users')->where('tenant_id', $tenant->id)->where('user_id', $request->user()->id)->value('status')
+            : null;
 
-        return view('platform.clubs.show', compact('tenant', 'profile', 'events', 'affiliateOffers'));
+        return view('platform.clubs.show', compact('tenant', 'profile', 'events', 'affiliateOffers', 'membershipStatus'));
     }
 
     public function affiliate(Request $request, AffiliateOffer $offer): RedirectResponse
@@ -125,9 +112,6 @@ final class HostedDiscoveryController extends Controller
             'clicked_at' => now(),
         ]);
 
-        return redirect()->away($url, 302, [
-            'Referrer-Policy' => 'no-referrer',
-            'Cache-Control' => 'no-store, private',
-        ]);
+        return redirect()->away($url, 302, ['Referrer-Policy' => 'no-referrer', 'Cache-Control' => 'no-store, private']);
     }
 }

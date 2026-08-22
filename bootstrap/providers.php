@@ -7,6 +7,7 @@ return [
     App\Providers\GrowthCommerceServiceProvider::class,
     App\Providers\HostedDiscoveryRevenueServiceProvider::class,
     App\Providers\HostedSubdomainProvisioningServiceProvider::class,
+    App\Providers\MemberTrustServiceProvider::class,
     App\Providers\SelfHostedManagementServiceProvider::class,
     App\Providers\EventWaitlistServiceProvider::class,
     App\Providers\PrivacyAdministrationServiceProvider::class,
