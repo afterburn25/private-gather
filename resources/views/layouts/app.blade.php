@@ -13,6 +13,7 @@
     $canRegister = \App\Support\Edition::registrationEnabled();
     $canManage = false;
     $isCommunityMember = false;
+    $membershipApplicationStatus = null;
 
     if (auth()->check() && $tenant) {
         $membership = auth()->user()->tenants()->whereKey($tenant->id)->first()?->pivot;
@@ -21,6 +22,14 @@
             $isPlatformAdmin
             || in_array($membership->role, ['owner', 'admin', 'manager', 'staff', 'checkin'], true)
         );
+
+        if ($isHosted && ! $isCommunityMember) {
+            $membershipApplicationStatus = \App\Models\TenantMembershipApplication::query()
+                ->where('tenant_id', $tenant->id)
+                ->where('user_id', auth()->id())
+                ->latest('id')
+                ->value('status');
+        }
     }
 
     $headerNav = $tenant ? ($tenantNavigation['header'] ?? collect()) : collect();
@@ -103,6 +112,14 @@
 
                 @if ($canManage)
                     <a class="button button-ghost" href="{{ route('tenant.dashboard') }}">Manage</a>
+                @elseif ($tenant && $isHosted && ! $isCommunityMember)
+                    <a class="button button-ghost" href="{{ route('membership.apply') }}">
+                        @if(in_array($membershipApplicationStatus, ['pending', 'more_info', 'approved'], true))
+                            Application Status
+                        @else
+                            Apply to Join
+                        @endif
+                    </a>
                 @elseif (! $tenant && $isHosted)
                     <a class="button button-ghost" href="{{ route('organizations.index') }}">My Sites</a>
                 @endif
@@ -111,7 +128,9 @@
             @else
                 <a class="button button-ghost" href="{{ route('login') }}">Log in</a>
 
-                @if ($canRegister)
+                @if ($tenant && $isHosted)
+                    <a class="button button-primary" href="{{ route('membership.apply') }}">Apply to Join</a>
+                @elseif ($canRegister)
                     <a class="button button-primary" href="{{ \App\Support\MountUrl::to($siteSettings['header_cta_url'] ?? route('register')) }}">
                         {{ $siteSettings['header_cta_label'] ?? 'Join Private Gather' }}
                     </a>
@@ -183,6 +202,11 @@
                 <a href="{{ route('site.events') }}">Events</a>
                 <a href="{{ route('site.about') }}">About</a>
             @endif
+
+            @if ($tenant && $isHosted && ! $isCommunityMember)
+                <a href="{{ route('membership.apply') }}">Apply to Join</a>
+            @endif
+
             @if ($isCommunityMember)
                 <a href="{{ route('community.index') }}">Community</a>
                 <a href="{{ route('community.chat') }}">Live Chat</a>
