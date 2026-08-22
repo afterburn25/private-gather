@@ -1,2 +1,3 @@
-Fresh certification branch based on current release head 70846e36c1a619cb08cdf7fb5d2818487edc63be.
-Purpose: expose exact /register exception if central route matrix fails.
+Fresh certification branch for Private Gather 1.2.3.
+restored-runtime-dependency=app/Support/LifestyleProfileOptions.php
+runtime-payload-files=30
