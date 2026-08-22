@@ -2,6 +2,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Tenant;
+use App\Models\TenantDomain;
 use App\Services\TenantDomainCache;
 use App\Support\DomainName;
 use App\Support\Edition;
@@ -79,6 +80,40 @@ class ResolveTenantByDomain
         }
 
         $domain = $this->domains->find($host);
+
+        // Platform subdomains are owned by Private Gather itself, so they do not
+        // require external-domain ownership verification. If a request for a
+        // recorded platform subdomain reaches this Laravel application, DNS and
+        // web routing are demonstrably working. Promote a pending platform
+        // subdomain at that point instead of returning a permanent 404 until a
+        // human clicks Provision / Repair again.
+        if (! $domain && str_ends_with($host, '.'.(string) config('platform.root_domain'))) {
+            $domain = TenantDomain::with('tenant')
+                ->where('domain', $host)
+                ->where('type', TenantDomain::TYPE_PLATFORM_SUBDOMAIN)
+                ->whereIn('status', [TenantDomain::STATUS_PENDING, TenantDomain::STATUS_ACTIVE])
+                ->first();
+
+            if ($domain && $domain->tenant?->isActive()) {
+                if ($domain->status !== TenantDomain::STATUS_ACTIVE || ! $domain->verified_at || $domain->dns_status !== 'active') {
+                    $health = is_array($domain->health) ? $domain->health : [];
+                    $domain->forceFill([
+                        'status' => TenantDomain::STATUS_ACTIVE,
+                        'verified_at' => $domain->verified_at ?: now(),
+                        'dns_status' => 'active',
+                        'dns_last_checked_at' => now(),
+                        'last_error' => null,
+                        'health' => array_merge($health, [
+                            'provisioner' => $health['provisioner'] ?? 'wildcard-request-route',
+                            'accepted' => true,
+                            'route_confirmed_at' => now()->toIso8601String(),
+                        ]),
+                    ])->save();
+                    $this->domains->forget($host);
+                }
+            }
+        }
+
         if (! $domain || ! $domain->tenant || ! $domain->tenant->isActive()) {
             $this->context->clear();
             return response()->view('errors.tenant-domain', [
