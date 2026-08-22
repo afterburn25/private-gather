@@ -12,6 +12,7 @@ FILES = [
     'config/release.php',
     'app/Contracts/AgeVerificationProvider.php',
     'app/Support/UsStates.php',
+    'app/Support/LifestyleProfileOptions.php',
     'app/Services/Verification/MemberTrust.php',
     'app/Services/Verification/PersonaAgeVerificationProvider.php',
     'app/Providers/MemberTrustServiceProvider.php',
