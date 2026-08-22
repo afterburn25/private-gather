@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - repro/live-1.2.0-auth-homepage
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
