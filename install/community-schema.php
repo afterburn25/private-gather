@@ -125,12 +125,38 @@ SQL,
         }
     }
 
-    // This supplemental table lives outside install/schema.sql, so fresh installs
-    // must record the matching Laravel migration after creating it. Otherwise the
-    // first Artisan migration pass would try to create the table a second time.
-    $migration = '2026_08_22_230000_create_tenant_membership_applications';
+    // ticket_types is created by install/schema.sql. Add the lifestyle-specific
+    // admission fields only when absent so browser installs remain retry-safe.
+    installer_add_column_if_missing($pdo, 'ticket_types', 'profile_eligibility', "VARCHAR(24) NOT NULL DEFAULT 'any'");
+    installer_add_column_if_missing($pdo, 'ticket_types', 'membership_required', 'TINYINT(1) NOT NULL DEFAULT 0');
+    installer_add_column_if_missing($pdo, 'ticket_types', 'approval_required', 'TINYINT(1) NOT NULL DEFAULT 0');
+
+    $registeredMigrations = [
+        '2026_08_22_230000_create_tenant_membership_applications',
+        '2026_08_22_231000_add_lifestyle_ticket_eligibility',
+    ];
     $stmt = $pdo->prepare(
         'INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)'
     );
-    $stmt->execute([$migration, $migration]);
+    foreach ($registeredMigrations as $migration) {
+        $stmt->execute([$migration, $migration]);
+    }
+}
+
+function installer_add_column_if_missing(PDO $pdo, string $table, string $column, string $definition): void
+{
+    if (! preg_match('/^[A-Za-z0-9_]+$/', $table) || ! preg_match('/^[A-Za-z0-9_]+$/', $column)) {
+        throw new InvalidArgumentException('Unsafe installer schema identifier.');
+    }
+
+    $check = $pdo->prepare(
+        'SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?'
+    );
+    $check->execute([$table, $column]);
+
+    if ((int) $check->fetchColumn() > 0) {
+        return;
+    }
+
+    $pdo->exec(sprintf('ALTER TABLE `%s` ADD COLUMN `%s` %s', $table, $column, $definition));
 }
