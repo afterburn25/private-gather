@@ -6,7 +6,7 @@ $base = dirname(__DIR__);
 $errors = [];
 $need = [
     'index.php', 'private-gather.php', '.htaccess', 'install/index.php', 'install/lib.php', 'install/schema.sql',
-    'docs/INSTALLATION.md', 'storage/app', 'bootstrap/cache',
+    'install/community-schema.php', 'docs/INSTALLATION.md', 'storage/app', 'bootstrap/cache',
 ];
 foreach ($need as $path) {
     if (! file_exists($base.'/'.$path)) {
@@ -20,6 +20,7 @@ $rootHt = (string) @file_get_contents($base.'/.htaccess');
 $installIndex = (string) @file_get_contents($base.'/install/index.php');
 $installLib = (string) @file_get_contents($base.'/install/lib.php');
 $schema = (string) @file_get_contents($base.'/install/schema.sql');
+$communitySchema = (string) @file_get_contents($base.'/install/community-schema.php');
 $userMigration = (string) @file_get_contents($base.'/database/migrations/0001_01_01_000000_create_users_table.php');
 
 $assertions = [
@@ -34,6 +35,7 @@ $assertions = [
     ['root request reaches reliable controller before directory bypass', str_contains($rootHt, 'RewriteRule ^$ private-gather.php')],
     ['explicit index reaches reliable controller', str_contains($rootHt, 'RewriteRule ^index\\.php$ private-gather.php')],
     ['installer schema import', str_contains($installIndex, 'installer_import_schema')],
+    ['installer supplemental community schema import', str_contains($installIndex, 'installer_import_private_community')],
     ['installer admin creation', str_contains($installIndex, 'installer_create_admin')],
     ['installer environment generation', str_contains($installIndex, 'installer_write_env')],
     ['installer self removal', str_contains($installIndex, 'installer_disable_self')],
@@ -42,6 +44,8 @@ $assertions = [
     ['installer avoids false DDL transaction', ! str_contains($installLib, '$pdo->beginTransaction()') && str_contains($installLib, "preg_replace('/^\\s*--.*$/m'")],
     ['schema migration registry', str_contains($schema, 'CREATE TABLE IF NOT EXISTS migrations')],
     ['browser installer registers invite token data hardening', str_contains($installIndex, '2026_08_18_021500_hash_existing_event_invitation_tokens')],
+    ['supplemental installer creates lifestyle membership applications', str_contains($communitySchema, 'CREATE TABLE IF NOT EXISTS tenant_membership_applications')],
+    ['supplemental installer registers lifestyle membership migration', str_contains($communitySchema, '2026_08_22_230000_create_tenant_membership_applications')],
     ['platform admin schema', str_contains($schema, 'is_platform_admin') && str_contains($userMigration, 'is_platform_admin')],
     ['fresh 1.0 security schema', str_contains($schema, 'two_factor_secret') && str_contains($schema, 'consent_records')],
     ['fresh 1.0 commerce schema', str_contains($schema, 'ticket_types') && str_contains($schema, 'orders') && str_contains($schema, 'tickets')],
@@ -61,9 +65,12 @@ $migrations = glob($base.'/database/migrations/*.php') ?: [];
 foreach ($migrations as $file) {
     $name = basename($file, '.php');
     // Most fresh-install migrations are represented directly in schema.sql.
-    // Data-only migrations that are a no-op on an empty fresh database may be
-    // explicitly registered by install/index.php after the schema import.
-    if (! str_contains($schema, $name) && ! str_contains($installIndex, $name)) {
+    // Supplemental fresh-install modules may create and register their matching
+    // migration in community-schema.php. Data-only migrations that are a no-op
+    // on an empty fresh database may be registered by install/index.php.
+    if (! str_contains($schema, $name)
+        && ! str_contains($installIndex, $name)
+        && ! str_contains($communitySchema, $name)) {
         $errors[] = 'Installer does not register migration '.$name;
     }
 }
@@ -74,4 +81,4 @@ if ($errors) {
 }
 
 echo "INSTALLER VERIFY: PASS\n";
-echo "Inline first-run installer, subdirectory-safe front controller, retry-safe fresh schema, install lock, migration bookkeeping, and installer self-removal are structurally present.\n";
+echo "Inline first-run installer, subdirectory-safe front controller, retry-safe fresh schema, supplemental schema modules, install lock, migration bookkeeping, and installer self-removal are structurally present.\n";
