@@ -65,3 +65,6 @@ jobs:
 
       - name: Run tenant subdomain host regression
         run: php artisan test tests/Feature/Live120TenantSubdomainRegressionTest.php --stop-on-failure
+
+      - name: Run tenant-domain navigation matrix
+        run: php artisan test tests/Feature/Live120TenantLinkMatrixTest.php --stop-on-failure
