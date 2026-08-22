@@ -7,6 +7,7 @@ class User extends Authenticatable implements MustVerifyEmail{
  protected $hidden=['password','remember_token','two_factor_secret','two_factor_recovery_codes'];
  protected function casts():array{return ['email_verified_at'=>'datetime','date_of_birth'=>'date','password'=>'hashed','is_platform_admin'=>'boolean','adult_confirmed_at'=>'datetime','terms_accepted_at'=>'datetime','last_login_at'=>'datetime','privacy_accepted_at'=>'datetime','two_factor_confirmed_at'=>'datetime'];}
  public function tenants():BelongsToMany{return $this->belongsToMany(Tenant::class,'tenant_users')->withPivot(['role','status'])->withTimestamps();}
+ public function membershipApplications():HasMany{return $this->hasMany(TenantMembershipApplication::class);}
  public function profile():HasOne{return $this->hasOne(Profile::class);}
  public function tickets():HasMany{return $this->hasMany(Ticket::class);}
  public function isAdult():bool{return $this->date_of_birth?->lte(now()->subYears(18))??false;}

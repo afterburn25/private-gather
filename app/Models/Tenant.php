@@ -73,6 +73,11 @@ class Tenant extends Model
             ->withTimestamps();
     }
 
+    public function membershipApplications(): HasMany
+    {
+        return $this->hasMany(TenantMembershipApplication::class);
+    }
+
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);

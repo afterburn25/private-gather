@@ -16,6 +16,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\EventPublicController;
 use App\Http\Controllers\EventInvitationController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\MembershipApplicationController;
 use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\MessageController;
 use App\Http\Controllers\Member\OrderController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\Tenant\CmsController;
 use App\Http\Controllers\Tenant\DomainController;
 use App\Http\Controllers\Tenant\EventManageController;
 use App\Http\Controllers\Tenant\ManageController;
+use App\Http\Controllers\Tenant\MembershipApplicationManageController;
 use App\Http\Controllers\Tenant\NavigationController;
 use App\Http\Controllers\Tenant\SiteSettingsController;
 use App\Http\Controllers\Tenant\MediaController;
@@ -72,9 +74,6 @@ Route::middleware('auth')->group(function():void{
  Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
 
  Route::get('/email/verify',[EmailVerificationController::class,'notice'])->name('verification.notice');
- // Verification signatures are intentionally relative so the signed payload
- // cannot be poisoned by a request Host. Notification generation pins the
- // delivered URL to canonical APP_URL.
  Route::get('/email/verify/{id}/{hash}',[EmailVerificationController::class,'verify'])->middleware('signed:relative')->name('verification.verify');
  Route::post('/email/verification-notification',[EmailVerificationController::class,'send'])->middleware('throttle:6,1')->name('verification.send');
 
@@ -88,6 +87,9 @@ Route::middleware('auth')->group(function():void{
  Route::get('/my-organizations/create',[OrganizationController::class,'create'])->name('organizations.create');
  Route::post('/my-organizations',[OrganizationController::class,'store'])->name('organizations.store');
  Route::get('/staff-invite/{token}',[StaffController::class,'accept'])->name('staff.invite.accept');
+
+ Route::get('/membership/apply',[MembershipApplicationController::class,'create'])->name('membership.apply');
+ Route::post('/membership/apply',[MembershipApplicationController::class,'store'])->name('membership.apply.store');
 
  Route::get('/messages',[MessageController::class,'index'])->name('messages.index');
  Route::post('/messages/start',[MessageController::class,'start'])->name('messages.start');
@@ -112,6 +114,9 @@ Route::middleware(['auth',EnsureTenantManager::class])->prefix('manage')->name('
  Route::post('/domains',[DomainController::class,'store'])->name('domains.store');
  Route::post('/domains/{domain}/verify',[DomainController::class,'verify'])->name('domains.verify');
  Route::post('/domains/{domain}/primary',[DomainController::class,'primary'])->name('domains.primary');
+
+ Route::get('/membership-applications',[MembershipApplicationManageController::class,'index'])->name('membership-applications.index');
+ Route::patch('/membership-applications/{application}',[MembershipApplicationManageController::class,'update'])->name('membership-applications.update');
 
  Route::get('/cms/pages',[CmsController::class,'pages'])->name('cms.pages');
  Route::get('/cms/pages/create',[CmsController::class,'create'])->name('cms.create');
