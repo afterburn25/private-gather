@@ -62,6 +62,7 @@ class Live120TenantLinkMatrixTest extends TestCase
     {
         [$tenant, $manager] = $this->tenantFixture('owner');
         $this->actingAs($manager);
+        $this->withoutExceptionHandling();
 
         foreach ([
             '/manage',
