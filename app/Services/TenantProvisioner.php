@@ -77,6 +77,7 @@ final class TenantProvisioner
                 'theme' => [
                     'template' => $settings['template'],
                     'surface' => 'dark',
+                    'market' => 'adult_lifestyle',
                 ],
             ]);
 
@@ -115,13 +116,23 @@ final class TenantProvisioner
         $defaults = [
             'marketplace_enabled' => $type !== Tenant::TYPE_PRIVATE_HOST,
             'site_kind' => $type,
+            'market' => 'adult_lifestyle',
+            'adult_only' => true,
+            'minimum_age' => 18,
             'template' => 'midnight',
             'city' => null,
             'region' => null,
             'tagline' => $type === Tenant::TYPE_CLUB
-                ? 'A private nightlife community, events, and member experience.'
-                : 'A private community for members, events, and shared experiences.',
+                ? 'A private adult lifestyle club for connection, community, and unforgettable events.'
+                : 'A private adult lifestyle community for couples, singles, groups, and shared experiences.',
             'network_visibility' => $type === Tenant::TYPE_PRIVATE_HOST ? 'private' : 'listed',
+            'member_directory_visibility' => 'members',
+            'event_attendance_visibility' => 'members',
+            'venue_address_visibility' => 'approved_or_ticketed',
+            'verification_policy' => 'age_required_identity_optional',
+            'membership_profiles' => ['couple', 'individual'],
+            'consent_policy_enabled' => true,
+            'privacy_first' => true,
         ];
 
         foreach (['city', 'region', 'tagline', 'template', 'network_visibility', 'marketplace_enabled'] as $key) {
@@ -178,17 +189,17 @@ final class TenantProvisioner
                 'sort_order' => 10,
                 'is_enabled' => true,
                 'content' => [
-                    'eyebrow' => $tenant->isClub() ? 'WELCOME TO THE CLUB' : 'WELCOME TO OUR COMMUNITY',
+                    'eyebrow' => $tenant->isClub() ? 'PRIVATE ADULT LIFESTYLE CLUB' : 'PRIVATE ADULT LIFESTYLE COMMUNITY',
                     'heading' => $tenant->name,
                     'body' => $settings['tagline'],
-                    'primary_label' => 'View Events',
+                    'primary_label' => 'Explore Events',
                     'primary_url' => '/events',
                 ],
                 'settings' => ['alignment' => 'left'],
             ],
             [
                 'type' => 'event_grid',
-                'name' => 'Upcoming Events',
+                'name' => 'Upcoming Lifestyle Events',
                 'sort_order' => 20,
                 'is_enabled' => true,
                 'content' => [
@@ -199,14 +210,14 @@ final class TenantProvisioner
             ],
             [
                 'type' => 'image_text',
-                'name' => $tenant->isClub() ? 'The Club Experience' : 'Our Community',
+                'name' => $tenant->isClub() ? 'The Club Experience' : 'Our Lifestyle Community',
                 'sort_order' => 30,
                 'is_enabled' => true,
                 'content' => [
-                    'heading' => $tenant->isClub() ? 'More than a night out' : 'Built around community',
+                    'heading' => $tenant->isClub() ? 'A better night starts with trust' : 'Community built around trust',
                     'body' => $tenant->isClub()
-                        ? 'Use the Website Builder to introduce your venue, membership experience, amenities, and what makes your club distinctive.'
-                        : 'Use the Website Builder to explain your mission, chapters, membership, community standards, and what members can expect.',
+                        ? 'Introduce your venue, couples and singles policies, membership experience, amenities, dress expectations, privacy standards, and what first-time guests should expect.'
+                        : 'Explain your adult lifestyle community, membership expectations, chapters or local groups, event culture, privacy standards, and how new members become part of the community.',
                 ],
                 'settings' => [],
             ],
@@ -216,9 +227,9 @@ final class TenantProvisioner
                 'sort_order' => 40,
                 'is_enabled' => true,
                 'content' => [
-                    'heading' => $tenant->isClub() ? 'Become a member' : 'Join the community',
-                    'body' => 'Create a Private Gather profile to RSVP, purchase eligible tickets, and manage your membership experience.',
-                    'button_label' => 'Create Account',
+                    'heading' => $tenant->isClub() ? 'Join the club community' : 'Join the lifestyle community',
+                    'body' => 'Create an adult Private Gather profile to request membership, RSVP, purchase eligible tickets, and manage your event experience privately.',
+                    'button_label' => 'Create Member Profile',
                     'button_url' => '/register',
                 ],
                 'settings' => [],
@@ -231,8 +242,8 @@ final class TenantProvisioner
             'About',
             'About '.$tenant->name,
             $tenant->isClub()
-                ? 'Tell prospective members about the club, venue, atmosphere, amenities, and the experience you provide.'
-                : 'Tell prospective members about the organization, its mission, community, leadership, and the experience you provide.',
+                ? 'Tell prospective members about your adult lifestyle club, venue, atmosphere, membership philosophy, amenities, and the experience you provide for consenting adults.'
+                : 'Tell prospective members about your adult lifestyle organization, mission, community, leadership, chapters, and the experience you provide for consenting adults.',
         );
 
         $this->createContentPage(
@@ -240,15 +251,33 @@ final class TenantProvisioner
             'membership',
             'Membership',
             'Membership',
-            'Describe membership levels, eligibility, benefits, application requirements, renewal terms, and how to join.',
+            'Explain eligibility for couples and individuals, application and verification requirements, membership levels, benefits, guest policies, renewal terms, and how new members are approved.',
+        );
+
+        $this->createContentPage(
+            $tenant,
+            'first-visit',
+            'First Visit',
+            'Your First Visit',
+            $tenant->isClub()
+                ? 'Help first-time guests understand arrival and check-in, ID requirements, dress expectations, privacy, phones and photography rules, guest etiquette, consent standards, and when a private venue address becomes visible.'
+                : 'Help new members understand verification, introductions, event etiquette, privacy, community expectations, consent standards, and how to participate comfortably for the first time.',
         );
 
         $this->createContentPage(
             $tenant,
             'rules',
-            $tenant->isClub() ? 'House Rules' : 'Community Guidelines',
-            $tenant->isClub() ? 'House Rules' : 'Community Guidelines',
-            'Publish the standards, privacy expectations, consent policies, dress requirements, and other rules members should know before participating.',
+            $tenant->isClub() ? 'House Rules & Consent' : 'Community Rules & Consent',
+            $tenant->isClub() ? 'House Rules & Consent' : 'Community Rules & Consent',
+            'Publish clear standards covering affirmative consent, boundaries, respectful conduct, privacy, photography, phones, intoxication, prohibited behavior, dress requirements, reporting concerns, and removal or suspension policies.',
+        );
+
+        $this->createContentPage(
+            $tenant,
+            'privacy',
+            'Privacy & Discretion',
+            'Privacy & Discretion',
+            'Explain how member information, event attendance, photos, private venue details, directories, and communications are protected and which visibility choices members control.',
         );
 
         $this->createContentPage(
@@ -256,14 +285,16 @@ final class TenantProvisioner
             'contact',
             'Contact',
             'Contact '.$tenant->name,
-            'Add your preferred contact method, support information, operating hours, and other ways members can reach your team.',
+            'Add a discreet contact method, member support information, operating hours, event questions, and the best way to reach your team without publishing private member or venue information unnecessarily.',
         );
 
         $headerItems = [
             ['Events', '/events'],
             ['About', '/about'],
             ['Membership', '/page/membership'],
-            [$tenant->isClub() ? 'Rules' : 'Guidelines', '/page/rules'],
+            ['First Visit', '/page/first-visit'],
+            [$tenant->isClub() ? 'Rules & Consent' : 'Community Standards', '/page/rules'],
+            ['Privacy', '/page/privacy'],
             ['Contact', '/page/contact'],
         ];
 
@@ -289,7 +320,7 @@ final class TenantProvisioner
 
         $publicSettings = [
             'tagline' => $settings['tagline'],
-            'footer_text' => 'Events, memberships, and member access powered securely by Private Gather.',
+            'footer_text' => 'Private adult lifestyle events, memberships, and member access powered securely by Private Gather.',
             'city' => (string) ($settings['city'] ?? ''),
             'region' => (string) ($settings['region'] ?? ''),
         ];
