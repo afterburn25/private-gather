@@ -2,62 +2,13 @@
 
 namespace App\Http\Controllers\Tenant;
 
-use App\Http\Controllers\Controller;
-use App\Models\Badge;
-use App\Models\User;
-use App\Models\UserBadge;
-use App\Services\BadgeService;
-use App\Support\Audit;
-use App\Tenancy\TenantContext;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
-
+use App\Http\Controllers\Controller;use App\Models\Badge;use App\Models\TenantMembershipLevel;use App\Models\User;use App\Models\UserBadge;use App\Services\BadgeService;use App\Services\MembershipLevelService;use App\Support\Audit;use App\Support\TenantMembership;use App\Tenancy\TenantContext;use Illuminate\Http\RedirectResponse;use Illuminate\Http\Request;use Illuminate\Support\Str;use Illuminate\Validation\ValidationException;use Illuminate\View\View;
 class BadgeController extends Controller
 {
-    public function index(TenantContext $context): View
-    {
-        $tenant=$context->requireTenant();
-        $badges=Badge::query()->where('tenant_id',$tenant->id)->where('scope',Badge::SCOPE_TENANT)->withCount(['assignments as active_assignments_count'=>fn($q)=>$q->whereNull('revoked_at')->where(fn($e)=>$e->whereNull('expires_at')->orWhere('expires_at','>',now()))])->orderBy('category')->orderBy('name')->get();
-        $assignments=UserBadge::query()->with(['badge','user','issuer'])->where('tenant_id',$tenant->id)->whereNull('revoked_at')->where(fn($q)=>$q->whereNull('expires_at')->orWhere('expires_at','>',now()))->latest('issued_at')->limit(100)->get();
-        return view('tenant.manage.badges.index',compact('tenant','badges','assignments'));
-    }
-
-    public function store(Request $request, TenantContext $context, BadgeService $badges): RedirectResponse
-    {
-        $tenant=$context->requireTenant(); $data=$request->validate([
-            'name'=>['required','string','max:120'],'slug'=>['nullable','string','max:120'],'description'=>['nullable','string','max:2000'],'icon'=>['nullable','string','max:64'],
-            'badge_color'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'text_color'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'category'=>['required','in:membership,reputation,events,community,staff,achievement,promotional,custom'],
-            'visibility'=>['required','in:public,members,tenant_members,event_attendees,staff,private'],'issuance_type'=>['required','in:manual,automatic,membership'],'membership_role'=>['nullable','in:owner,admin,manager,staff,checkin,member'],
-            'event_count'=>['nullable','integer','min:1','max:10000'],'expires_after_days'=>['nullable','integer','min:1','max:3650'],
-        ]);
-        if($badges->tenantNameIsReserved($data['name'])) throw ValidationException::withMessages(['name'=>'That badge name is reserved for Private Gather platform authority.']);
-        if($data['issuance_type']===Badge::ISSUE_AUTOMATIC&&empty($data['event_count'])) throw ValidationException::withMessages(['event_count'=>'Enter the number of unique event check-ins required for this badge.']);
-        $slug=Str::slug($data['slug']?:$data['name']); if(Badge::where('tenant_id',$tenant->id)->where('slug',$slug)->exists()) throw ValidationException::withMessages(['slug'=>'That badge slug is already in use for this club or organization.']);
-        $criteria=match($data['issuance_type']){Badge::ISSUE_MEMBERSHIP=>array_filter(['membership_role'=>$data['membership_role']??null]),Badge::ISSUE_AUTOMATIC=>['event_count'=>(int)$data['event_count']],default=>null};
-        $badge=Badge::create(['tenant_id'=>$tenant->id,'scope'=>Badge::SCOPE_TENANT,'name'=>trim($data['name']),'slug'=>$slug,'description'=>$data['description']??null,'icon'=>$data['icon']??null,'badge_color'=>$data['badge_color'],'text_color'=>$data['text_color'],'category'=>$data['category'],'visibility'=>$data['visibility'],'issuance_type'=>$data['issuance_type'],'criteria'=>$criteria,'expires_after_days'=>$data['expires_after_days']??null,'is_active'=>true,'is_system_reserved'=>false,'created_by'=>$request->user()->id]);
-        Audit::write('badge.tenant.created',$badge,after:$badge->toArray(),tenantId:$tenant->id,request:$request); return back()->with('status','Club badge created.');
-    }
-
-    public function update(Request $request, TenantContext $context, Badge $badge): RedirectResponse
-    {
-        $tenant=$context->requireTenant(); $this->requireTenantBadge($badge,$tenant->id); $data=$request->validate(['is_active'=>['required','boolean']]); $before=$badge->toArray(); $badge->update(['is_active'=>(bool)$data['is_active']]); Audit::write('badge.tenant.status',$badge,before:$before,after:$badge->fresh()->toArray(),tenantId:$tenant->id,request:$request); return back()->with('status','Club badge status updated.');
-    }
-
-    public function assign(Request $request, TenantContext $context, Badge $badge, BadgeService $badges): RedirectResponse
-    {
-        $tenant=$context->requireTenant(); $this->requireTenantBadge($badge,$tenant->id); abort_unless($badge->is_active,422,'This badge is inactive.'); abort_unless($badge->issuance_type===Badge::ISSUE_MANUAL,422,'Only manual badges can be directly assigned.');
-        $data=$request->validate(['email'=>['required','email'],'expires_at'=>['nullable','date','after:now']]); $user=User::where('email',$data['email'])->firstOrFail(); abort_unless($user->tenants()->where('tenants.id',$tenant->id)->wherePivot('status','active')->exists(),422,'That member does not have active membership in this club or organization.');
-        $assignment=$badges->awardManual($badge,$user,$request->user(),$data['expires_at']??null); Audit::write('badge.tenant.assigned',$assignment,after:$assignment->toArray(),tenantId:$tenant->id,request:$request); return back()->with('status',$badge->name.' assigned to '.$user->email.'.');
-    }
-
-    public function revoke(Request $request, TenantContext $context, Badge $badge, UserBadge $assignment, BadgeService $badges): RedirectResponse
-    {
-        $tenant=$context->requireTenant(); $this->requireTenantBadge($badge,$tenant->id); abort_unless($assignment->badge_id===$badge->id&&(int)$assignment->tenant_id===$tenant->id,404); abort_unless($badge->issuance_type===Badge::ISSUE_MANUAL,422,'System-managed badges follow their configured criteria and cannot be manually revoked.');
-        $data=$request->validate(['reason'=>['required','string','max:1000']]); $before=$assignment->toArray(); $badges->revoke($assignment,$request->user(),$data['reason']); Audit::write('badge.tenant.revoked',$assignment,before:$before,after:$assignment->fresh()->toArray(),tenantId:$tenant->id,request:$request); return back()->with('status','Club badge revoked.');
-    }
-
-    private function requireTenantBadge(Badge $badge,int $tenantId):void{abort_unless($badge->scope===Badge::SCOPE_TENANT&&(int)$badge->tenant_id===$tenantId,404);}
+ public function index(TenantContext $context,MembershipLevelService $memberships):View{$tenant=$context->requireTenant();$memberships->ensureDefaultLevel($tenant);$badges=Badge::query()->where('tenant_id',$tenant->id)->where('scope',Badge::SCOPE_TENANT)->withCount(['assignments as active_assignments_count'=>fn($q)=>$q->whereNull('revoked_at')->where(fn($e)=>$e->whereNull('expires_at')->orWhere('expires_at','>',now()))])->orderBy('category')->orderBy('name')->get();$assignments=UserBadge::query()->with(['badge','user','issuer'])->where('tenant_id',$tenant->id)->whereNull('revoked_at')->where(fn($q)=>$q->whereNull('expires_at')->orWhere('expires_at','>',now()))->latest('issued_at')->limit(100)->get();$membershipLevels=TenantMembershipLevel::where('tenant_id',$tenant->id)->where('is_active',true)->orderBy('sort_order')->get();return view('tenant.manage.badges.index',compact('tenant','badges','assignments','membershipLevels'));}
+ public function store(Request $request,TenantContext $context,BadgeService $badges):RedirectResponse{$tenant=$context->requireTenant();$data=$request->validate(['name'=>['required','string','max:120'],'slug'=>['nullable','string','max:120'],'description'=>['nullable','string','max:2000'],'icon'=>['nullable','string','max:64'],'badge_color'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'text_color'=>['required','regex:/^#[0-9A-Fa-f]{6}$/'],'category'=>['required','in:membership,reputation,events,community,staff,achievement,promotional,custom'],'visibility'=>['required','in:public,members,tenant_members,event_attendees,staff,private'],'issuance_type'=>['required','in:manual,automatic,membership'],'membership_role'=>['nullable','in:owner,admin,manager,staff,checkin,member'],'membership_level_id'=>['nullable','integer','exists:tenant_membership_levels,id'],'event_count'=>['nullable','integer','min:1','max:10000'],'expires_after_days'=>['nullable','integer','min:1','max:3650']]);if($badges->tenantNameIsReserved($data['name']))throw ValidationException::withMessages(['name'=>'That badge name is reserved for Private Gather platform authority.']);if($data['issuance_type']===Badge::ISSUE_AUTOMATIC&&empty($data['event_count']))throw ValidationException::withMessages(['event_count'=>'Enter the number of unique event check-ins required for this badge.']);if(!empty($data['membership_level_id'])&&!TenantMembershipLevel::where('tenant_id',$tenant->id)->whereKey($data['membership_level_id'])->exists())abort(404);$slug=Str::slug($data['slug']?:$data['name']);if(Badge::where('tenant_id',$tenant->id)->where('slug',$slug)->exists())throw ValidationException::withMessages(['slug'=>'That badge slug is already in use for this club or organization.']);$criteria=match($data['issuance_type']){Badge::ISSUE_MEMBERSHIP=>array_filter(['membership_role'=>$data['membership_role']??null,'membership_level_id'=>$data['membership_level_id']??null]),Badge::ISSUE_AUTOMATIC=>['event_count'=>(int)$data['event_count']],default=>null};$badge=Badge::create(['tenant_id'=>$tenant->id,'scope'=>Badge::SCOPE_TENANT,'name'=>trim($data['name']),'slug'=>$slug,'description'=>$data['description']??null,'icon'=>$data['icon']??null,'badge_color'=>$data['badge_color'],'text_color'=>$data['text_color'],'category'=>$data['category'],'visibility'=>$data['visibility'],'issuance_type'=>$data['issuance_type'],'criteria'=>$criteria,'expires_after_days'=>$data['expires_after_days']??null,'is_active'=>true,'is_system_reserved'=>false,'created_by'=>$request->user()->id]);Audit::write('badge.tenant.created',$badge,after:$badge->toArray(),tenantId:$tenant->id,request:$request);return back()->with('status','Club badge created.');}
+ public function update(Request $request,TenantContext $context,Badge $badge):RedirectResponse{$tenant=$context->requireTenant();$this->requireTenantBadge($badge,$tenant->id);$data=$request->validate(['is_active'=>['required','boolean']]);$before=$badge->toArray();$badge->update(['is_active'=>(bool)$data['is_active']]);Audit::write('badge.tenant.status',$badge,before:$before,after:$badge->fresh()->toArray(),tenantId:$tenant->id,request:$request);return back()->with('status','Club badge status updated.');}
+ public function assign(Request $request,TenantContext $context,Badge $badge,BadgeService $badges):RedirectResponse{$tenant=$context->requireTenant();$this->requireTenantBadge($badge,$tenant->id);abort_unless($badge->is_active,422,'This badge is inactive.');abort_unless($badge->issuance_type===Badge::ISSUE_MANUAL,422,'Only manual badges can be directly assigned.');$data=$request->validate(['email'=>['required','email'],'expires_at'=>['nullable','date','after:now']]);$user=User::where('email',$data['email'])->firstOrFail();abort_unless(TenantMembership::hasActiveMembership($user,$tenant->id),422,'That member does not have active membership in this club or organization.');$assignment=$badges->awardManual($badge,$user,$request->user(),$data['expires_at']??null);Audit::write('badge.tenant.assigned',$assignment,after:$assignment->toArray(),tenantId:$tenant->id,request:$request);return back()->with('status',$badge->name.' assigned to '.$user->email.'.');}
+ public function revoke(Request $request,TenantContext $context,Badge $badge,UserBadge $assignment,BadgeService $badges):RedirectResponse{$tenant=$context->requireTenant();$this->requireTenantBadge($badge,$tenant->id);abort_unless($assignment->badge_id===$badge->id&&(int)$assignment->tenant_id===$tenant->id,404);abort_unless($badge->issuance_type===Badge::ISSUE_MANUAL,422,'System-managed badges follow their configured criteria and cannot be manually revoked.');$data=$request->validate(['reason'=>['required','string','max:1000']]);$before=$assignment->toArray();$badges->revoke($assignment,$request->user(),$data['reason']);Audit::write('badge.tenant.revoked',$assignment,before:$before,after:$assignment->fresh()->toArray(),tenantId:$tenant->id,request:$request);return back()->with('status','Club badge revoked.');}
+ private function requireTenantBadge(Badge $badge,int $tenantId):void{abort_unless($badge->scope===Badge::SCOPE_TENANT&&(int)$badge->tenant_id===$tenantId,404);}
 }

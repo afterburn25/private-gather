@@ -20,7 +20,10 @@ class Tenant extends Model
     public function isOrganization():bool{return $this->normalizedType()===self::TYPE_ORGANIZATION;}
     public function domains():HasMany{return $this->hasMany(TenantDomain::class);} public function primaryDomain():HasOne{return $this->hasOne(TenantDomain::class)->where('is_primary',true);}
     public function users():BelongsToMany{return $this->belongsToMany(User::class,'tenant_users')->withPivot(['role','status'])->withTimestamps();}
-    public function membershipApplications():HasMany{return $this->hasMany(TenantMembershipApplication::class);} public function badges():HasMany{return $this->hasMany(Badge::class);} public function badgeAssignments():HasMany{return $this->hasMany(UserBadge::class);}
+    public function membershipApplications():HasMany{return $this->hasMany(TenantMembershipApplication::class);}
+    public function membershipLevels():HasMany{return $this->hasMany(TenantMembershipLevel::class);}
+    public function membershipTerms():HasMany{return $this->hasMany(TenantMembershipTerm::class);}
+    public function badges():HasMany{return $this->hasMany(Badge::class);} public function badgeAssignments():HasMany{return $this->hasMany(UserBadge::class);}
     public function events():HasMany{return $this->hasMany(Event::class);} public function pages():HasMany{return $this->hasMany(CmsPage::class);} public function settingsRecords():HasMany{return $this->hasMany(SiteSetting::class);} public function branding():HasOne{return $this->hasOne(TenantBranding::class);} public function subscription():HasOne{return $this->hasOne(TenantSubscription::class);}
     public function isActive():bool{return $this->status==='active';}
 }
