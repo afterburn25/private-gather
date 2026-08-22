@@ -36,6 +36,7 @@ class Live120RouteMatrixTest extends TestCase
     {
         $member = $this->user('route-matrix-member@example.test');
         $this->actingAs($member);
+        $this->withoutExceptionHandling();
 
         foreach (['/dashboard', '/profile', '/messages', '/orders', '/tickets', '/security', '/my-organizations'] as $path) {
             $response = $this->get('http://platform.test'.$path);
