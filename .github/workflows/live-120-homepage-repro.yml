@@ -62,3 +62,6 @@ jobs:
 
       - name: Run public member admin route matrix
         run: php artisan test tests/Feature/Live120RouteMatrixTest.php --stop-on-failure
+
+      - name: Run tenant subdomain host regression
+        run: php artisan test tests/Feature/Live120TenantSubdomainRegressionTest.php --stop-on-failure
