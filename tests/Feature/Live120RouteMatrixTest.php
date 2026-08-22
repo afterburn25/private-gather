@@ -36,9 +36,13 @@ class Live120RouteMatrixTest extends TestCase
     {
         $member = $this->user('route-matrix-member@example.test');
         $this->actingAs($member);
-        $this->withoutExceptionHandling();
 
-        foreach (['/dashboard', '/profile', '/messages', '/orders', '/tickets', '/security', '/my-organizations'] as $path) {
+        // Central messaging intentionally has no tenant context and returns 404.
+        $messages = $this->get('http://platform.test/messages');
+        $this->assertNotSame(500, $messages->getStatusCode(), 'Unexpected 500 for /messages');
+
+        $this->withoutExceptionHandling();
+        foreach (['/dashboard', '/profile', '/orders', '/tickets', '/security', '/my-organizations'] as $path) {
             $response = $this->get('http://platform.test'.$path);
             $this->assertNotSame(500, $response->getStatusCode(), 'Unexpected 500 for '.$path);
         }
