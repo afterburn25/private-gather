@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   live-120-homepage:
-    name: Exact 1.2.0 homepage runtime reproduction
+    name: Exact 1.2.0 runtime reproduction
     runs-on: ubuntu-24.04
     env:
       PRIVATE_GATHER_EDITION: hosted
@@ -57,11 +57,8 @@ jobs:
       - name: Fresh database
         run: php artisan migrate:fresh --force
 
-      - name: Prove hosted discovery routes
-        run: |
-          php artisan route:list --name=clubs.index
-          php artisan route:list --name=clubs.show
-          php artisan route:list --name=affiliate.go
-
       - name: Run exact homepage regression
         run: php artisan test tests/Feature/Live120HomepageRegressionTest.php --stop-on-failure
+
+      - name: Run public member admin route matrix
+        run: php artisan test tests/Feature/Live120RouteMatrixTest.php --stop-on-failure
