@@ -73,10 +73,7 @@ jobs:
 
       - name: Assert release routes
         run: |
-          php artisan route:list --except-vendor > /tmp/routes.txt
-          for route in verification.index verification.start verification.return verification.webhooks.persona clubs.apply admin.age-verification.index; do
-            grep -F "$route" /tmp/routes.txt >/dev/null || { echo "Missing route: $route"; exit 1; }
-          done
+          php artisan tinker --execute='$names=["verification.index","verification.start","verification.return","verification.webhooks.persona","clubs.apply","admin.age-verification.index"]; foreach($names as $name){ if(!Illuminate\Support\Facades\Route::has($name)){ fwrite(STDERR,"Missing route: {$name}\n"); exit(1); } echo "Route OK: {$name}\n"; }'
 
       - name: Compile every Blade view
         run: |
