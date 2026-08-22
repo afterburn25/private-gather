@@ -3,3 +3,4 @@ restored-runtime-dependency=app/Support/LifestyleProfileOptions.php
 runtime-payload-files=30
 member-route-diagnostic=exception-v1
 baseline-parity=DashboardController-live-1.2.0
+central-messages=expected-404
