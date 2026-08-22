@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Contracts\PaymentGateway;
@@ -33,19 +34,14 @@ class CheckoutController extends Controller
             abort_unless($event->visibility === 'public', 404);
         }
 
-        if ($event->visibility === 'members') {
-            abort_unless(
-                TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
-                403
-            );
-        }
-
         if (in_array($event->visibility, ['private', 'invite_only'], true)) {
             abort_unless(
                 $event->rsvps()->where('user_id', $request->user()->id)->where('status', 'approved')->exists(),
                 403
             );
         }
+
+        $this->enforceTicketEligibility($request, $event, $ticketType);
 
         $data = $request->validate(['quantity' => 'required|integer|min:1|max:20']);
         $quantity = (int) $data['quantity'];
@@ -54,15 +50,15 @@ class CheckoutController extends Controller
         $order = DB::transaction(function () use ($event, $ticketType, $quantity, $request, $gateway, $issuer, $tenantId) {
             $type = TicketType::whereKey($ticketType->id)->lockForUpdate()->firstOrFail();
             abort_unless($type->event_id === $event->id && $type->active, 404);
+
             if ($tenantId !== null) {
                 abort_unless((int) $event->tenant_id === (int) $tenantId, 404);
             }
-            if ($event->visibility === 'members') {
-                abort_unless(
-                    TenantMembership::hasActiveMembership($request->user(), (int) $event->tenant_id),
-                    403
-                );
-            }
+
+            // Re-check authorization inside the locked transaction so membership,
+            // profile eligibility, or RSVP approval cannot change between the
+            // initial page action and inventory reservation.
+            $this->enforceTicketEligibility($request, $event, $type);
 
             if ($type->sales_start_at && now()->lt($type->sales_start_at)) {
                 abort(422, 'Ticket sales have not started.');
@@ -101,8 +97,8 @@ class CheckoutController extends Controller
             ]);
 
             if ($subtotal === 0) {
-                // Free inventory and ticket issuance commit atomically.
                 $issuer->issue($order);
+
                 return $order;
             }
 
@@ -139,5 +135,38 @@ class CheckoutController extends Controller
                     ? 'Order created. Payment is pending organizer/payment-provider confirmation.'
                     : 'The payment was not completed.')
         );
+    }
+
+    private function enforceTicketEligibility(Request $request, Event $event, TicketType $ticketType): void
+    {
+        $user = $request->user();
+        abort_unless($user, 401);
+
+        if ($event->visibility === 'members' || $ticketType->membership_required) {
+            abort_unless(
+                TenantMembership::hasActiveMembership($user, (int) $event->tenant_id),
+                403,
+                'This ticket is available only to active members of this club or organization.'
+            );
+        }
+
+        if ($ticketType->profile_eligibility !== TicketType::ELIGIBILITY_ANY) {
+            $profileType = $user->profile?->profile_type;
+            abort_unless(
+                $profileType === $ticketType->profile_eligibility,
+                403,
+                $ticketType->profile_eligibility === TicketType::ELIGIBILITY_COUPLE
+                    ? 'This admission type is reserved for couple profiles.'
+                    : 'This admission type is reserved for individual profiles.'
+            );
+        }
+
+        if ($ticketType->approval_required) {
+            abort_unless(
+                $event->rsvps()->where('user_id', $user->id)->where('status', 'approved')->exists(),
+                403,
+                'Your event attendance must be approved before this ticket can be purchased.'
+            );
+        }
     }
 }
