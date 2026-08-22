@@ -51,6 +51,11 @@ class CreateWebsiteFlowTest extends TestCase
             'role' => 'owner',
             'status' => 'active',
         ]);
+        $this->assertSame('adult_lifestyle', data_get($tenant->settings, 'market'));
+        $this->assertTrue((bool) data_get($tenant->settings, 'adult_only'));
+        $this->assertSame('approved_or_ticketed', data_get($tenant->settings, 'venue_address_visibility'));
+        $this->assertSame(['couple', 'individual'], data_get($tenant->settings, 'membership_profiles'));
+        $this->assertTrue((bool) data_get($tenant->settings, 'consent_policy_enabled'));
 
         $this->get('http://platform.test/manage')
             ->assertOk()
@@ -60,7 +65,7 @@ class CreateWebsiteFlowTest extends TestCase
             ->assertSee('https://demo-club.privategather.test/private-gather/', false);
     }
 
-    public function test_organization_creation_provisions_first_class_website_defaults(): void
+    public function test_organization_creation_provisions_first_class_lifestyle_website_defaults(): void
     {
         $owner = $this->createUser('community-owner@example.test');
 
@@ -85,9 +90,14 @@ class CreateWebsiteFlowTest extends TestCase
         $this->assertSame('Texas', data_get($tenant->settings, 'region'));
         $this->assertSame('velvet', data_get($tenant->settings, 'template'));
         $this->assertTrue((bool) data_get($tenant->settings, 'marketplace_enabled'));
+        $this->assertSame('adult_lifestyle', data_get($tenant->settings, 'market'));
+        $this->assertSame('members', data_get($tenant->settings, 'member_directory_visibility'));
+        $this->assertSame('members', data_get($tenant->settings, 'event_attendance_visibility'));
+        $this->assertSame('age_required_identity_optional', data_get($tenant->settings, 'verification_policy'));
         $this->assertSame('velvet', data_get($tenant->branding?->theme, 'template'));
+        $this->assertSame('adult_lifestyle', data_get($tenant->branding?->theme, 'market'));
 
-        foreach (['home', 'about', 'membership', 'rules', 'contact'] as $slug) {
+        foreach (['home', 'about', 'membership', 'first-visit', 'rules', 'privacy', 'contact'] as $slug) {
             $this->assertDatabaseHas('cms_pages', [
                 'tenant_id' => $tenant->id,
                 'slug' => $slug,
@@ -100,6 +110,18 @@ class CreateWebsiteFlowTest extends TestCase
             'location' => 'header',
             'label' => 'Membership',
             'url' => '/page/membership',
+        ]);
+        $this->assertDatabaseHas('cms_navigation_items', [
+            'tenant_id' => $tenant->id,
+            'location' => 'header',
+            'label' => 'First Visit',
+            'url' => '/page/first-visit',
+        ]);
+        $this->assertDatabaseHas('cms_navigation_items', [
+            'tenant_id' => $tenant->id,
+            'location' => 'header',
+            'label' => 'Privacy',
+            'url' => '/page/privacy',
         ]);
 
         $this->get('http://platform.test/my-organizations?preview='.$tenant->id)
