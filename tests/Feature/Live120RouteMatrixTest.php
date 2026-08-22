@@ -21,19 +21,17 @@ class Live120RouteMatrixTest extends TestCase
             'platform.central_domains' => ['platform.test'],
             'demo.enabled' => false,
         ]);
-
-        $this->withoutExceptionHandling();
     }
 
-    public function test_public_and_auth_pages_do_not_throw(): void
+    public function test_public_and_auth_pages_do_not_return_500(): void
     {
-        foreach (['/', '/events', '/organizations', '/about', '/login', '/register'] as $path) {
+        foreach (['/', '/events', '/organizations', '/about', '/login', '/register', '/clubs'] as $path) {
             $response = $this->get('http://platform.test'.$path);
             $this->assertNotSame(500, $response->getStatusCode(), 'Unexpected 500 for '.$path);
         }
     }
 
-    public function test_member_pages_do_not_throw(): void
+    public function test_member_pages_do_not_return_500(): void
     {
         $member = $this->user('route-matrix-member@example.test');
         $this->actingAs($member);
@@ -44,7 +42,7 @@ class Live120RouteMatrixTest extends TestCase
         }
     }
 
-    public function test_platform_admin_pages_do_not_throw(): void
+    public function test_platform_admin_pages_do_not_return_500(): void
     {
         $admin = $this->user('route-matrix-admin@example.test', true);
         $this->actingAs($admin);
