@@ -25,6 +25,7 @@ class Live120RouteMatrixTest extends TestCase
 
     public function test_public_and_auth_pages_do_not_return_500(): void
     {
+        $this->withoutExceptionHandling();
         foreach (['/', '/events', '/organizations', '/about', '/login', '/register', '/clubs'] as $path) {
             $response = $this->get('http://platform.test'.$path);
             $this->assertNotSame(500, $response->getStatusCode(), 'Unexpected 500 for '.$path);
