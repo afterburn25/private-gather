@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 /**
- * Create the Private Gather community tables during browser-based fresh installs.
+ * Create the Private Gather community and lifestyle membership tables during
+ * browser-based fresh installs.
  *
  * Existing installations receive these same tables through the matching Laravel
- * migration. Keeping this step separate from the mature base schema reduces the
+ * migrations. Keeping this step separate from the mature base schema reduces the
  * risk of destabilizing retry-safe legacy installer SQL.
  */
 function installer_import_private_community(PDO $pdo): void
@@ -84,6 +85,32 @@ CREATE TABLE IF NOT EXISTS community_chat_messages (
  CONSTRAINT community_chat_user_fk FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS tenant_membership_applications (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ tenant_id BIGINT UNSIGNED NOT NULL,
+ user_id BIGINT UNSIGNED NOT NULL,
+ profile_type VARCHAR(24) NOT NULL DEFAULT 'individual',
+ status VARCHAR(24) NOT NULL DEFAULT 'pending',
+ referred_by VARCHAR(255) NULL,
+ introduction TEXT NULL,
+ answers JSON NULL,
+ reviewed_by BIGINT UNSIGNED NULL,
+ reviewed_at TIMESTAMP NULL,
+ decision_note TEXT NULL,
+ created_at TIMESTAMP NULL,
+ updated_at TIMESTAMP NULL,
+ PRIMARY KEY(id),
+ KEY tenant_membership_applications_profile_type_index(profile_type),
+ KEY tenant_membership_applications_status_index(status),
+ KEY tenant_membership_applications_tenant_status_created_idx(tenant_id,status,created_at),
+ KEY tenant_membership_applications_tenant_user_status_idx(tenant_id,user_id,status),
+ KEY tenant_membership_applications_user_created_idx(user_id,created_at),
+ CONSTRAINT tenant_membership_applications_tenant_fk FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE,
+ CONSTRAINT tenant_membership_applications_user_fk FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+ CONSTRAINT tenant_membership_applications_reviewer_fk FOREIGN KEY(reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
     ];
 
     foreach ($statements as $number => $statement) {
@@ -97,4 +124,13 @@ SQL,
             );
         }
     }
+
+    // This supplemental table lives outside install/schema.sql, so fresh installs
+    // must record the matching Laravel migration after creating it. Otherwise the
+    // first Artisan migration pass would try to create the table a second time.
+    $migration = '2026_08_22_230000_create_tenant_membership_applications';
+    $stmt = $pdo->prepare(
+        'INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)'
+    );
+    $stmt->execute([$migration, $migration]);
 }
