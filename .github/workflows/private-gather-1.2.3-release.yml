@@ -117,7 +117,7 @@ jobs:
               manifest = json.loads(z.read('manifest.json'))
               assert manifest['to_version'] == '1.2.3'
               assert manifest['from_versions'] == ['1.2.0', '1.2.1']
-              assert len(manifest['files']) == 29
+              assert len(manifest['files']) == 30
           print('sha256=' + hashlib.sha256(zpath.read_bytes()).hexdigest())
           PY
 
