@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
@@ -68,19 +69,39 @@ class OrganizationController extends Controller
         abort_unless(Edition::isHosted(), 404);
 
         // Human-friendly input such as "My Club" becomes a safe subdomain
-        // instead of silently failing the lowercase-only validation rule.
+        // instead of silently failing lowercase-only validation.
         $request->merge([
             'subdomain' => Str::slug((string) $request->input('subdomain')),
         ]);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'type' => ['required', 'in:club,organizer,private_host'],
+            'type' => ['required', 'in:club,organization,organizer,private_host'],
             'subdomain' => ['required', 'string', 'max:63', 'regex:/^[a-z0-9-]+$/'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'region' => ['nullable', 'string', 'max:120'],
+            'tagline' => ['nullable', 'string', 'max:180'],
+            'template' => ['nullable', 'in:midnight,velvet,noir,modern'],
+            'marketplace_enabled' => ['nullable', 'boolean'],
         ], [
             'subdomain.required' => 'Choose a Private Gather website address.',
             'subdomain.regex' => 'The website address may contain only letters, numbers, and hyphens.',
         ]);
+
+        $siteOptions = [
+            'city' => $data['city'] ?? null,
+            'region' => $data['region'] ?? null,
+            'template' => $data['template'] ?? 'midnight',
+        ];
+
+        if (filled($data['tagline'] ?? null)) {
+            $siteOptions['tagline'] = trim($data['tagline']);
+        }
+
+        if ($request->exists('marketplace_enabled')) {
+            $siteOptions['marketplace_enabled'] = $request->boolean('marketplace_enabled');
+            $siteOptions['network_visibility'] = $request->boolean('marketplace_enabled') ? 'listed' : 'private';
+        }
 
         try {
             $tenant = $provisioner->create(
@@ -88,6 +109,7 @@ class OrganizationController extends Controller
                 $data['type'],
                 $data['subdomain'],
                 $request->user(),
+                $siteOptions,
             );
         } catch (InvalidArgumentException $exception) {
             throw ValidationException::withMessages([
@@ -102,7 +124,9 @@ class OrganizationController extends Controller
 
         return redirect()->route('tenant.dashboard')->with(
             'status',
-            'Website created. You are now managing '.$tenant->name.'.',
+            $tenant->isClub()
+                ? 'Club website created. You are now managing '.$tenant->name.'.'
+                : 'Organization website created. You are now managing '.$tenant->name.'.',
         );
     }
 

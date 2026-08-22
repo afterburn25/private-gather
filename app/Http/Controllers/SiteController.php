@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\CmsPage;
@@ -28,7 +29,7 @@ class SiteController extends Controller
                 'organizations' => Tenant::with('primaryDomain')
                     ->where('status', 'active')
                     ->where('settings->marketplace_enabled', true)
-                    ->whereIn('type', [Tenant::TYPE_CLUB, Tenant::TYPE_ORGANIZER])
+                    ->whereIn('type', Tenant::publicNetworkTypes())
                     ->latest()
                     ->limit(6)
                     ->get(),
@@ -51,7 +52,11 @@ class SiteController extends Controller
 
     public function events(Request $request, TenantContext $context): View
     {
-        $query = Event::query()->with('tenant')->where('status', 'published')->where('starts_at', '>=', now())->orderBy('starts_at');
+        $query = Event::query()
+            ->with('tenant')
+            ->where('status', 'published')
+            ->where('starts_at', '>=', now())
+            ->orderBy('starts_at');
 
         if ($context->check()) {
             $tenant = $context->requireTenant();
@@ -68,9 +73,11 @@ class SiteController extends Controller
         if ($search = trim((string) $request->query('q'))) {
             $query->where(fn ($q) => $q->where('title', 'like', '%'.$search.'%')->orWhere('summary', 'like', '%'.$search.'%'));
         }
+
         if ($city = trim((string) $request->query('city'))) {
             $query->where('city', 'like', '%'.$city.'%');
         }
+
         if ($category = trim((string) $request->query('category'))) {
             $query->where('category', $category);
         }
@@ -92,10 +99,11 @@ class SiteController extends Controller
     public function organizations(TenantContext $context): View
     {
         abort_if($context->check(), 404);
+
         $organizations = Tenant::with('primaryDomain')
             ->where('status', 'active')
             ->where('settings->marketplace_enabled', true)
-            ->whereIn('type', [Tenant::TYPE_CLUB, Tenant::TYPE_ORGANIZER])
+            ->whereIn('type', Tenant::publicNetworkTypes())
             ->orderBy('name')
             ->paginate(30);
 
@@ -125,6 +133,7 @@ class SiteController extends Controller
         $query = Event::where('tenant_id', $tenantId)
             ->where('status', 'published')
             ->where('starts_at', '>=', now());
+
         $this->applyTenantVisibility($query, $tenantId);
 
         return $query;

@@ -1,16 +1,110 @@
 @php
 $renderer=app(\App\Services\PlaceholderRenderer::class);
-$templateContext=['site'=>['name'=>config('app.name'),'url'=>config('app.url')],'club'=>['name'=>$tenant->name,'city'=>data_get($tenant->settings,'city','')],'organizer'=>['name'=>$tenant->name],'member'=>['display_name'=>auth()->user()?->display_name??'']];
+$templateContext=[
+    'site'=>['name'=>config('app.name'),'url'=>config('app.url')],
+    'club'=>['name'=>$tenant->name,'city'=>data_get($tenant->settings,'city','')],
+    'organization'=>['name'=>$tenant->name,'city'=>data_get($tenant->settings,'city','')],
+    'organizer'=>['name'=>$tenant->name],
+    'member'=>['display_name'=>auth()->user()?->display_name??''],
+];
 @endphp
 @foreach($page->sections as $section)
  @php($content=$section->content??[])
  @php($heading=$renderer->render((string)data_get($content,'heading',$section->name),$templateContext))
  @php($body=$renderer->render((string)data_get($content,'body',''),$templateContext))
  @switch($section->type)
-  @case('hero')<section class="hero tenant-hero"><div class="container hero-grid"><div class="hero-copy narrow"><span class="eyebrow">{{$renderer->render((string)data_get($content,'eyebrow','WELCOME'),$templateContext)}}</span><h1>{{$heading}}</h1><p>{{$body}}</p>@if(data_get($content,'primary_label'))<div class="hero-actions"><a class="button button-primary" href="{{\App\Support\MountUrl::to(data_get($content,'primary_url','#'))}}">{{$renderer->render((string)data_get($content,'primary_label'),$templateContext)}}</a></div>@endif</div>@if(data_get($content,'image_url'))<div class="hero-art"><img src="{{\App\Support\MountUrl::to(data_get($content,'image_url'))}}" alt="{{data_get($content,'image_alt','')}}"></div>@endif</div></section>@break
-  @case('event_grid')<section class="section"><div class="container"><div class="section-heading"><h2>{{$heading}}</h2><a href="{{route('site.events')}}">View all</a></div><div class="event-grid">@forelse($events->take((int)data_get($content,'limit',6)) as $event)<article class="event-card"><div class="event-image"><span>{{$event->starts_at->format('M d')}}</span></div><div class="event-card-body"><h3>{{$event->title}}</h3><p>{{$event->starts_at->format('F j · g:i A')}}</p><a class="text-link" href="{{route('events.show',$event)}}">View event →</a></div></article>@empty<div class="empty-state compact">No upcoming events.</div>@endforelse</div></div></section>@break
-  @case('cta')<section class="section section-dark"><div class="container"><div class="cta-panel"><div><h2>{{$heading}}</h2><p>{{$body}}</p></div><a class="button button-primary" href="{{\App\Support\MountUrl::to(data_get($content,'button_url','#'))}}">{{$renderer->render((string)data_get($content,'button_label','Learn More'),$templateContext)}}</a></div></div></section>@break
-  @case('image_text')<section class="section"><div class="container image-text"><div>@if(data_get($content,'image_url'))<img src="{{\App\Support\MountUrl::to(data_get($content,'image_url'))}}" alt="{{data_get($content,'image_alt','')}}">@endif</div><div><h2>{{$heading}}</h2><div class="prose">{!!nl2br(e($body))!!}</div></div></div></section>@break
-  @default <section class="section"><div class="container narrow"><div class="panel"><h2>{{$heading}}</h2>@if(data_get($content,'image_url'))<img class="content-image" src="{{\App\Support\MountUrl::to(data_get($content,'image_url'))}}" alt="{{data_get($content,'image_alt','')}}">@endif @if($body)<div class="prose">{!!nl2br(e($body))!!}</div>@endif</div></div></section>
+  @case('hero')
+   <section class="hero tenant-hero">
+    <div class="container hero-grid">
+     <div class="hero-copy narrow">
+      <span class="eyebrow">{{$renderer->render((string)data_get($content,'eyebrow','WELCOME'),$templateContext)}}</span>
+      <h1>{{$heading}}</h1>
+      <p>{{$body}}</p>
+      @if(data_get($tenant->settings,'city'))
+       <p class="muted">{{data_get($tenant->settings,'city')}}@if(data_get($tenant->settings,'region')), {{data_get($tenant->settings,'region')}}@endif</p>
+      @endif
+      @if(data_get($content,'primary_label'))
+       <div class="hero-actions">
+        <a class="button button-primary" href="{{\App\Support\MountUrl::to(data_get($content,'primary_url','#'))}}">
+         {{$renderer->render((string)data_get($content,'primary_label'),$templateContext)}}
+        </a>
+       </div>
+      @endif
+     </div>
+     @if(data_get($content,'image_url'))
+      <div class="hero-art">
+       <img src="{{\App\Support\MountUrl::to(data_get($content,'image_url'))}}" alt="{{data_get($content,'image_alt','')}}">
+      </div>
+     @endif
+    </div>
+   </section>
+   @break
+
+  @case('event_grid')
+   <section class="section">
+    <div class="container">
+     <div class="section-heading">
+      <h2>{{$heading}}</h2>
+      <a href="{{route('site.events')}}">View all</a>
+     </div>
+     <div class="event-grid">
+      @forelse($events->take((int)data_get($content,'limit',6)) as $event)
+       <article class="event-card">
+        <div class="event-image"><span>{{$event->starts_at->format('M d')}}</span></div>
+        <div class="event-card-body">
+         <h3>{{$event->title}}</h3>
+         <p>{{$event->starts_at->format('F j · g:i A')}}</p>
+         <a class="text-link" href="{{route('events.show',$event)}}">View event →</a>
+        </div>
+       </article>
+      @empty
+       <div class="empty-state compact">No upcoming events.</div>
+      @endforelse
+     </div>
+    </div>
+   </section>
+   @break
+
+  @case('cta')
+   <section class="section section-dark">
+    <div class="container">
+     <div class="cta-panel">
+      <div><h2>{{$heading}}</h2><p>{{$body}}</p></div>
+      <a class="button button-primary" href="{{\App\Support\MountUrl::to(data_get($content,'button_url','#'))}}">
+       {{$renderer->render((string)data_get($content,'button_label','Learn More'),$templateContext)}}
+      </a>
+     </div>
+    </div>
+   </section>
+   @break
+
+  @case('image_text')
+   <section class="section">
+    <div class="container image-text">
+     <div>
+      @if(data_get($content,'image_url'))
+       <img src="{{\App\Support\MountUrl::to(data_get($content,'image_url'))}}" alt="{{data_get($content,'image_alt','')}}">
+      @endif
+     </div>
+     <div>
+      <h2>{{$heading}}</h2>
+      <div class="prose">{!!nl2br(e($body))!!}</div>
+     </div>
+    </div>
+   </section>
+   @break
+
+  @default
+   <section class="section">
+    <div class="container narrow">
+     <div class="panel">
+      <h2>{{$heading}}</h2>
+      @if(data_get($content,'image_url'))
+       <img class="content-image" src="{{\App\Support\MountUrl::to(data_get($content,'image_url'))}}" alt="{{data_get($content,'image_alt','')}}">
+      @endif
+      @if($body)<div class="prose">{!!nl2br(e($body))!!}</div>@endif
+     </div>
+    </div>
+   </section>
  @endswitch
 @endforeach

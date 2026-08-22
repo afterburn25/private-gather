@@ -60,6 +60,72 @@ class CreateWebsiteFlowTest extends TestCase
             ->assertSee('https://demo-club.privategather.test/private-gather/', false);
     }
 
+    public function test_organization_creation_provisions_first_class_website_defaults(): void
+    {
+        $owner = $this->createUser('community-owner@example.test');
+
+        $this->actingAs($owner)->post('http://platform.test/my-organizations', [
+            'name' => 'Dallas Social Society',
+            'type' => 'organization',
+            'subdomain' => 'Dallas Social',
+            'city' => 'Dallas',
+            'region' => 'Texas',
+            'tagline' => 'Private events, community, and connections.',
+            'template' => 'velvet',
+            'marketplace_enabled' => '1',
+        ])->assertRedirect();
+
+        $tenant = Tenant::query()
+            ->where('name', 'Dallas Social Society')
+            ->with(['branding', 'pages'])
+            ->firstOrFail();
+
+        $this->assertSame(Tenant::TYPE_ORGANIZATION, $tenant->type);
+        $this->assertSame('Dallas', data_get($tenant->settings, 'city'));
+        $this->assertSame('Texas', data_get($tenant->settings, 'region'));
+        $this->assertSame('velvet', data_get($tenant->settings, 'template'));
+        $this->assertTrue((bool) data_get($tenant->settings, 'marketplace_enabled'));
+        $this->assertSame('velvet', data_get($tenant->branding?->theme, 'template'));
+
+        foreach (['home', 'about', 'membership', 'rules', 'contact'] as $slug) {
+            $this->assertDatabaseHas('cms_pages', [
+                'tenant_id' => $tenant->id,
+                'slug' => $slug,
+                'status' => 'published',
+            ]);
+        }
+
+        $this->assertDatabaseHas('cms_navigation_items', [
+            'tenant_id' => $tenant->id,
+            'location' => 'header',
+            'label' => 'Membership',
+            'url' => '/page/membership',
+        ]);
+
+        $this->get('http://platform.test/my-organizations?preview='.$tenant->id)
+            ->assertOk()
+            ->assertSee('Dallas Social Society')
+            ->assertSee('Private events, community, and connections.')
+            ->assertSee('Dallas')
+            ->assertSee('Texas');
+    }
+
+    public function test_legacy_organizer_creation_is_normalized_to_organization(): void
+    {
+        $owner = $this->createUser('legacy-organizer@example.test');
+
+        $this->actingAs($owner)->post('http://platform.test/my-organizations', [
+            'name' => 'Legacy Organizer',
+            'type' => 'organizer',
+            'subdomain' => 'legacy-organizer',
+        ])->assertRedirect();
+
+        $this->assertDatabaseHas('tenants', [
+            'name' => 'Legacy Organizer',
+            'type' => Tenant::TYPE_ORGANIZATION,
+        ]);
+    }
+
     public function test_reserved_address_returns_visible_validation_error_instead_of_exception_page(): void
     {
         $owner = $this->createUser('reserved@example.test');
@@ -98,6 +164,7 @@ class CreateWebsiteFlowTest extends TestCase
 
         $this->get('http://platform.test/my-organizations?workspace='.$tenant->id)
             ->assertRedirect();
+
         $this->get('http://platform.test/manage')
             ->assertOk()
             ->assertSee('Preview Club');
