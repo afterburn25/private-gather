@@ -31,9 +31,6 @@ return new class extends Migration
             $t->id(); $t->foreignId('user_id')->constrained()->cascadeOnDelete(); $t->string('target_type',24); $t->unsignedBigInteger('target_id'); $t->timestamps();
             $t->unique(['user_id','target_type','target_id']); $t->index(['target_type','target_id']);
         });
-        Schema::create('user_blocks', function (Blueprint $t): void {
-            $t->id(); $t->foreignId('blocker_id')->constrained('users')->cascadeOnDelete(); $t->foreignId('blocked_id')->constrained('users')->cascadeOnDelete(); $t->timestamps(); $t->unique(['blocker_id','blocked_id']);
-        });
         Schema::create('user_privacy_settings', function (Blueprint $t): void {
             $t->id(); $t->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
             $t->string('profile_visibility',24)->default('members'); $t->string('messages_from',24)->default('connections'); $t->string('location_visibility',24)->default('city');
@@ -108,6 +105,6 @@ return new class extends Migration
     {
         Schema::table('events', function (Blueprint $t): void { $t->dropColumn(['latitude','longitude','featured_at','gallery','faq','hosts','updates']); });
         Schema::table('notification_preferences', function (Blueprint $t): void { $t->dropColumn(['email_membership','email_tickets','push_messages','push_events','push_membership','push_tickets','digest_frequency']); });
-        foreach (['cms_section_templates','trust_cases','push_subscriptions','domain_orders','membership_subscriptions','refunds','payouts','marketplace_ledger_entries','merchant_accounts','referral_attributions','referral_codes','marketing_campaigns','marketing_contacts','tenant_member_notes','tenant_member_tag_assignments','tenant_member_tags','reviews','user_privacy_settings','user_blocks','user_follows','user_connections','saved_searches','favorites','onboarding_progress'] as $table) Schema::dropIfExists($table);
+        foreach (['cms_section_templates','trust_cases','push_subscriptions','domain_orders','membership_subscriptions','refunds','payouts','marketplace_ledger_entries','merchant_accounts','referral_attributions','referral_codes','marketing_campaigns','marketing_contacts','tenant_member_notes','tenant_member_tag_assignments','tenant_member_tags','reviews','user_privacy_settings','user_follows','user_connections','saved_searches','favorites','onboarding_progress'] as $table) Schema::dropIfExists($table);
     }
 };
