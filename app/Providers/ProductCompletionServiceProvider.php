@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Http\Controllers\Admin\ProductInsightsController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\Member\ProductExperienceController;
+use App\Http\Controllers\Tenant\CommerceDashboardController;
 use App\Http\Controllers\Tenant\ProductOperationsController;
 use App\Http\Middleware\EnsurePlatformAdmin;
 use App\Http\Middleware\EnsureTenantManager;
@@ -18,10 +19,6 @@ final class ProductCompletionServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // These routes are registered by a service provider rather than routes/web.php,
-        // so opt into the complete web stack explicitly. This is required for
-        // sessions, CSRF, implicit model binding, tenant-domain resolution,
-        // self-hosted privacy, active-account enforcement, and security headers.
         Route::middleware('web')->group(function (): void {
             if (Edition::isHosted()) {
                 Route::get('/discover', [MarketplaceController::class, 'discover'])->name('discover.index');
@@ -66,7 +63,7 @@ final class ProductCompletionServiceProvider extends ServiceProvider
                 Route::post('/crm/tags', [ProductOperationsController::class, 'createTag'])->name('crm.tags.store');
                 Route::post('/crm/members/{user}/tags', [ProductOperationsController::class, 'assignTag'])->name('crm.tags.assign');
                 Route::post('/crm/members/{user}/notes', [ProductOperationsController::class, 'addNote'])->name('crm.notes.store');
-                Route::get('/commerce', [ProductOperationsController::class, 'commerce'])->name('commerce.index');
+                Route::get('/commerce', CommerceDashboardController::class)->name('commerce.index');
                 Route::patch('/commerce/merchant', [ProductOperationsController::class, 'merchant'])->name('commerce.merchant');
                 Route::post('/commerce/payouts', [ProductOperationsController::class, 'payout'])->name('commerce.payouts.store');
                 Route::post('/commerce/orders/{order}/refund', [ProductOperationsController::class, 'refund'])->name('commerce.refunds.store');
