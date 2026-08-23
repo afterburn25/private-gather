@@ -38,6 +38,7 @@ jobs:
         run: |
           php tools/verify-foundation.php
           php tools/verify-installer.php
+          php tools/test-installer-runtime.php
           php tools/verify-subdirectory-install.php
           php tools/verify-admin-layout.php
           php tools/verify-upgrader.php
@@ -184,7 +185,7 @@ jobs:
         run: find app bootstrap config database routes tests tools install public -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 
   edition-packages:
-    name: Synchronized Hosted and Self-Hosted release packages
+    name: Separate Hosted and Self-Hosted release bases
     runs-on: ubuntu-24.04
     needs: [source-integrity, laravel-runtime, self-hosted-runtime]
     steps:
@@ -202,13 +203,13 @@ jobs:
       - name: Install production dependencies
         run: composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
-      - name: Build both editions from the same Core commit
+      - name: Build dedicated Hosted and Self-Hosted bases
         run: |
           mkdir -p dist
           php tools/build-edition-package.php hosted "$GITHUB_SHA" dist
           php tools/build-edition-package.php self_hosted "$GITHUB_SHA" dist
 
-      - name: Verify edition presets, protected state and Core parity
+      - name: Verify dedicated installers, protected state and shared Core parity
         shell: bash
         run: |
           hosted="$(find dist -maxdepth 1 -type f -name 'Private-Gather-Hosted-*.zip' -print -quit)"
@@ -218,7 +219,7 @@ jobs:
           php tools/verify-edition-packages.php "$hosted" "$self_hosted" "$GITHUB_SHA"
           (cd dist && sha256sum -c ./*.sha256)
 
-      - name: Upload synchronized edition packages
+      - name: Upload separate edition packages
         uses: actions/upload-artifact@v4
         with:
           name: private-gather-${{ github.sha }}-edition-packages
