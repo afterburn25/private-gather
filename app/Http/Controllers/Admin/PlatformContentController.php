@@ -7,6 +7,7 @@ use App\Models\PlatformSetting;
 use App\Services\PlatformContent;
 use App\Support\Audit;
 use App\Support\ThemeCatalog;
+use Database\Seeders\ShowcaseContentSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -22,6 +23,12 @@ class PlatformContentController extends Controller
 
     public function update(Request $request)
     {
+        if ($request->string('action')->toString() === 'seed_showcase') {
+            app(ShowcaseContentSeeder::class)->run();
+            Audit::write('platform.showcase.seeded', after: ['clubs' => 10, 'events' => 20], request: $request);
+            return back()->with('status', 'Showcase content populated: 10 clubs and 20 upcoming events. Running it again safely refreshes the same showcase records.');
+        }
+
         $data = $request->validate([
             'brand_name' => 'required|string|max:120',
             'theme_preset' => ['required', Rule::in(array_keys(ThemeCatalog::platformThemes()))],
@@ -69,8 +76,6 @@ class PlatformContentController extends Controller
             unset($data[$uploadKey]);
         }
 
-        // Never persist an alternate central logo. The main marketplace uses the
-        // official Private Gather crest; tenant sites own their separate branding.
         PlatformSetting::updateOrCreate(
             ['key' => 'logo_url'],
             ['group' => 'content', 'value' => PlatformContent::OFFICIAL_LOGO, 'type' => 'string', 'updated_by' => $request->user()->id]
