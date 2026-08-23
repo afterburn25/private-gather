@@ -98,7 +98,7 @@
         <div class="pg-header-actions">
             @if (auth()->check())
                 @if ($isPlatformAdmin)
-                    <a class="button button-ghost" href="{{ route('admin.home') }}">Platform</a>
+                    <a class="button button-ghost" href="{{ route('admin.home') }}">Admin Backend</a>
                 @endif
                 @if ($canManage)
                     <a class="button button-ghost" href="{{ route('tenant.dashboard') }}">Club OS</a>
