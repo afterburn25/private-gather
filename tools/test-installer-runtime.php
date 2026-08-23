@@ -5,6 +5,25 @@ declare(strict_types=1);
 require dirname(__DIR__).'/install/lib.php';
 require dirname(__DIR__).'/install/runtime.php';
 
+$installerSource = (string) file_get_contents(dirname(__DIR__).'/install/index.php');
+$forbiddenVisibleLabels = [
+    'Install Hosted Platform',
+    'This installer always provisions the Hosted platform base',
+    'There is no edition selector and no Self-Hosted mode in this package',
+    'Install Private Gather Hosted',
+    'PRIVATE GATHER · HOSTED INSTALLER',
+    'Private Gather Hosted Installer',
+    'Private Gather Hosted is configured and ready',
+];
+foreach ($forbiddenVisibleLabels as $label) {
+    if (str_contains($installerSource, $label)) {
+        throw new RuntimeException('Hosted browser installer still exposes edition jargon: '.$label);
+    }
+}
+if (! str_contains($installerSource, '<h2>5. Install Private Gather</h2>') || ! str_contains($installerSource, '>Install Private Gather</button>')) {
+    throw new RuntimeException('Hosted browser installer does not expose the clean Private Gather install action.');
+}
+
 $root = sys_get_temp_dir().'/private-gather-installer-runtime-'.bin2hex(random_bytes(5));
 if (! mkdir($root, 0755, true) && ! is_dir($root)) {
     throw new RuntimeException('Unable to create temporary installer test root.');
@@ -111,6 +130,7 @@ try {
         throw new RuntimeException('Installer or disabled fallback remains after automatic cleanup.');
     }
 
+    echo "INSTALLER PRESENTATION CLEANUP: PASS\n";
     echo "INSTALLER OWNERSHIP-NEUTRAL REBUILD: PASS\n";
     echo "INSTALLER RUNTIME REPAIR: PASS\n";
     echo "INSTALLER AUTO-DELETE: PASS\n";
