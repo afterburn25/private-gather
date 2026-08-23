@@ -136,8 +136,13 @@ final class MessageController
         $blocked = DB::table('user_blocks')->where(fn ($q) => $q->where(['user_id' => $senderId, 'blocked_user_id' => $recipientId]))
             ->orWhere(fn ($q) => $q->where(['user_id' => $recipientId, 'blocked_user_id' => $senderId]))->exists();
         if ($blocked) return false;
+
         $privacy = DB::table('user_privacy_settings')->where('user_id', $recipientId)->first();
-        $mode = $privacy?->messages_from ?? 'connections';
+        // Existing members predate granular messaging preferences. Preserve the
+        // certified same-site messaging contract until a member explicitly has
+        // a privacy row; onboarding/settings can then narrow it to connections
+        // or nobody.
+        $mode = $privacy?->messages_from ?? 'members';
         if ($mode === 'nobody') return false;
         if ($mode === 'members') return true;
         return DB::table('user_connections')->where('status', 'accepted')->where(function ($q) use ($senderId, $recipientId): void {
