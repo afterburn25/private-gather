@@ -33,6 +33,7 @@ if (! is_dir($outputDir) && ! mkdir($outputDir, 0775, true) && ! is_dir($outputD
 }
 
 $label = $edition === 'hosted' ? 'Hosted' : 'Self-Hosted';
+$baseIdentity = $edition === 'hosted' ? 'hosted-platform' : 'self-hosted-organization';
 $filename = 'Private-Gather-'.$label.'-'.$version.'.zip';
 $output = rtrim($outputDir, '/\\').DIRECTORY_SEPARATOR.$filename;
 @unlink($output);
@@ -64,7 +65,8 @@ $addFile = static function (string $absolute, string $relative) use (
     &$added,
     $excludedBasenames,
     $runtimePrefixes,
-    $edition
+    $edition,
+    $root
 ): void {
     $relative = str_replace('\\', '/', ltrim($relative, '/'));
     $basename = basename($relative);
@@ -79,7 +81,7 @@ $addFile = static function (string $absolute, string $relative) use (
         return;
     }
 
-    if ($relative === 'database/database.sqlite') {
+    if ($relative === 'database/database.sqlite' || $relative === 'install/self-hosted-index.php') {
         return;
     }
 
@@ -93,18 +95,12 @@ $addFile = static function (string $absolute, string $relative) use (
         return;
     }
 
-    if ($relative === 'install/index.php') {
-        $contents = (string) file_get_contents($absolute);
-        $search = "'edition' => 'hosted',";
-        $replacement = "'edition' => '".$edition."',";
-        if (! str_contains($contents, $search)) {
-            throw new RuntimeException('Installer edition preset marker changed; package build refused.');
+    if ($relative === 'install/index.php' && $edition === 'self_hosted') {
+        $selfHostedInstaller = $root.'/install/self-hosted-index.php';
+        if (! is_file($selfHostedInstaller)) {
+            throw new RuntimeException('Dedicated Self-Hosted installer is missing.');
         }
-        $contents = str_replace($search, $replacement, $contents, $count);
-        if ($count !== 1) {
-            throw new RuntimeException('Installer edition preset marker must occur exactly once.');
-        }
-        $zip->addFromString($relative, $contents);
+        $zip->addFromString($relative, (string) file_get_contents($selfHostedInstaller));
     } elseif ($relative === '.env.example') {
         $contents = (string) file_get_contents($absolute);
         $contents = preg_replace(
@@ -151,15 +147,18 @@ foreach ($includeRoots as $entry) {
 }
 
 $metadata = [
-    'schema' => 1,
+    'schema' => 2,
     'product' => 'privategather/private-gather',
     'version' => $version,
     'edition' => $edition,
+    'installation_base' => $baseIdentity,
     'source_commit' => $sourceSha,
     'shared_core' => true,
+    'dedicated_installer' => true,
 ];
 
 $zip->addFromString('EDITION-PRESET', $edition."\n");
+$zip->addFromString('BASE-PRESET', $baseIdentity."\n");
 $zip->addFromString(
     'PACKAGE-METADATA.json',
     json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)."\n"
@@ -175,8 +174,9 @@ file_put_contents($output.'.sha256', $sha256.'  '.$filename."\n");
 echo json_encode([
     'file' => $output,
     'edition' => $edition,
+    'installation_base' => $baseIdentity,
     'version' => $version,
     'source_commit' => $sourceSha,
-    'files' => $added + 2,
+    'files' => $added + 3,
     'sha256' => $sha256,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)."\n";
