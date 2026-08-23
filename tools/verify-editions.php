@@ -8,7 +8,9 @@ $required = [
     'config/edition.php' => ['PRIVATE_GATHER_EDITION', 'SELF_HOSTED_VISIBILITY', 'SELF_HOSTED_REGISTRATION'],
     'app/Http/Middleware/EnforceSelfHostedPrivacy.php' => ['selfHostedVisibility', 'registrationEnabled'],
     'app/Http/Middleware/ResolveTenantByDomain.php' => ['selfHostedTenant', 'tenant_self_hosted'],
-    'install/index.php' => ['Hosted Edition', 'Self-Hosted Edition', 'organization_name'],
+    'install/index.php' => ['HOSTED INSTALLER', "'edition' => 'hosted'"],
+    'install/self-hosted-index.php' => ['SELF-HOSTED INSTALLER', "'edition' => 'self_hosted'", 'organization_name'],
+    'install/runtime.php' => ['installer_prepare_runtime_directories', 'bootstrap/cache'],
     'install/lib.php' => ['installer_create_self_hosted_tenant', 'SELF_HOSTED_TENANT_ID', 'PRIVATE_GATHER_EDITION'],
     '.env.example' => ['PRIVATE_GATHER_EDITION=hosted', 'SELF_HOSTED_VISIBILITY=private'],
 ];
@@ -28,14 +30,26 @@ foreach ($required as $path => $needles) {
     }
 }
 
+$hostedInstaller = (string) @file_get_contents($root.'/install/index.php');
+$selfHostedInstaller = (string) @file_get_contents($root.'/install/self-hosted-index.php');
+if (str_contains($hostedInstaller, 'name="edition"') || str_contains($selfHostedInstaller, 'name="edition"')) {
+    $failures[] = 'Deployable installer source still exposes an edition selector.';
+}
+if (str_contains($hostedInstaller, 'name="organization_name"')) {
+    $failures[] = 'Hosted installer still exposes Self-Hosted organization setup.';
+}
+if (! str_contains($selfHostedInstaller, 'name="organization_name"')) {
+    $failures[] = 'Self-Hosted installer is missing dedicated organization setup.';
+}
+
 $layout = (string) @file_get_contents($root.'/resources/views/layouts/app.blade.php');
 if (! str_contains($layout, 'Edition::registrationEnabled()')) {
-    $failures[] = 'Public layout is not edition-aware.';
+    $failures[] = 'Shared application layout is not edition-aware.';
 }
 
 $adminLayout = (string) @file_get_contents($root.'/resources/views/layouts/admin.blade.php');
 if (! str_contains($adminLayout, 'Self-Hosted Edition')) {
-    $failures[] = 'Admin layout does not identify Self-Hosted Edition.';
+    $failures[] = 'Shared admin layout does not identify Self-Hosted Edition when that base is running.';
 }
 
 if ($failures !== []) {
@@ -43,4 +57,4 @@ if ($failures !== []) {
     exit(1);
 }
 
-echo "Private Gather unified editions: PASS\n";
+echo "Private Gather separate Hosted/Self-Hosted bases with shared maintained Core: PASS\n";
