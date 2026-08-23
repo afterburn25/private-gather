@@ -22,7 +22,7 @@
                 @endphp
                 <article class="pg-card pg-card-interactive">
                     <div class="pg-event-meta"><span class="pg-pill">{{ $kind }}</span>@if($location)<span class="pg-pill">{{ $location }}</span>@endif</div>
-                    <div class="pg-media" style="margin:16px 0"><div class="pg-media-overlay"><span class="pg-eyebrow">{{ strtoupper($kind) }}</span><h3 style="margin:.35rem 0 0">{{ $org->name }}</h3></div></div>
+                    <div class="pg-media" style="margin:16px 0">@if(data_get($org->settings,'cover_image_path'))<img src="{{ \App\Support\MountUrl::to(data_get($org->settings,'cover_image_path')) }}" alt="{{ $org->name }} showcase image">@endif<div class="pg-media-overlay"><span class="pg-eyebrow">{{ strtoupper($kind) }}</span><h3 style="margin:.35rem 0 0">{{ $org->name }}</h3>@if(data_get($org->settings,'showcase_content'))<span class="pg-pill">Fictional showcase</span>@endif</div></div>
                     <p class="muted">{{ data_get($org->settings,'marketplace_summary') ?: 'Visit this community’s Private Gather site for events, membership information and community details.' }}</p>
                     @if($org->primaryDomain)
                         <div class="pg-actions"><a class="button button-primary" href="https://{{ $org->primaryDomain->domain }}">Visit community</a><span class="pg-pill">{{ $org->primaryDomain->domain }}</span></div>
