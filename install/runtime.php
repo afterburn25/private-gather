@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__.'/cleanup.php';
+
 /**
  * Prepare the Laravel runtime directories before requirements are evaluated.
  *
