@@ -1,6 +1,7 @@
 Fresh certification branch for Private Gather 1.2.3.
 restored-runtime-dependency=app/Support/LifestyleProfileOptions.php
-runtime-payload-files=30
-member-route-diagnostic=exception-v1
+runtime-payload-files=31
+member-route-diagnostic=exception-v2
+partner-invite-model=app/Models/ProfilePartnerInvite.php
 baseline-parity=DashboardController-live-1.2.0
 central-messages=expected-404
