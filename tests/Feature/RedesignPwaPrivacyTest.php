@@ -24,6 +24,7 @@ class RedesignPwaPrivacyTest extends TestCase
         foreach ([
             './assets/app.css',
             './assets/redesign.css',
+            './assets/redesign-compat.css',
             './assets/redesign.js',
             './assets/branding/private-gather-logo.png',
             './offline.html',
