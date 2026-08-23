@@ -1,121 +1,18 @@
 @extends('layouts.app')
-
 @section('title', 'Door Mode · '.$event->title)
-
 @section('content')
-<section class="container section">
-    <div class="panel-head">
-        <div>
-            <div class="eyebrow">DOOR MODE</div>
-            <h1>{{ $event->title }}</h1>
-            <p class="muted">Admission, verification and club recognition at a glance. Private-only badges are never exposed here.</p>
-        </div>
-        <a class="button button-ghost" href="{{ route('tenant.events.edit', $event) }}">Event Manager</a>
-    </div>
+<section class="pg-door-shell">
+<section class="pg-page-hero"><div class="pg-shell"><div class="row-between" style="gap:20px"><div><span class="pg-eyebrow">DOOR MODE</span><h1>{{ $event->title }}</h1><p>Fast admission with only the information staff need at the door. Private-only recognition and unnecessary account details are intentionally omitted.</p></div><a class="button button-ghost" href="{{ route('tenant.events.edit', $event) }}">Exit Door Mode</a></div></div></section>
+<section class="pg-page"><div class="pg-shell">
+@if($errors->any())<div class="pg-card" style="border-color:rgba(235,119,119,.35)!important;color:#ffb0b0">{{ $errors->first() }}</div>@endif
+<div class="pg-grid pg-grid-4"><div class="pg-stat"><span>Checked in</span><strong class="pg-door-count">{{ $checkedIn }}</strong></div><div class="pg-stat"><span>Approved</span><strong class="pg-door-count">{{ $approved }}</strong></div><div class="pg-stat"><span>Capacity</span><strong class="pg-door-count">{{ $event->capacity ?? '∞' }}</strong></div><div class="pg-stat"><span>Space remaining</span><strong class="pg-door-count">{{ $remaining ?? '∞' }}</strong></div></div>
 
-    @if($errors->any())
-        <div class="error">{{ $errors->first() }}</div>
-    @endif
+<section class="pg-section"><div class="pg-grid pg-grid-2"><section class="pg-card"><span class="pg-eyebrow">FASTEST PATH</span><h2>Scan / enter ticket</h2><form method="post" action="{{ route('tenant.checkin.ticket', $event) }}" class="form-stack">@csrf<label>Ticket token<input name="qr_token" placeholder="Scan or enter ticket QR token" autocomplete="off" autofocus required></label><button class="button button-primary button-large">Check in ticket</button></form></section><section class="pg-card"><span class="pg-eyebrow">AUTHORIZED WALK-IN</span><h2>Named walk-in</h2><p class="muted">Use only when this event’s door policy permits entry without an existing member/ticket entitlement.</p><form method="post" action="{{ route('tenant.checkin.manual', $event) }}" class="form-stack">@csrf<label>Guest / party name<input name="guest_name" required></label><label>Party size<input name="guest_count" type="number" min="1" max="20" value="1" required></label><button class="button button-ghost">Check in walk-in</button></form></section></div></section>
 
-    <div class="stats">
-        <div class="stat"><strong>{{ $checkedIn }}</strong><span>Checked In</span></div>
-        <div class="stat"><strong>{{ $approved }}</strong><span>Approved Guests</span></div>
-        <div class="stat"><strong>{{ $event->capacity ?? '∞' }}</strong><span>Capacity</span></div>
-        <div class="stat"><strong>{{ $remaining ?? '∞' }}</strong><span>Space Remaining</span></div>
-    </div>
+<section class="pg-section"><div class="pg-card"><div class="pg-section-head"><div><span class="pg-eyebrow">APPROVED ATTENDEES</span><h2>Guest lookup</h2><p>Search can match account records, but the door screen only displays admission-relevant identity.</p></div><form method="get" class="form-inline"><input name="q" value="{{ $search }}" placeholder="Search approved attendees" aria-label="Search approved attendees"><button class="button button-ghost">Search</button></form></div>
+<div class="pg-grid" style="gap:10px">@forelse($attendees as $rsvp) @php($user=$rsvp->user) @if($user)<div class="pg-card" style="background:rgba(255,255,255,.025)!important"><div class="row-between" style="gap:18px"><div><div class="pg-event-meta"><span class="pg-pill">{{ ucfirst($user->profile?->profile_type ?: 'member') }} profile</span><span class="pg-pill">Approved for {{ $rsvp->guest_count }}</span><span class="pg-pill">{{ (int)($checkedByUser[$user->id]??0) }} already in</span>@if($activeMembership[$user->id]??false)<span class="pg-pill pg-pill-good">Active club member</span>@endif</div><h3 style="font-size:1.35rem;margin:.6rem 0">{{ $user->display_name ?: $user->name }}</h3><div class="pg-trust-row">@foreach($doorBadges[$user->id]??[] as $assignment)<span class="pg-pill">{{ $assignment->badge->isGlobal()?'PG · ':'' }}{{ $assignment->badge->icon }} {{ $assignment->badge->name }}</span>@endforeach</div></div><form method="post" action="{{ route('tenant.checkin.manual', $event) }}" class="form-inline">@csrf<input type="hidden" name="user_id" value="{{ $user->id }}"><input name="guest_count" aria-label="Guests checking in" type="number" min="1" max="{{ max(1,$rsvp->guest_count) }}" value="1" style="width:82px"><button class="button button-primary button-large">Check in</button></form></div></div>@endif @empty<div class="pg-empty">No approved attendees match this search.</div>@endforelse</div><div style="margin-top:24px">{{ $attendees->links() }}</div></div></section>
 
-    <div class="management-grid">
-        <section class="panel">
-            <h2>Scan / enter ticket</h2>
-            <form method="post" action="{{ route('tenant.checkin.ticket', $event) }}" class="form-stack">
-                @csrf
-                <input name="qr_token" placeholder="Ticket QR token" autocomplete="off" required>
-                <button class="button button-primary">Check In Ticket</button>
-            </form>
-        </section>
-
-        <section class="panel">
-            <h2>Named walk-in</h2>
-            <p class="muted">Use only when door policy allows an authorized walk-in without an existing member/ticket entitlement.</p>
-            <form method="post" action="{{ route('tenant.checkin.manual', $event) }}" class="form-stack">
-                @csrf
-                <input name="guest_name" placeholder="Guest / party name" required>
-                <input name="guest_count" type="number" min="1" max="20" value="1" required>
-                <button>Check In Walk-In</button>
-            </form>
-        </section>
-    </div>
-
-    <section class="panel">
-        <div class="panel-head">
-            <div>
-                <h2>Approved attendees</h2>
-                <p class="muted">Search by member name, display name or email.</p>
-            </div>
-            <form method="get" class="form-inline">
-                <input name="q" value="{{ $search }}" placeholder="Search approved attendees">
-                <button>Search</button>
-            </form>
-        </div>
-
-        @forelse($attendees as $rsvp)
-            @php
-                $user = $rsvp->user;
-            @endphp
-
-            @if($user)
-                <div class="list-row">
-                    <div>
-                        <strong>{{ $user->display_name ?: $user->name }}</strong>
-                        <small>
-                            {{ ucfirst($user->profile?->profile_type ?: 'member') }} profile
-                            · {{ $user->email }}
-                            · approved for {{ $rsvp->guest_count }}
-                            · {{ (int) ($checkedByUser[$user->id] ?? 0) }} already checked in
-                            @if($activeMembership[$user->id] ?? false)
-                                · Active club member
-                            @endif
-                        </small>
-
-                        <div class="row-actions">
-                            @foreach($doorBadges[$user->id] ?? [] as $assignment)
-                                <span class="pill">
-                                    {{ $assignment->badge->isGlobal() ? 'PG ' : '' }}{{ $assignment->badge->icon }} {{ $assignment->badge->name }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <form method="post" action="{{ route('tenant.checkin.manual', $event) }}" class="form-inline">
-                        @csrf
-                        <input type="hidden" name="user_id" value="{{ $user->id }}">
-                        <input name="guest_count" type="number" min="1" max="{{ max(1, $rsvp->guest_count) }}" value="1">
-                        <button class="button button-primary">Check In</button>
-                    </form>
-                </div>
-            @endif
-        @empty
-            <p>No approved attendees match this search.</p>
-        @endforelse
-
-        {{ $attendees->links() }}
-    </section>
-
-    <section class="panel">
-        <h2>Recent check-ins</h2>
-
-        @forelse($checkins as $checkin)
-            <div class="list-row">
-                <div>
-                    <strong>{{ $checkin->user?->display_name ?: $checkin->user?->name ?: data_get($checkin->metadata, 'guest_name', 'Walk-in guest') }}</strong>
-                    <small>{{ strtoupper($checkin->method) }} · {{ $checkin->guest_count }} admitted · {{ $checkin->checked_in_at?->format('g:i A') }}</small>
-                </div>
-            </div>
-        @empty
-            <p>No check-ins yet.</p>
-        @endforelse
-
-        {{ $checkins->links() }}
-    </section>
-</section>
+<section class="pg-section"><div class="pg-card"><div class="pg-section-head"><div><span class="pg-eyebrow">RECENT ENTRY</span><h2>Check-ins</h2></div></div><div class="pg-grid" style="gap:10px">@forelse($checkins as $checkin)<div class="row-between"><div><strong>{{ $checkin->user?->display_name ?: $checkin->user?->name ?: data_get($checkin->metadata,'guest_name','Walk-in guest') }}</strong><small>{{ strtoupper($checkin->method) }} · {{ $checkin->guest_count }} admitted · {{ $checkin->checked_in_at?->format('g:i A') }}</small></div><span class="pg-pill pg-pill-good">Admitted</span></div>@empty<div class="pg-empty">No check-ins yet.</div>@endforelse</div><div style="margin-top:24px">{{ $checkins->links() }}</div></div></section>
+<div class="pg-privacy-note">Door Mode deliberately omits member email addresses and private-only badges. Staff see admission status, display identity, party count and only recognition configured for door visibility.</div>
+</div></section></section>
 @endsection
