@@ -110,7 +110,7 @@ jobs:
       - name: Assert release routes
         run: |
           php artisan route:list --except-vendor
-          php artisan tinker --execute='$names=["verification.index","verification.start","verification.return","verification.webhooks.persona","clubs.apply","admin.age-verification.index","events.community","groups.show","network.connections.request"]; foreach($names as $name){ if(!Illuminate\Support\Facades\Route::has($name)){ fwrite(STDERR,"Missing route: {$name}\n"); exit(1); } echo "Route OK: {$name}\n"; }'
+          php artisan tinker --execute='$names=["verification.index","verification.start","verification.return","verification.webhooks.persona","clubs.apply","admin.age-verification.index","events.community","groups.show","network.connections.request","tenant.growth.index","tenant.growth.members.index","organizations.provision-subdomain"]; foreach($names as $name){ if(!Illuminate\Support\Facades\Route::has($name)){ fwrite(STDERR,"Missing route: {$name}\n"); exit(1); } echo "Route OK: {$name}\n"; }'
 
       - name: Verify every controller route action resolves
         run: php artisan test tests/Feature/RouteActionIntegrityTest.php --stop-on-failure
@@ -131,6 +131,12 @@ jobs:
 
       - name: Re-run tenant navigation matrix
         run: php artisan test tests/Feature/Live120TenantLinkMatrixTest.php --stop-on-failure
+
+      - name: Run 1.2.3 community runtime tests
+        run: php artisan test tests/Feature/V123CommunityRuntimeTest.php --stop-on-failure
+
+      - name: Run 1.2.3 growth commerce runtime tests
+        run: php artisan test tests/Feature/V123GrowthCommerceRuntimeTest.php --stop-on-failure
 
       - name: Run 1.2.3 identity and membership tests
         run: php artisan test tests/Feature/V123IdentityVerificationTest.php --stop-on-failure
@@ -161,7 +167,7 @@ jobs:
               manifest = json.loads(z.read('manifest.json'))
               assert manifest['to_version'] == '1.2.3'
               assert manifest['from_versions'] == ['1.2.0', '1.2.1']
-              assert len(manifest['files']) == 42
+              assert len(manifest['files']) == 48
               payload_paths = {f['path'] for f in manifest['files']}
               required = {
                   'app/Models/ProfilePartnerInvite.php',
@@ -176,6 +182,12 @@ jobs:
                   'app/Models/CommunityPollVote.php',
                   'app/Models/CommunityPost.php',
                   'resources/views/member/community/context.blade.php',
+                  'app/Http/Controllers/Tenant/GrowthCommerceController.php',
+                  'app/Http/Controllers/Tenant/MembershipManagementController.php',
+                  'app/Http/Controllers/Tenant/OrganizationController.php',
+                  'resources/views/tenant/manage/growth.blade.php',
+                  'resources/views/tenant/manage/growth-members.blade.php',
+                  'resources/views/tenant/manage/dashboard.blade.php',
               }
               assert required.issubset(payload_paths)
           print('sha256=' + hashlib.sha256(zpath.read_bytes()).hexdigest())
