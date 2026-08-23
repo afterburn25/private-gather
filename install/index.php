@@ -8,6 +8,7 @@ require __DIR__.'/runtime.php';
 require __DIR__.'/database.php';
 require __DIR__.'/community-schema.php';
 require __DIR__.'/product-completion-schema.php';
+require __DIR__.'/showcase.php';
 
 if (installer_is_installed()) {
     http_response_code(410);
@@ -18,6 +19,7 @@ if (installer_is_installed()) {
 
 $runtimeRepair = installer_prepare_runtime_directories();
 $checks = installer_requirements();
+$checks[] = ['Public CSS, JavaScript, branding, and showcase images are present', installer_showcase_assets_present()];
 $csrf = $_SESSION['installer_csrf'] ??= bin2hex(random_bytes(32));
 $errors = [];
 $success = false;
@@ -81,8 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         installer_create_admin($pdo, $installInput);
         installer_write_env($installInput);
         installer_finalize_database_env($installInput);
-        installer_write_receipt($installInput);
         foreach (glob(installer_base_path().'/bootstrap/cache/*.php') ?: [] as $cacheFile) @unlink($cacheFile);
+        installer_seed_hosted_showcase($installInput);
+        installer_write_receipt($installInput);
         $success = true;
         unset($_SESSION['installer_csrf']);
         session_write_close();
