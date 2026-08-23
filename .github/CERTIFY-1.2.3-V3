@@ -1,0 +1,6 @@
+Fresh certification branch for Private Gather 1.2.3 after tenant profile dependency repair.
+source-release-head=56337d3cbbde4f1bf2a7b3c87829cfd5f1b866d7
+runtime-payload-files=31
+partner-invite-model=app/Models/ProfilePartnerInvite.php
+upgrade-payload-asserts-partner-invite-model=true
+baseline-parity=certified-live-1.2.0
