@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Tenant;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\SiteController;
 use App\Models\Tenant;
+use App\Models\TenantDomain;
 use App\Services\PlatformContent;
 use App\Services\TenantProvisioner;
+use App\Support\DomainName;
 use App\Support\Edition;
 use App\Tenancy\TenantContext;
 use Illuminate\Contracts\View\View as ViewContract;
@@ -67,8 +69,6 @@ class OrganizationController extends Controller
     {
         abort_unless(Edition::isHosted(), 404);
 
-        // Human-friendly input such as "My Club" becomes a safe subdomain
-        // instead of silently failing the lowercase-only validation rule.
         $request->merge([
             'subdomain' => Str::slug((string) $request->input('subdomain')),
         ]);
@@ -95,15 +95,59 @@ class OrganizationController extends Controller
             ]);
         }
 
-        // Keep management usable on central/demo hosts where wildcard tenant
-        // DNS is not available. Production tenant-domain requests still resolve
-        // by Host and do not depend on this workspace session value.
         $request->session()->put('tenant.workspace_id', $tenant->id);
 
         return redirect()->route('tenant.dashboard')->with(
             'status',
             'Website created. You are now managing '.$tenant->name.'.',
         );
+    }
+
+    public function provision(Request $request, Tenant $tenant): RedirectResponse
+    {
+        abort_unless(Edition::isHosted(), 404);
+        $this->authorizeManagement($request, $tenant);
+
+        $existing = $tenant->domains()
+            ->where('type', TenantDomain::TYPE_PLATFORM_SUBDOMAIN)
+            ->where('status', TenantDomain::STATUS_ACTIVE)
+            ->first();
+        if ($existing) {
+            return back()->with('status', 'This organization already has a Private Gather subdomain: '.$existing->domain);
+        }
+
+        $request->merge(['subdomain' => Str::slug((string) $request->input('subdomain'))]);
+        $data = $request->validate([
+            'subdomain' => ['required', 'string', 'max:63', 'regex:/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/'],
+        ]);
+        $subdomain = (string) $data['subdomain'];
+        if (in_array($subdomain, (array) config('platform.reserved_subdomains', []), true)) {
+            throw ValidationException::withMessages(['subdomain' => 'That Private Gather subdomain is reserved.']);
+        }
+
+        try {
+            $domain = DomainName::platformSubdomain($subdomain, (string) config('platform.root_domain'));
+        } catch (InvalidArgumentException $exception) {
+            throw ValidationException::withMessages(['subdomain' => $exception->getMessage()]);
+        }
+        if (TenantDomain::query()->where('domain', $domain)->exists()) {
+            throw ValidationException::withMessages(['subdomain' => 'That Private Gather subdomain is already in use.']);
+        }
+
+        $isPrimary = ! $tenant->domains()->where('is_primary', true)->exists();
+        $tenant->domains()->create([
+            'domain' => $domain,
+            'type' => TenantDomain::TYPE_PLATFORM_SUBDOMAIN,
+            'is_primary' => $isPrimary,
+            'status' => TenantDomain::STATUS_ACTIVE,
+            'verified_at' => now(),
+            'ssl_status' => 'managed',
+            'dns_status' => 'active',
+            'dns_last_checked_at' => now(),
+            'redirect_to_primary' => ! $isPrimary,
+        ]);
+
+        return back()->with('status', 'Private Gather subdomain provisioned: '.$domain);
     }
 
     private function tenantForUser(Request $request, int $tenantId): Tenant
