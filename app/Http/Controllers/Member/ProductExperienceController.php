@@ -141,7 +141,7 @@ final class ProductExperienceController extends Controller
     {
         return view('member.product-center', [
             'section' => 'privacy', 'privacy' => DB::table('user_privacy_settings')->where('user_id', $request->user()->id)->first(),
-            'blocks' => DB::table('user_blocks')->join('users', 'users.id', '=', 'user_blocks.blocked_id')->where('blocker_id', $request->user()->id)->select('user_blocks.*', 'users.display_name', 'users.name')->get(),
+            'blocks' => DB::table('user_blocks')->join('users', 'users.id', '=', 'user_blocks.blocked_user_id')->where('user_blocks.user_id', $request->user()->id)->select('user_blocks.*', 'users.display_name', 'users.name')->get(),
         ]);
     }
 
@@ -170,8 +170,8 @@ final class ProductExperienceController extends Controller
     {
         $tenant = $context->requireTenant();
         $viewerId = (int) $request->user()->id;
-        $blocked = DB::table('user_blocks')->where('blocker_id', $viewerId)->pluck('blocked_id')
-            ->merge(DB::table('user_blocks')->where('blocked_id', $viewerId)->pluck('blocker_id'))->unique()->map(fn ($id) => (int) $id);
+        $blocked = DB::table('user_blocks')->where('user_id', $viewerId)->pluck('blocked_user_id')
+            ->merge(DB::table('user_blocks')->where('blocked_user_id', $viewerId)->pluck('user_id'))->unique()->map(fn ($id) => (int) $id);
         $users = $tenant->users()->with('profile')->wherePivot('status', 'active')->where('users.id', '!=', $viewerId)
             ->whereNotIn('users.id', $blocked)
             ->whereHas('profile', fn ($q) => $q->where('discoverable', true))
@@ -222,7 +222,7 @@ final class ProductExperienceController extends Controller
     {
         abort_if($user->id === $request->user()->id, 422);
         DB::transaction(function () use ($request, $user): void {
-            DB::table('user_blocks')->updateOrInsert(['blocker_id' => $request->user()->id, 'blocked_id' => $user->id], ['created_at' => now(), 'updated_at' => now()]);
+            DB::table('user_blocks')->updateOrInsert(['user_id' => $request->user()->id, 'blocked_user_id' => $user->id], ['created_at' => now(), 'updated_at' => now()]);
             DB::table('user_connections')->where(fn ($q) => $q->where(['requester_id' => $request->user()->id, 'addressee_id' => $user->id]))->orWhere(fn ($q) => $q->where(['requester_id' => $user->id, 'addressee_id' => $request->user()->id]))->delete();
         });
         return back()->with('status', 'Member blocked.');
@@ -230,7 +230,7 @@ final class ProductExperienceController extends Controller
 
     public function unblock(Request $request, User $user): RedirectResponse
     {
-        DB::table('user_blocks')->where(['blocker_id' => $request->user()->id, 'blocked_id' => $user->id])->delete();
+        DB::table('user_blocks')->where(['user_id' => $request->user()->id, 'blocked_user_id' => $user->id])->delete();
         return back()->with('status', 'Member unblocked.');
     }
 
@@ -275,6 +275,6 @@ final class ProductExperienceController extends Controller
 
     private function assertNotBlocked(int $a, int $b): void
     {
-        abort_if(DB::table('user_blocks')->where(fn ($q) => $q->where(['blocker_id' => $a, 'blocked_id' => $b]))->orWhere(fn ($q) => $q->where(['blocker_id' => $b, 'blocked_id' => $a]))->exists(), 403, 'Connection is not available.');
+        abort_if(DB::table('user_blocks')->where(fn ($q) => $q->where(['user_id' => $a, 'blocked_user_id' => $b]))->orWhere(fn ($q) => $q->where(['user_id' => $b, 'blocked_user_id' => $a]))->exists(), 403, 'Connection is not available.');
     }
 }
