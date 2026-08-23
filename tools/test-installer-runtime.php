@@ -15,18 +15,20 @@ $remove = static function (string $path) use (&$remove): void {
         @unlink($path);
         return;
     }
+    @chmod($path, 0775);
     foreach (scandir($path) ?: [] as $item) {
         if ($item === '.' || $item === '..') continue;
         $full = $path.DIRECTORY_SEPARATOR.$item;
         is_dir($full) && ! is_link($full) ? $remove($full) : @unlink($full);
     }
-    @chmod($path, 0775);
     @rmdir($path);
 };
 
 try {
     mkdir($root.'/storage', 0555, true);
-    mkdir($root.'/bootstrap/cache', 0555, true);
+    mkdir($root.'/bootstrap', 0755, true);
+    mkdir($root.'/bootstrap/cache', 0755, false);
+    @chmod($root.'/bootstrap/cache', 0555);
 
     $results = installer_prepare_runtime_directories($root);
     $failures = array_keys(array_filter($results, static fn (bool $ok): bool => ! $ok));
