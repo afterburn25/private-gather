@@ -5,7 +5,6 @@ import hashlib, json, zipfile
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'dist' / 'Private-Gather-1.2.0-or-1.2.1-to-1.2.3-Upgrade.zip'
 FILES = [
-    '.env.example',
     'VERSION',
     'bootstrap/providers.php',
     'config/age_verification.php',
@@ -42,6 +41,7 @@ FILES = [
 ]
 MIGRATION = 'database/migrations/2026_08_22_200000_global_username_and_age_verification_v123.php'
 
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open('rb') as f:
@@ -49,12 +49,18 @@ def sha256(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+
 def main() -> None:
     if (ROOT / 'VERSION').read_text().strip() != '1.2.3':
         raise SystemExit('VERSION must be exactly 1.2.3 before packaging')
     missing = [p for p in FILES if not (ROOT / p).is_file()]
     if missing:
         raise SystemExit('Missing payload files: ' + ', '.join(missing))
+
+    protected = [p for p in FILES if Path(p).name == '.env' or Path(p).name.startswith('.env.') or p.startswith('install/') or p.startswith('storage/')]
+    if protected:
+        raise SystemExit('Protected paths must not be included in upgrade payload: ' + ', '.join(protected))
+
     entries = [{'path': p, 'action': 'replace', 'sha256': sha256(ROOT / p)} for p in FILES]
     manifest = {
         'format': 1,
@@ -74,6 +80,7 @@ def main() -> None:
     print(OUT)
     print('sha256=' + sha256(OUT))
     print('files=' + str(len(FILES)))
+
 
 if __name__ == '__main__':
     main()
