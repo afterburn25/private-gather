@@ -36,17 +36,20 @@ $assertions = [
 
     ['Hosted installer is edition-locked', str_contains($hostedInstaller, "'edition' => 'hosted'") && ! str_contains($hostedInstaller, 'name="edition"') && ! str_contains($hostedInstaller, 'Choose Edition')],
     ['Hosted installer exposes no Self-Hosted configuration fields', ! str_contains($hostedInstaller, 'name="organization_name"') && ! str_contains($hostedInstaller, 'name="self_hosted_visibility"') && ! str_contains($hostedInstaller, 'name="self_hosted_registration"')],
+    ['Hosted installer has no legacy platform footer', ! str_contains($hostedInstaller, 'Private Gather Hosted Base · Multi-organization platform')],
     ['Self-Hosted installer is edition-locked', str_contains($selfHostedInstaller, "'edition' => 'self_hosted'") && ! str_contains($selfHostedInstaller, 'name="edition"') && ! str_contains($selfHostedInstaller, 'Choose Edition')],
     ['Self-Hosted installer has its own organization setup', str_contains($selfHostedInstaller, 'name="organization_name"') && str_contains($selfHostedInstaller, 'name="self_hosted_visibility"') && str_contains($selfHostedInstaller, 'name="self_hosted_registration"') && str_contains($selfHostedInstaller, 'installer_create_self_hosted_tenant')],
     ['both installers auto-provision runtime directories', str_contains($hostedInstaller, 'installer_prepare_runtime_directories') && str_contains($selfHostedInstaller, 'installer_prepare_runtime_directories')],
     ['runtime repair creates Laravel writable tree at 0775', str_contains($runtime, "'storage/framework/cache/data'") && str_contains($runtime, "'storage/framework/sessions'") && str_contains($runtime, "'storage/framework/views'") && str_contains($runtime, "'storage/logs'") && str_contains($runtime, "'bootstrap/cache'") && str_contains($runtime, '0775') && str_contains($runtime, '.private-gather-write-probe-')],
+    ['runtime repair can rebuild foreign-owned trees through writable parents', str_contains($runtime, 'installer_atomic_rebuild_tree') && str_contains($runtime, 'installer_copy_tree_for_repair') && str_contains($runtime, '-pg-original-') && str_contains($runtime, '@rename($target, $backup)')],
 
     ['installer schema import', str_contains($hostedInstaller, 'installer_import_schema') && str_contains($selfHostedInstaller, 'installer_import_schema')],
     ['installer supplemental community schema import', str_contains($hostedInstaller, 'installer_import_private_community') && str_contains($selfHostedInstaller, 'installer_import_private_community')],
     ['installer product completion schema import', str_contains($hostedInstaller, "require __DIR__.'/product-completion-schema.php'") && str_contains($selfHostedInstaller, "require __DIR__.'/product-completion-schema.php'")],
     ['installer admin creation', str_contains($hostedInstaller, 'installer_create_admin') && str_contains($selfHostedInstaller, 'installer_create_admin')],
     ['installer environment generation', str_contains($hostedInstaller, 'installer_write_env') && str_contains($selfHostedInstaller, 'installer_write_env')],
-    ['installer self removal', str_contains($hostedInstaller, 'installer_disable_self') && str_contains($selfHostedInstaller, 'installer_disable_self')],
+    ['Hosted installer uses hardened post-install cleanup', str_contains($hostedInstaller, 'installer_cleanup_after_success')],
+    ['Self-Hosted installer retains fail-closed installer removal', str_contains($selfHostedInstaller, 'installer_disable_self') || str_contains($selfHostedInstaller, 'installer_cleanup_after_success')],
     ['installer permanent lock', str_contains($installLib, 'installed.lock')],
     ['installer receipt identity present', str_contains($installLib, "'installer_version'")],
     ['installer avoids false DDL transaction', ! str_contains($installLib, '$pdo->beginTransaction()') && str_contains($installLib, "preg_replace('/^\\s*--.*$/m'")],
@@ -90,4 +93,4 @@ if ($errors) {
 }
 
 echo "INSTALLER VERIFY: PASS\n";
-echo "Dedicated Hosted and Self-Hosted installers, automatic runtime directory repair, retry-safe schema, migration bookkeeping and protected first-run routing are structurally present.\n";
+echo "Dedicated Hosted and Self-Hosted installers, ownership-neutral runtime repair, retry-safe schema, migration bookkeeping and protected first-run routing are structurally present.\n";
