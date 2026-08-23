@@ -76,19 +76,32 @@ class SelfHostedEditionTest extends TestCase
     {
         $response = $this->post('http://platform.test/register', [
             'name' => 'Pending Member',
-            'display_name' => 'Pending Member',
+            'username' => 'pending.member',
             'email' => 'pending@example.test',
             'date_of_birth' => now()->subYears(30)->toDateString(),
             'password' => 'Password1234',
             'password_confirmation' => 'Password1234',
+            'lifestyle_identity' => 'single_man',
+            'relationship_status' => '',
+            'experience_level' => '',
+            'pronouns' => '',
+            'city' => '',
+            'region' => '',
+            'headline' => '',
+            'looking_for' => [],
+            'lifestyle_interests' => [],
+            'boundaries' => '',
+            'application_note' => '',
             'adult' => '1',
             'terms' => '1',
             'privacy' => '1',
+            'consent_culture' => '1',
         ]);
 
         $user = User::query()->where('email', 'pending@example.test')->firstOrFail();
 
         $response->assertRedirect('http://platform.test/login');
+        $this->assertSame('pending.member', $user->username);
         $this->assertSame('pending', $user->status);
         $this->assertGuest();
         $this->assertDatabaseHas('tenant_users', [
