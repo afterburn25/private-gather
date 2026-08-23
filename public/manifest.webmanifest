@@ -1,0 +1,21 @@
+{
+  "name": "Private Gather",
+  "short_name": "Private Gather",
+  "description": "Private lifestyle communities, events, clubs and member operations.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#09090c",
+  "theme_color": "#09090c",
+  "orientation": "any",
+  "categories": ["social", "lifestyle", "events"],
+  "icons": [
+    {
+      "src": "./assets/branding/private-gather-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
