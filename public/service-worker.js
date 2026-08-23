@@ -1,7 +1,8 @@
-const CACHE = 'private-gather-redesign-static-v1';
+const CACHE = 'private-gather-redesign-static-v2';
 const STATIC_FILES = [
   './assets/app.css',
   './assets/redesign.css',
+  './assets/redesign-compat.css',
   './assets/redesign.js',
   './assets/branding/private-gather-logo.png',
   './offline.html'
