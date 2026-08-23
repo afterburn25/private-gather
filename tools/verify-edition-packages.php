@@ -17,7 +17,7 @@ if ($hosted === '' || $selfHosted === '') {
 }
 
 $failures = [];
-$editionSpecific = ['.env.example', 'install/index.php', 'EDITION-PRESET', 'PACKAGE-METADATA.json'];
+$editionSpecific = ['.env.example', 'install/index.php', 'EDITION-PRESET', 'BASE-PRESET', 'PACKAGE-METADATA.json'];
 
 $inspect = static function (string $path, string $expectedEdition) use (&$failures, $editionSpecific): ?array {
     if (! is_file($path)) {
@@ -56,6 +56,10 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
             $failures[] = basename($path).' contains runtime log data: '.$name;
         }
 
+        if ($name === 'install/self-hosted-index.php') {
+            $failures[] = basename($path).' leaked the packaging-only Self-Hosted installer template.';
+        }
+
         if (! in_array($name, $editionSpecific, true) && ! str_ends_with($name, '/')) {
             $contents = $zip->getFromIndex($i);
             if (! is_string($contents)) {
@@ -67,8 +71,8 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
     }
 
     foreach ([
-        'index.php', 'private-gather.php', 'artisan', 'composer.json', 'install/index.php', 'vendor/autoload.php',
-        'EDITION-PRESET', 'PACKAGE-METADATA.json',
+        'index.php', 'private-gather.php', 'artisan', 'composer.json', 'install/index.php', 'install/runtime.php', 'vendor/autoload.php',
+        'EDITION-PRESET', 'BASE-PRESET', 'PACKAGE-METADATA.json',
     ] as $required) {
         if (! in_array($required, $names, true)) {
             $failures[] = basename($path).' missing '.$required;
@@ -80,14 +84,39 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
         $failures[] = basename($path).' edition preset mismatch: '.$preset;
     }
 
+    $expectedBase = $expectedEdition === 'hosted' ? 'hosted-platform' : 'self-hosted-organization';
+    $basePreset = trim((string) $zip->getFromName('BASE-PRESET'));
+    if ($basePreset !== $expectedBase) {
+        $failures[] = basename($path).' installation base mismatch: '.$basePreset;
+    }
+
     $env = (string) $zip->getFromName('.env.example');
     if (! preg_match('/^PRIVATE_GATHER_EDITION='.preg_quote($expectedEdition, '/').'$/m', $env)) {
         $failures[] = basename($path).' .env.example does not preset '.$expectedEdition.'.';
     }
 
     $installer = (string) $zip->getFromName('install/index.php');
-    if (! str_contains($installer, "'edition' => '".$expectedEdition."',")) {
-        $failures[] = basename($path).' installer does not preset '.$expectedEdition.'.';
+    if (! str_contains($installer, "'edition' => '".$expectedEdition."'")) {
+        $failures[] = basename($path).' dedicated installer does not lock '.$expectedEdition.'.';
+    }
+    if (str_contains($installer, 'name="edition"') || str_contains($installer, 'Choose Edition')) {
+        $failures[] = basename($path).' still exposes an edition selector.';
+    }
+    if (! str_contains($installer, 'installer_prepare_runtime_directories')) {
+        $failures[] = basename($path).' installer does not auto-provision runtime directories.';
+    }
+    if ($expectedEdition === 'hosted') {
+        foreach (['organization_name', 'self_hosted_visibility', 'self_hosted_registration'] as $selfHostedField) {
+            if (str_contains($installer, 'name="'.$selfHostedField.'"')) {
+                $failures[] = basename($path).' Hosted installer leaks Self-Hosted field '.$selfHostedField.'.';
+            }
+        }
+    } else {
+        foreach (['organization_name', 'self_hosted_visibility', 'self_hosted_registration'] as $requiredField) {
+            if (! str_contains($installer, 'name="'.$requiredField.'"')) {
+                $failures[] = basename($path).' Self-Hosted installer missing '.$requiredField.'.';
+            }
+        }
     }
 
     $metadata = json_decode((string) $zip->getFromName('PACKAGE-METADATA.json'), true);
@@ -95,7 +124,7 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
         $failures[] = basename($path).' has invalid package metadata.';
         $metadata = null;
     } else {
-        if (($metadata['schema'] ?? null) !== 1) {
+        if (($metadata['schema'] ?? null) !== 2) {
             $failures[] = basename($path).' metadata schema mismatch.';
         }
         if (($metadata['product'] ?? null) !== 'privategather/private-gather') {
@@ -103,6 +132,12 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
         }
         if (($metadata['edition'] ?? null) !== $expectedEdition) {
             $failures[] = basename($path).' metadata edition mismatch.';
+        }
+        if (($metadata['installation_base'] ?? null) !== $expectedBase) {
+            $failures[] = basename($path).' metadata installation base mismatch.';
+        }
+        if (($metadata['dedicated_installer'] ?? null) !== true) {
+            $failures[] = basename($path).' metadata does not assert a dedicated installer.';
         }
         if (($metadata['shared_core'] ?? null) !== true) {
             $failures[] = basename($path).' metadata does not assert shared Core.';
@@ -135,10 +170,7 @@ if (is_array($hostedResult) && is_array($selfResult)) {
     }
 
     if ($hostedResult['shared_hashes'] !== $selfResult['shared_hashes']) {
-        $allNames = array_unique(array_merge(
-            array_keys($hostedResult['shared_hashes']),
-            array_keys($selfResult['shared_hashes'])
-        ));
+        $allNames = array_unique(array_merge(array_keys($hostedResult['shared_hashes']), array_keys($selfResult['shared_hashes'])));
         sort($allNames);
         foreach ($allNames as $name) {
             if (($hostedResult['shared_hashes'][$name] ?? null) !== ($selfResult['shared_hashes'][$name] ?? null)) {
