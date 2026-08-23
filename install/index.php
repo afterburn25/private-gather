@@ -8,6 +8,7 @@ require_once __DIR__.'/community-schema.php';
 require_once __DIR__.'/competitive-schema.php';
 require_once __DIR__.'/hosted-member-network-schema.php';
 require_once __DIR__.'/hosted-discovery-revenue-schema.php';
+require_once __DIR__.'/lifestyle-community-suite-schema.php';
 
 if (installer_is_installed()) {
     http_response_code(410);
@@ -93,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         installer_import_competitive_schema($pdo);
         installer_import_hosted_member_network($pdo);
         installer_import_hosted_discovery_revenue($pdo);
+        installer_import_lifestyle_community_suite($pdo);
 
         // These migrations are represented by the fresh-install schemas above.
         // Registering them prevents Laravel from replaying schema already created.
@@ -103,6 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             '2026_08_19_220000_create_hosted_member_network',
             '2026_08_19_230000_create_hosted_member_matching',
             '2026_08_19_230000_create_hosted_club_directory_and_affiliate_revenue',
+            '2026_08_22_030000_expand_lifestyle_community_suite',
+            '2026_08_22_031000_create_community_poll_votes',
+            '2026_08_22_032000_create_profile_partner_invites',
+            '2026_08_22_033000_create_club_rewards',
+            '2026_08_22_200000_global_username_and_age_verification_v123',
         ];
         $stmt = $pdo->prepare('INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)');
         foreach ($registeredMigrations as $migration) {
