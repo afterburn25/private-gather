@@ -95,6 +95,9 @@ jobs:
       - name: Run 1.2.3 identity and membership tests
         run: php artisan test tests/Feature/V123IdentityVerificationTest.php --stop-on-failure
 
+      - name: Run 1.2.3 profile runtime dependency tests
+        run: php artisan test tests/Feature/V123ProfileRuntimeDependencyTest.php --stop-on-failure
+
       - name: Run 1.2.3 Persona provider tests
         run: php artisan test tests/Feature/V123PersonaProviderTest.php --stop-on-failure
 
