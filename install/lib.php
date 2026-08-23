@@ -23,231 +23,192 @@ function installer_is_installed(): bool
         return false;
     }
 
-    return (bool) preg_match('/^APP_INSTALLED=(true|1|yes)$/mi', (string) @file_get_contents($env));
+    $contents = (string) @file_get_contents($env);
+    return preg_match('/^APP_INSTALLED\s*=\s*(true|1|yes|on)\s*$/mi', $contents) === 1;
 }
 
-function installer_normalize_host(string $value): string
+function installer_normalize_host(string $host): string
 {
-    $value = strtolower(trim($value));
-    $value = preg_replace('#^https?://#', '', $value) ?? $value;
-    $value = explode('/', $value, 2)[0];
-    $value = explode(':', $value, 2)[0];
-    return trim($value, '.');
+    $host = strtolower(trim($host));
+    if (str_starts_with($host, '[')) {
+        $end = strpos($host, ']');
+        return $end === false ? trim($host, '[]') : trim(substr($host, 1, $end - 1));
+    }
+
+    return preg_replace('/:\d+$/', '', $host) ?? $host;
 }
 
-function installer_detect_base_uri(): string
+function installer_request_base_path(): string
 {
-    $appRoot = realpath(installer_base_path());
-    $requestPath = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/install/'), PHP_URL_PATH) ?: '/install/';
-    $requestPath = '/'.ltrim(str_replace('\\', '/', $requestPath), '/');
-
-    if (preg_match('#^(.+?)/install(?:/|$)#i', $requestPath, $m)) {
-        return '/'.trim($m[1], '/');
-    }
-
-    if ($appRoot !== false) {
-        $physicalName = basename(str_replace('\\', '/', $appRoot));
-        if ($physicalName !== '') {
-            $segments = array_values(array_filter(explode('/', trim($requestPath, '/')), static fn ($v) => $v !== ''));
-            foreach ($segments as $i => $segment) {
-                if (strcasecmp(rawurldecode($segment), $physicalName) === 0) {
-                    return '/'.implode('/', array_slice($segments, 0, $i + 1));
-                }
-            }
-        }
-    }
-
-    foreach (['DOCUMENT_ROOT', 'CONTEXT_DOCUMENT_ROOT', 'ORIG_DOCUMENT_ROOT'] as $key) {
-        $candidate = trim((string) ($_SERVER[$key] ?? ''));
-        $docRoot = $candidate !== '' ? realpath($candidate) : false;
-
-        if ($appRoot !== false && $docRoot !== false) {
-            $app = rtrim(str_replace('\\', '/', $appRoot), '/');
-            $doc = rtrim(str_replace('\\', '/', $docRoot), '/');
-
-            if ($app !== $doc && str_starts_with($app.'/', $doc.'/')) {
-                $relative = trim(substr($app, strlen($doc)), '/');
-                if ($relative !== '') {
-                    return '/'.$relative;
-                }
-            }
-        }
-    }
-
     $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '/install/index.php'));
-    $installDir = str_replace('\\', '/', dirname($script));
-    $appDir = str_replace('\\', '/', dirname($installDir));
-    if ($appDir !== '/' && $appDir !== '.' && $appDir !== '\\') {
-        return '/'.trim($appDir, '/');
+    $installPos = strpos($script, '/install/');
+    if ($installPos !== false) {
+        return rtrim(substr($script, 0, $installPos), '/');
     }
 
-    return '';
+    $dir = str_replace('\\', '/', dirname($script));
+    return $dir === '/' || $dir === '.' ? '' : rtrim($dir, '/');
 }
 
 function installer_detect_url(): string
 {
-    $https = (! empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off')
-        || (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
-    $scheme = $https ? 'https' : 'http';
-    $host = installer_normalize_host((string) ($_SERVER['HTTP_HOST'] ?? 'localhost'));
-    return $scheme.'://'.$host.installer_detect_base_uri();
+    $https = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    return ($https ? 'https' : 'http').'://'.$host.installer_request_base_path();
 }
 
 function installer_app_href(): string
 {
-    $base = installer_detect_base_uri();
-    return ($base === '' ? '' : $base).'/';
+    $base = installer_request_base_path();
+    return $base === '' ? '/' : $base.'/';
 }
 
-function installer_asset_href(string $path): string
+function installer_asset_href(string $relative): string
 {
-    $base = installer_detect_base_uri();
-    return ($base === '' ? '' : $base).'/'.ltrim($path, '/');
+    $base = installer_request_base_path();
+    return ($base === '' ? '' : $base).'/'.ltrim($relative, '/');
 }
 
 function installer_requirements(): array
 {
     $base = installer_base_path();
-    $checks = [
-        ['PHP 8.3 or newer', version_compare(PHP_VERSION, '8.3.0', '>=')],
-        ['PDO extension', extension_loaded('pdo')],
-        ['PDO MySQL extension', extension_loaded('pdo_mysql')],
-        ['OpenSSL extension', extension_loaded('openssl')],
-        ['Mbstring extension', extension_loaded('mbstring')],
-        ['JSON extension', extension_loaded('json')],
-        ['Fileinfo extension', extension_loaded('fileinfo')],
-        ['Zip extension (required for backend upgrades)', extension_loaded('zip')],
-        ['storage/ is writable', is_writable($base.'/storage')],
-        ['bootstrap/cache/ is writable', is_writable($base.'/bootstrap/cache')],
-        ['Project root is writable for .env', is_writable($base)],
-        ['Laravel vendor dependencies are present', is_file($base.'/vendor/autoload.php')],
+    $requirements = [
+        ['PHP 8.3+', version_compare(PHP_VERSION, '8.3.0', '>=')],
+        ['PDO MySQL', extension_loaded('pdo_mysql')],
+        ['Mbstring', extension_loaded('mbstring')],
+        ['OpenSSL', extension_loaded('openssl')],
+        ['Fileinfo', extension_loaded('fileinfo')],
+        ['JSON', extension_loaded('json')],
+        ['Storage writable', is_dir($base.'/storage') && is_writable($base.'/storage')],
+        ['Bootstrap cache writable', is_dir($base.'/bootstrap/cache') && is_writable($base.'/bootstrap/cache')],
+        ['Composer dependencies installed', is_file($base.'/vendor/autoload.php')],
     ];
 
-    return $checks;
+    return $requirements;
 }
 
-function installer_requirements_pass(array $checks): bool
+function installer_requirements_pass(array $requirements): bool
 {
-    foreach ($checks as $check) {
-        if (! $check[1]) {
+    foreach ($requirements as $requirement) {
+        if (! ($requirement[1] ?? false)) {
             return false;
         }
     }
     return true;
 }
 
-function installer_quote_env(string $value): string
+function installer_connect_database(array $input): PDO
 {
-    return '"'.str_replace(['\\', '"', "\r", "\n"], ['\\\\', '\\"', '', '\\n'], $value).'"';
+    $host = trim((string) ($input['db_host'] ?? 'localhost')) ?: 'localhost';
+    $port = (int) ($input['db_port'] ?? 3306);
+    $database = trim((string) ($input['db_database'] ?? ''));
+    $username = (string) ($input['db_username'] ?? '');
+    $password = (string) ($input['db_password'] ?? '');
+
+    if (! preg_match('/^[A-Za-z0-9_$-]+$/', $database)) {
+        throw new InvalidArgumentException('Database name contains unsupported characters.');
+    }
+    if ($port < 1 || $port > 65535) {
+        throw new InvalidArgumentException('Database port is invalid.');
+    }
+
+    $serverDsn = 'mysql:host='.$host.';port='.$port.';charset=utf8mb4';
+    $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_EMULATE_PREPARES => false];
+
+    if (($input['db_create'] ?? '') === '1') {
+        $server = new PDO($serverDsn, $username, $password, $options);
+        $server->exec('CREATE DATABASE IF NOT EXISTS `'.str_replace('`', '``', $database).'` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+    }
+
+    $pdo = new PDO($serverDsn.';dbname='.$database, $username, $password, $options);
+    installer_database_preflight($pdo);
+    return $pdo;
+}
+
+function installer_database_preflight(PDO $pdo): void
+{
+    // Non-destructive privilege probe: temporary table lifecycle proves the
+    // configured account can create/write/drop schema objects without touching
+    // existing application tables.
+    $probe = 'pg_install_probe_'.bin2hex(random_bytes(5));
+    try {
+        $pdo->exec('CREATE TEMPORARY TABLE `'.$probe.'` (id INT PRIMARY KEY, value VARCHAR(16) NOT NULL)');
+        $stmt = $pdo->prepare('INSERT INTO `'.$probe.'` (id,value) VALUES (1,?)');
+        $stmt->execute(['ok']);
+        $value = $pdo->query('SELECT value FROM `'.$probe.'` WHERE id=1')->fetchColumn();
+        if ($value !== 'ok') {
+            throw new RuntimeException('Database privilege probe could not read its temporary test row.');
+        }
+    } catch (Throwable $e) {
+        throw new RuntimeException('Database connection succeeded, but the configured user cannot perform the schema operations required by Private Gather: '.$e->getMessage(), 0, $e);
+    } finally {
+        try {
+            $pdo->exec('DROP TEMPORARY TABLE IF EXISTS `'.$probe.'`');
+        } catch (Throwable) {
+            // The original probe error is the actionable result.
+        }
+    }
+}
+
+function installer_env_quote(string $value): string
+{
+    if ($value === '' || preg_match('/[\s#="\'\\]/', $value)) {
+        return '"'.addcslashes($value, "\\\"").'"';
+    }
+    return $value;
+}
+
+function installer_generate_key(): string
+{
+    return 'base64:'.base64_encode(random_bytes(32));
 }
 
 function installer_write_env(array $input): void
 {
     $base = installer_base_path();
-    $appKey = 'base64:'.base64_encode(random_bytes(32));
-    $appUrl = rtrim((string) $input['app_url'], '/');
-    $rootDomain = installer_normalize_host((string) $input['platform_root_domain']);
-    $mailHost = $rootDomain ?: 'example.test';
-    $edition = (string) ($input['edition'] ?? 'hosted');
-    $selfHosted = $edition === 'self_hosted';
-    $tenantId = $selfHosted ? (string) ((int) ($input['self_hosted_tenant_id'] ?? 0)) : '';
-
     $lines = [
-        'APP_NAME='.installer_quote_env((string) $input['app_name']),
+        'APP_NAME='.installer_env_quote((string) $input['app_name']),
         'APP_ENV=production',
-        'APP_KEY='.$appKey,
+        'APP_KEY='.installer_env_quote(installer_generate_key()),
         'APP_DEBUG=false',
-        'APP_URL='.installer_quote_env($appUrl),
-        'APP_TIMEZONE='.installer_quote_env((string) $input['timezone']),
+        'APP_URL='.installer_env_quote((string) $input['app_url']),
+        'APP_TIMEZONE='.installer_env_quote((string) $input['timezone']),
         'APP_INSTALLED=true',
-        'PRIVATE_GATHER_DOMAIN=privategather.com',
-        'PRIVATE_GATHER_URL=https://privategather.com',
-        'PRIVATE_GATHER_EDITION='.$edition,
-        'SELF_HOSTED_TENANT_ID='.$tenantId,
-        'SELF_HOSTED_VISIBILITY='.(string) ($input['self_hosted_visibility'] ?? 'private'),
-        'SELF_HOSTED_REGISTRATION='.(string) ($input['self_hosted_registration'] ?? 'approval'),
         '',
-        'PLATFORM_ROOT_DOMAIN='.$rootDomain,
-        'PLATFORM_DOMAIN_TARGET=domains.'.$rootDomain,
-        'PLATFORM_WILDCARD_ENABLED='.($selfHosted ? 'false' : 'true'),
-        'PLATFORM_WILDCARD_TARGET='.$rootDomain,
-        'PLATFORM_TENANT_SCHEME='.(parse_url($appUrl, PHP_URL_SCHEME) ?: 'https'),
-        'PLATFORM_TENANT_MOUNT_PATH='.(string) (parse_url($appUrl, PHP_URL_PATH) ?: ''),
-        'PLATFORM_RESERVED_SUBDOMAINS=www,admin,api,mail,support,help,billing,account,login,signup,status,cdn,assets,static,domains,install',
-        'PLATFORM_TERMS_VERSION=1.0',
-        'PLATFORM_PRIVACY_VERSION=1.0',
-        '',
-        'UPGRADE_PRODUCT=privategather/private-gather',
-        'UPGRADE_MAX_UPLOAD_MB=256',
-        'UPGRADE_KEEP_BACKUPS=5',
-        'UPGRADE_REQUIRE_SIGNATURE=false',
+        'PRIVATE_GATHER_EDITION=hosted',
+        'PLATFORM_ROOT_DOMAIN='.installer_env_quote((string) $input['platform_root_domain']),
+        'SELF_HOSTED_REGISTRATION=approval',
+        'SELF_HOSTED_VISIBILITY=private',
         '',
         'LOG_CHANNEL=stack',
         'LOG_LEVEL=warning',
         '',
         'DB_CONNECTION=mysql',
-        'DB_HOST='.installer_quote_env((string) $input['db_host']),
+        'DB_HOST='.installer_env_quote((string) $input['db_host']),
         'DB_PORT='.(int) $input['db_port'],
-        'DB_DATABASE='.installer_quote_env((string) $input['db_database']),
-        'DB_USERNAME='.installer_quote_env((string) $input['db_username']),
-        'DB_PASSWORD='.installer_quote_env((string) $input['db_password']),
+        'DB_DATABASE='.installer_env_quote((string) $input['db_database']),
+        'DB_USERNAME='.installer_env_quote((string) $input['db_username']),
+        'DB_PASSWORD='.installer_env_quote((string) $input['db_password']),
         '',
         'SESSION_DRIVER=database',
         'SESSION_LIFETIME=120',
-        'SESSION_ENCRYPT=true',
-        'SESSION_PATH=/',
-        'SESSION_DOMAIN=',
-        '',
         'CACHE_STORE=database',
         'QUEUE_CONNECTION=database',
+        '',
         'FILESYSTEM_DISK=local',
-        '',
         'MAIL_MAILER=log',
-        'MAIL_FROM_ADDRESS='.installer_quote_env('noreply@'.$mailHost),
-        'MAIL_FROM_NAME=${APP_NAME}',
-        '',
     ];
 
+    $payload = implode(PHP_EOL, $lines).PHP_EOL;
     $tmp = $base.'/.env.installing';
-    if (file_put_contents($tmp, implode(PHP_EOL, $lines), LOCK_EX) === false) {
+    if (@file_put_contents($tmp, $payload, LOCK_EX) === false) {
         throw new RuntimeException('Unable to write temporary environment file.');
     }
     @chmod($tmp, 0600);
-
     if (! @rename($tmp, $base.'/.env')) {
         @unlink($tmp);
-        throw new RuntimeException('Unable to activate .env. Check root folder permissions.');
+        throw new RuntimeException('Unable to finalize .env file.');
     }
-    @chmod($base.'/.env', 0600);
-}
-
-function installer_connect_database(array $input): PDO
-{
-    $host = (string) $input['db_host'];
-    $port = (int) $input['db_port'];
-    $database = (string) $input['db_database'];
-    $username = (string) $input['db_username'];
-    $password = (string) $input['db_password'];
-
-    if (! preg_match('/^[A-Za-z0-9_]+$/', $database)) {
-        throw new InvalidArgumentException('Database name may contain only letters, numbers, and underscores.');
-    }
-
-    $server = new PDO("mysql:host={$host};port={$port};charset=utf8mb4", $username, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ]);
-
-    if (! empty($input['db_create'])) {
-        $server->exec("CREATE DATABASE IF NOT EXISTS `{$database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    }
-
-    return new PDO("mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4", $username, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ]);
 }
 
 function installer_import_schema(PDO $pdo): void
@@ -278,6 +239,33 @@ function installer_import_schema(PDO $pdo): void
     }
 }
 
+function installer_admin_username(PDO $pdo, string $name, string $email): string
+{
+    $seed = strtolower(trim((string) strstr($email, '@', true)));
+    if ($seed === '') {
+        $seed = strtolower($name);
+    }
+    $base = preg_replace('/[^a-z0-9._-]+/', '-', $seed) ?: '';
+    $base = trim($base, '.-_');
+    if (strlen($base) < 3) {
+        $base = 'admin';
+    }
+    $base = substr($base, 0, 32);
+    $candidate = $base;
+    $counter = 1;
+    $exists = $pdo->prepare('SELECT COUNT(*) FROM users WHERE username=? AND email<>?');
+
+    while (true) {
+        $exists->execute([$candidate, $email]);
+        if ((int) $exists->fetchColumn() === 0) {
+            return $candidate;
+        }
+        ++$counter;
+        $suffix = '-'.$counter;
+        $candidate = substr($base, 0, max(3, 32 - strlen($suffix))).$suffix;
+    }
+}
+
 function installer_create_admin(PDO $pdo, array $input): int
 {
     $email = strtolower(trim((string) $input['admin_email']));
@@ -294,9 +282,10 @@ function installer_create_admin(PDO $pdo, array $input): int
         throw new InvalidArgumentException('Administrator password must be at least 12 characters.');
     }
 
+    $username = installer_admin_username($pdo, $name, $email);
     $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
-    $stmt = $pdo->prepare('INSERT INTO users (name, display_name, email, status, is_platform_admin, password, created_at, updated_at) VALUES (?, ?, ?, ?, 1, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE name=VALUES(name), display_name=VALUES(display_name), status="active", is_platform_admin=1, password=VALUES(password), updated_at=NOW()');
-    $stmt->execute([$name, $name, $email, 'active', $hash]);
+    $stmt = $pdo->prepare('INSERT INTO users (name, username, display_name, email, status, is_platform_admin, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE name=VALUES(name), username=COALESCE(username,VALUES(username)), display_name=COALESCE(NULLIF(display_name,""),VALUES(display_name)), status="active", is_platform_admin=1, password=VALUES(password), updated_at=NOW()');
+    $stmt->execute([$name, $username, $username, $email, 'active', $hash]);
 
     $lookup = $pdo->prepare('SELECT id FROM users WHERE email=? LIMIT 1');
     $lookup->execute([$email]);
