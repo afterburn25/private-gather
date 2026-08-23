@@ -7,6 +7,8 @@
     $isPlatformAdmin = auth()->check() && (bool) auth()->user()->is_platform_admin;
     $isHosted = \App\Support\Edition::isHosted();
     $canRegister = \App\Support\Edition::registrationEnabled();
+    $platformTheme = \App\Support\ThemeCatalog::platform($siteSettings['theme_preset'] ?? null);
+    $platformThemeClass = $tenant ? '' : 'platform-theme-'.$platformTheme['key'].' platform-layout-'.$platformTheme['layout'];
     $canManage = false;
     $isCommunityMember = false;
     $membershipApplicationStatus = null;
@@ -28,12 +30,12 @@
     $headerNav = $tenant ? ($tenantNavigation['header'] ?? collect()) : collect();
     $footerNav = $tenant ? ($tenantNavigation['footer'] ?? collect()) : collect();
     $platformName = $siteSettings['brand_name'] ?? config('app.name', 'Private Gather');
-    $platformLogo = \App\Support\MountUrl::to($siteSettings['logo_url'] ?? config('brand.logo_path', '/assets/branding/private-gather-logo.png'));
+    $platformLogo = \App\Support\MountUrl::to('/assets/branding/private-gather-logo.png');
     $displayName = auth()->check() ? (auth()->user()->display_name ?: auth()->user()->name) : null;
     $displayInitial = $displayName ? strtoupper(substr($displayName, 0, 1)) : 'PG';
 @endphp
 <!doctype html>
-<html lang="en" data-pwa>
+<html lang="en" data-pwa data-platform-theme="{{ $platformTheme['key'] }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -52,6 +54,7 @@
 
     <link rel="stylesheet" href="{{ \App\Support\MountUrl::to('/assets/app.css') }}">
     <link rel="stylesheet" href="{{ \App\Support\MountUrl::to('/assets/redesign.css') }}">
+    <link rel="stylesheet" href="{{ \App\Support\MountUrl::to('/assets/platform-themes.css') }}">
     <style>
         :root { --gold: {{ $primary }}; --gold2: {{ $primary }}; --plum: {{ $accent }}; }
         @if ($branding?->font_family)
@@ -60,7 +63,7 @@
     </style>
     @stack('head')
 </head>
-<body class="redesign-body {{ $isAdmin ? 'admin-body' : '' }}">
+<body class="redesign-body {{ $isAdmin ? 'admin-body' : '' }} {{ $platformThemeClass }}">
 <header class="pg-header">
     <div class="pg-shell pg-header-row">
         <a class="pg-brand" href="{{ \App\Support\MountUrl::to('/') }}" aria-label="{{ $tenant?->name ?? $platformName }} home">
@@ -104,7 +107,7 @@
                     <a class="button button-ghost" href="{{ route('tenant.dashboard') }}">Club OS</a>
                 @elseif ($tenant && $isHosted && ! $isCommunityMember)
                     <a class="button button-ghost" href="{{ route('membership.apply') }}">
-                        {{ in_array($membershipApplicationStatus, ['pending', 'more_info', 'approved'], true) ? 'Application' : 'Apply to join' }}
+                        {{ in_array($membershipApplicationStatus, ['pending', 'more_info', 'approved'], true) ? 'Application' : 'Apply to Join' }}
                     </a>
                 @elseif (! $tenant && $isHosted)
                     <a class="button button-ghost" href="{{ route('organizations.index') }}">My clubs</a>
@@ -113,7 +116,7 @@
             @else
                 <a class="button button-ghost" href="{{ route('login') }}">Log in</a>
                 @if ($tenant && $isHosted)
-                    <a class="button button-primary" href="{{ route('membership.apply') }}">Apply to join</a>
+                    <a class="button button-primary" href="{{ route('membership.apply') }}">Apply to Join</a>
                 @elseif ($canRegister)
                     <a class="button button-primary" href="{{ \App\Support\MountUrl::to($siteSettings['header_cta_url'] ?? route('register')) }}">{{ $siteSettings['header_cta_label'] ?? 'Join Private Gather' }}</a>
                 @endif
