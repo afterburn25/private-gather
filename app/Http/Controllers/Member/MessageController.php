@@ -133,8 +133,8 @@ final class MessageController
 
     private function messagingAllowed(int $senderId, int $recipientId): bool
     {
-        $blocked = DB::table('user_blocks')->where(fn ($q) => $q->where(['blocker_id' => $senderId, 'blocked_id' => $recipientId]))
-            ->orWhere(fn ($q) => $q->where(['blocker_id' => $recipientId, 'blocked_id' => $senderId]))->exists();
+        $blocked = DB::table('user_blocks')->where(fn ($q) => $q->where(['user_id' => $senderId, 'blocked_user_id' => $recipientId]))
+            ->orWhere(fn ($q) => $q->where(['user_id' => $recipientId, 'blocked_user_id' => $senderId]))->exists();
         if ($blocked) return false;
         $privacy = DB::table('user_privacy_settings')->where('user_id', $recipientId)->first();
         $mode = $privacy?->messages_from ?? 'connections';
