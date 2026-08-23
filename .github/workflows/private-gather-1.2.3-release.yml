@@ -68,8 +68,18 @@ jobs:
         run: |
           find app bootstrap config database routes tests install tools -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 
-      - name: Verify fresh installer structure
-        run: php tools/verify-installer.php
+      - name: Verify release structure
+        run: |
+          php tools/verify-foundation.php
+          php tools/verify-installer.php
+          php tools/verify-subdirectory-install.php
+          php tools/verify-admin-layout.php
+          php tools/verify-upgrader.php
+          php tools/verify-v1-structure.php
+          php tools/verify-private-gather-brand.php
+          php tools/verify-editions.php
+          php tools/test-domain-name.php
+          php tools/test-upgrade-path.php
 
       - name: Verify fresh installer on MySQL 8.4
         env:
