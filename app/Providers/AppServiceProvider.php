@@ -8,6 +8,7 @@ use App\Models\SiteSetting;
 use App\Services\ManualDomainProvisioner;
 use App\Services\Payments\OfflinePaymentGateway;
 use App\Services\PlatformContent;
+use App\Support\ShowcaseBootstrap;
 use App\Tenancy\TenantContext;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -27,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        ShowcaseBootstrap::runPending();
+
         ResetPassword::createUrlUsing(function ($notifiable, string $token): string {
             $relative = route('password.reset', [
                 'token' => $token,
