@@ -110,7 +110,7 @@ jobs:
       - name: Assert release routes
         run: |
           php artisan route:list --except-vendor
-          php artisan tinker --execute='$names=["verification.index","verification.start","verification.return","verification.webhooks.persona","clubs.apply","admin.age-verification.index","events.community","groups.show","network.connections.request","tenant.growth.index","tenant.growth.members.index","organizations.provision-subdomain"]; foreach($names as $name){ if(!Illuminate\Support\Facades\Route::has($name)){ fwrite(STDERR,"Missing route: {$name}\n"); exit(1); } echo "Route OK: {$name}\n"; }'
+          php artisan tinker --execute='$names=["verification.index","verification.start","verification.return","verification.webhooks.persona","clubs.apply","admin.age-verification.index","events.community","groups.show","network.connections.request","tenant.growth.index","tenant.growth.members.index","organizations.provision-subdomain","messages.typing","messages.attachment"]; foreach($names as $name){ if(!Illuminate\Support\Facades\Route::has($name)){ fwrite(STDERR,"Missing route: {$name}\n"); exit(1); } echo "Route OK: {$name}\n"; }'
 
       - name: Verify every controller route action resolves
         run: php artisan test tests/Feature/RouteActionIntegrityTest.php --stop-on-failure
@@ -137,6 +137,9 @@ jobs:
 
       - name: Run 1.2.3 growth commerce runtime tests
         run: php artisan test tests/Feature/V123GrowthCommerceRuntimeTest.php --stop-on-failure
+
+      - name: Run 1.2.3 message runtime tests
+        run: php artisan test tests/Feature/V123MessageRuntimeTest.php --stop-on-failure
 
       - name: Run 1.2.3 identity and membership tests
         run: php artisan test tests/Feature/V123IdentityVerificationTest.php --stop-on-failure
@@ -167,7 +170,7 @@ jobs:
               manifest = json.loads(z.read('manifest.json'))
               assert manifest['to_version'] == '1.2.3'
               assert manifest['from_versions'] == ['1.2.0', '1.2.1']
-              assert len(manifest['files']) == 48
+              assert len(manifest['files']) == 49
               payload_paths = {f['path'] for f in manifest['files']}
               required = {
                   'app/Models/ProfilePartnerInvite.php',
@@ -176,6 +179,7 @@ jobs:
                   'app/Services/CommunityNotifier.php',
                   'app/Http/Controllers/Member/EventCommunityController.php',
                   'app/Http/Controllers/Member/GroupController.php',
+                  'app/Http/Controllers/Member/MessageController.php',
                   'app/Http/Middleware/EnsureDiscoverableConnectionTarget.php',
                   'app/Http/Middleware/EnsureJoinableMemberGroup.php',
                   'app/Models/CommunityGroupInvite.php',
