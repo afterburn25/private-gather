@@ -1,0 +1,1 @@
+@include('errors._private-gather',['code'=>'429','eyebrow'=>'RATE LIMITED','title'=>'A few too many requests arrived at once.','message'=>'Private Gather temporarily slowed this action to protect accounts and shared services from automated or repeated requests.','help'=>'Wait a short moment before trying again. Repeated submissions will not make the action complete faster.'])

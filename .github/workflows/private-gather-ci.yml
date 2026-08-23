@@ -46,6 +46,7 @@ jobs:
           php tools/verify-editions.php
           php tools/test-domain-name.php
           php tools/test-upgrade-path.php
+          php tools/verify-product-completion.php
 
       - name: Reject committed secrets and deployment state
         shell: bash
@@ -81,7 +82,18 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: Dependency security audit
-        run: composer audit --locked
+        shell: bash
+        run: |
+          set +e
+          for attempt in 1 2 3; do
+            composer audit --locked
+            code=$?
+            if [ "$code" -eq 0 ]; then exit 0; fi
+            if [ "$code" -ne 100 ]; then exit "$code"; fi
+            echo "Composer audit network failure (exit 100), retry $attempt/3" >&2
+            sleep $((attempt * 3))
+          done
+          exit 100
 
       - name: Prepare test environment
         run: |
@@ -150,7 +162,7 @@ jobs:
         run: php artisan migrate:fresh --force
 
       - name: Self-Hosted edition PHPUnit
-        run: php artisan test --filter='EditionTest|SelfHostedEditionTest'
+        run: php artisan test --filter='EditionTest|SelfHostedEditionTest|SelfHostedProductCompletionTest'
 
   php-83-compatibility:
     name: PHP 8.3 minimum compatibility
