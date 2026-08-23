@@ -8,4 +8,5 @@ return [
     App\Providers\PrivacyAdministrationServiceProvider::class,
     App\Providers\AccountSecurityServiceProvider::class,
     App\Providers\ProductCompletionServiceProvider::class,
+    App\Providers\TrustOperationsServiceProvider::class,
 ];
