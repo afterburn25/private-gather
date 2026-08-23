@@ -18,9 +18,19 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request, TenantContext $context)
     {
-        $user = $request->user()->load(['profile','tenants.primaryDomain']);
         $tenant = $context->tenant();
         $tenantId = $tenant?->id;
+        $user = $request->user()->load('profile');
+
+        if ($tenantId) {
+            $user->load([
+                'tenants' => fn ($query) => $query
+                    ->where('tenants.id', $tenantId)
+                    ->with('primaryDomain'),
+            ]);
+        } else {
+            $user->load('tenants.primaryDomain');
+        }
 
         $rsvps = EventRsvp::query()->with('event.tenant')->where('user_id', $user->id)
             ->when($tenantId, fn ($q) => $q->whereHas('event', fn ($event) => $event->where('tenant_id', $tenantId)))
