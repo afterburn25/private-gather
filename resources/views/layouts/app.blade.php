@@ -88,7 +88,7 @@
                 @endforeach
                 @if ($isCommunityMember)
                     <a href="{{ route('community.index') }}">Community</a>
-                    <a href="{{ route('network.index') }}">Members</a>
+                    @if ($isHosted)<a href="{{ route('network.index') }}">Members</a>@endif
                     <a href="{{ route('messages.index') }}">Messages</a>
                     <a href="{{ route('notifications.index') }}">Alerts</a>
                 @endif
@@ -99,7 +99,7 @@
                 <a href="{{ route('site.about') }}">About</a>
                 @if ($isCommunityMember)
                     <a href="{{ route('community.index') }}">Community</a>
-                    <a href="{{ route('network.index') }}">Members</a>
+                    @if ($isHosted)<a href="{{ route('network.index') }}">Members</a>@endif
                     <a href="{{ route('messages.index') }}">Messages</a>
                     <a href="{{ route('notifications.index') }}">Alerts</a>
                 @endif
@@ -147,7 +147,7 @@
                     <a href="{{ route('club.news.index') }}">News</a>
                     @if($isCommunityMember)
                         <a href="{{ route('community.index') }}">Club Wall</a>
-                        <a href="{{ route('network.index') }}">Members & Galleries</a>
+                        @if ($isHosted)<a href="{{ route('network.index') }}">Members & Galleries</a>@endif
                         <a href="{{ route('messages.index') }}">Messages</a>
                         <a href="{{ route('notifications.index') }}">Notifications</a>
                         <a href="{{ route('community.chat') }}">Live Chat</a>
@@ -260,7 +260,12 @@
                     <a href="{{ route('site.events') }}">Events</a>
                     <a href="{{ route('site.about') }}">About</a>
                 @endif
-                @if ($isCommunityMember)<a href="{{ route('community.index') }}">Community</a><a href="{{ route('network.index') }}">Members & Galleries</a><a href="{{ route('messages.index') }}">Messages</a><a href="{{ route('notifications.index') }}">Notifications</a>@endif
+                @if ($isCommunityMember)
+                    <a href="{{ route('community.index') }}">Community</a>
+                    @if ($isHosted)<a href="{{ route('network.index') }}">Members & Galleries</a>@endif
+                    <a href="{{ route('messages.index') }}">Messages</a>
+                    <a href="{{ route('notifications.index') }}">Notifications</a>
+                @endif
             </div>
             <div>
                 <strong>Account</strong>
