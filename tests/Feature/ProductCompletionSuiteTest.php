@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\ProductCompletionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -26,7 +27,10 @@ class ProductCompletionSuiteTest extends TestCase
     public function test_completion_schema_and_routes_are_available(): void
     {
         foreach (['favorites','saved_searches','user_connections','user_privacy_settings','reviews','tenant_member_tags','marketing_contacts','marketing_campaigns','referral_codes','merchant_accounts','marketplace_ledger_entries','payouts','refunds','membership_subscriptions','domain_orders','trust_cases'] as $table) $this->assertTrue(Schema::hasTable($table),$table.' is missing');
-        foreach (['discover.index','clubs.show','onboarding.index','saved.index','notifications.index','privacy.index','connections.index','tenant.crm.index','tenant.commerce.index','tenant.domain-marketplace.index','tenant.builder.index','tenant.growth.index','admin.insights.index','admin.trust.index'] as $route) $this->assertTrue(\Illuminate\Support\Facades\Route::has($route),$route.' route missing');
+        foreach (['discover.index','clubs.show','onboarding.index','saved.index','notifications.index','privacy.index','connections.index','tenant.crm.index','tenant.commerce.index','tenant.domain-marketplace.index','tenant.builder.index','tenant.growth.index','admin.insights.index','admin.trust.index'] as $route) {
+            $this->assertTrue(Route::has($route),$route.' route missing');
+            $this->assertContains('web', Route::getRoutes()->getByName($route)->gatherMiddleware(), $route.' must inherit the web boundary');
+        }
         foreach (['latitude','longitude','gallery','faq','hosts','updates'] as $column) $this->assertTrue(Schema::hasColumn('events',$column));
     }
 
@@ -52,7 +56,7 @@ class ProductCompletionSuiteTest extends TestCase
         $this->actingAs($b)->patch('http://platform.test/connections/'.$connection->id,['decision'=>'accept'])->assertRedirect();
         $this->assertDatabaseHas('user_connections',['id'=>$connection->id,'status'=>'accepted']);
         $this->actingAs($a)->post('http://platform.test/block/'.$b->id)->assertRedirect();
-        $this->assertDatabaseHas('user_blocks',['blocker_id'=>$a->id,'blocked_id'=>$b->id]);
+        $this->assertDatabaseHas('user_blocks',['user_id'=>$a->id,'blocked_user_id'=>$b->id]);
         $this->assertDatabaseMissing('user_connections',['id'=>$connection->id]);
     }
 
