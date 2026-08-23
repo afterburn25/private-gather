@@ -6,17 +6,21 @@ declare(strict_types=1);
  * Remove installer code after a successful installation.
  *
  * The permanent install lock is written before this function is called. We
- * first use the existing fail-closed remover, then make a second cleanup pass
- * over the original /install path and any disabled fallback directories.
+ * first use the existing fail-closed remover in production, then make a second
+ * cleanup pass over the original /install path and any disabled fallback
+ * directories. The optional path exists for regression testing.
  *
- * @return bool true only when no executable installer directory remains
+ * @return bool true only when no installer directory remains
  */
-function installer_cleanup_after_success(): bool
+function installer_cleanup_after_success(?string $installDir = null): bool
 {
-    $installDir = __DIR__;
+    $productionPath = $installDir === null;
+    $installDir ??= __DIR__;
     $parent = dirname($installDir);
 
-    installer_disable_self();
+    if ($productionPath) {
+        installer_disable_self();
+    }
 
     if (is_dir($installDir)) {
         installer_make_tree_removable($installDir);
@@ -61,4 +65,13 @@ function installer_make_tree_removable(string $path): void
         }
         @chmod($entryPath, $entry->isDir() ? 0775 : 0664);
     }
+}
+
+if (! defined('PRIVATE_GATHER_INSTALLER_CLEANUP_REGISTERED')) {
+    define('PRIVATE_GATHER_INSTALLER_CLEANUP_REGISTERED', true);
+    register_shutdown_function(static function (): void {
+        if (function_exists('installer_is_installed') && installer_is_installed()) {
+            installer_cleanup_after_success();
+        }
+    });
 }
