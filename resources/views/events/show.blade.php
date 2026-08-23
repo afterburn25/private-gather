@@ -1,150 +1,143 @@
 @extends('layouts.app')
-
 @section('title', $event->title)
-
 @section('content')
 @php
     $viewer = auth()->user();
     $viewerProfileType = $viewer?->profile?->profile_type;
-    $viewerIsMember = $viewer
-        ? \App\Support\TenantMembership::hasActiveMembership($viewer, (int) $event->tenant_id)
-        : false;
-    $viewerApproved = $viewer
-        ? $event->rsvps()->where('user_id', $viewer->id)->where('status', 'approved')->exists()
-        : false;
+    $viewerIsMember = $viewer ? \App\Support\TenantMembership::hasActiveMembership($viewer, (int) $event->tenant_id) : false;
+    $viewerApproved = $viewer ? $event->rsvps()->where('user_id', $viewer->id)->where('status', 'approved')->exists() : false;
+    $publicLocation = $event->public_location_label ?: trim($event->city.', '.$event->region, ', ');
 @endphp
 
-<section class="event-hero">
-    <div class="container">
-        <div class="eyebrow">{{ strtoupper($event->category ?: 'LIFESTYLE EVENT') }}</div>
-        <h1>{{ $event->title }}</h1>
-        <p>{{ $event->summary }}</p>
-
-        <div class="event-meta">
-            <span>{{ $event->starts_at->format('l, F j · g:i A') }}</span>
-            <span>{{ $event->public_location_label ?: trim($event->city.', '.$event->region, ', ') }}</span>
-            <span>Hosted by {{ $event->tenant->name }}</span>
+<section class="pg-page-hero">
+    <div class="pg-shell pg-grid pg-grid-2" style="align-items:end">
+        <div>
+            <div class="pg-event-meta">
+                <span class="pg-pill">{{ strtoupper($event->category ?: 'Lifestyle event') }}</span>
+                <span class="pg-pill">{{ $event->starts_at->format('M j') }}</span>
+                <span class="pg-pill">{{ $publicLocation ?: 'Location protected' }}</span>
+            </div>
+            <h1>{{ $event->title }}</h1>
+            <p>{{ $event->summary }}</p>
+            <div class="pg-trust-row">
+                <span class="pg-pill">Hosted by {{ $event->tenant->name }}</span>
+                @if($event->rsvp_mode === 'instant')<span class="pg-pill pg-pill-good">Instant RSVP</span>@else<span class="pg-pill pg-pill-warn">Approval required</span>@endif
+                @if($remaining !== null)<span class="pg-pill">{{ $remaining }} spots available</span>@endif
+            </div>
         </div>
-
-        @auth
-            <form method="post" action="{{ route('rsvp.store', $event) }}" class="rsvp-box">
-                @csrf
-
-                <label>
-                    Guests
-                    <input type="number" name="guest_count" min="1" max="10" value="1">
-                </label>
-
-                @foreach($questions as $q)
-                    <label>
-                        {{ $q->label }}
-
-                        @if($q->type === 'textarea')
-                            <textarea name="answers[{{ $q->id }}]" @required($q->required)></textarea>
-                        @elseif($q->type === 'checkbox')
-                            <input type="checkbox" name="answers[{{ $q->id }}]" value="1" @required($q->required)>
-                        @else
-                            <input name="answers[{{ $q->id }}]" @required($q->required)>
-                        @endif
-                    </label>
-                @endforeach
-
-                <button class="button button-primary">
-                    {{ $event->rsvp_mode === 'instant' ? 'RSVP Now' : 'Request RSVP' }}
-                </button>
-
-                @if($remaining !== null)
-                    <small>{{ $remaining }} spots currently available</small>
-                @endif
-            </form>
-        @else
-            <a class="button button-primary" href="{{ route('login') }}">Log in to RSVP</a>
-        @endauth
+        <div class="pg-media"><div class="pg-media-overlay"><span class="pg-eyebrow">{{ $event->starts_at->format('l, F j') }}</span><h2 style="margin:.35rem 0 0">{{ $event->starts_at->format('g:i A') }}</h2></div></div>
     </div>
 </section>
 
-<section class="container section two-col">
-    <article>
-        <h2>About this event</h2>
-        <div class="prose">{!! nl2br(e($event->description)) !!}</div>
+<section class="pg-page">
+    <div class="pg-shell pg-grid" style="grid-template-columns:minmax(0,1.5fr) minmax(300px,.7fr);align-items:start">
+        <div class="pg-grid">
+            <article class="pg-card">
+                <span class="pg-eyebrow">THE EXPERIENCE</span>
+                <h2>About this event</h2>
+                <div class="prose">{!! nl2br(e($event->description)) !!}</div>
+            </article>
 
-        @if($event->dress_code)
-            <h2>Dress code</h2>
-            <p>{{ $event->dress_code }}</p>
-        @endif
+            @if($event->dress_code || $event->rules)
+                <div class="pg-grid pg-grid-2">
+                    @if($event->dress_code)
+                        <article class="pg-card"><span class="pg-eyebrow">ARRIVE READY</span><h2>Dress code</h2><p>{{ $event->dress_code }}</p></article>
+                    @endif
+                    @if($event->rules)
+                        <article class="pg-card"><span class="pg-eyebrow">CONSENT & CULTURE</span><h2>House rules</h2><div class="prose">{!! nl2br(e($event->rules)) !!}</div></article>
+                    @endif
+                </div>
+            @endif
 
-        @if($event->rules)
-            <h2>Rules & consent</h2>
-            <div class="prose">{!! nl2br(e($event->rules)) !!}</div>
-        @endif
-
-        @if($event->ticketTypes->isNotEmpty())
-            <h2>Admission & tickets</h2>
-
-            <div class="ticket-list">
-                @foreach($event->ticketTypes as $type)
-                    @php
-                        $eligibilityReason = null;
-
-                        if ($viewer) {
-                            if ($type->profile_eligibility !== 'any' && $viewerProfileType !== $type->profile_eligibility) {
-                                $eligibilityReason = $type->profile_eligibility === 'couple'
-                                    ? 'Couple profile required'
-                                    : 'Individual profile required';
-                            } elseif ($type->membership_required && ! $viewerIsMember) {
-                                $eligibilityReason = 'Active membership required';
-                            } elseif ($type->approval_required && ! $viewerApproved) {
-                                $eligibilityReason = 'Event approval required';
-                            }
-                        }
-                    @endphp
-
-                    <div class="panel row-between">
-                        <div>
-                            <strong>{{ $type->name }}</strong>
-                            <small>
-                                {{ $type->description }} · {{ $type->price_cents ? '$'.number_format($type->price_cents / 100, 2) : 'Free' }}
-                            </small>
-                            <small>
-                                {{ $type->eligibilityLabel() }}
-                                @if($type->membership_required)
-                                    · Members only
-                                @endif
-                                @if($type->approval_required)
-                                    · Prior approval required
-                                @endif
-                            </small>
-                        </div>
-
-                        @auth
-                            @if($eligibilityReason)
-                                <span class="muted">{{ $eligibilityReason }}</span>
-                            @else
-                                <form method="post" action="{{ route('checkout.store', [$event, $type]) }}" class="inline-controls">
-                                    @csrf
-                                    <input name="quantity" type="number" min="1" max="{{ $type->max_per_order }}" value="1">
-                                    <button>Get Tickets</button>
-                                </form>
-                            @endif
-                        @else
-                            <a href="{{ route('login') }}">Log in</a>
-                        @endauth
+            @if($event->ticketTypes->isNotEmpty())
+                <section>
+                    <div class="pg-section-head"><div><span class="pg-eyebrow">ADMISSION</span><h2>Tickets & access</h2><p>Ticket eligibility is enforced before purchase.</p></div></div>
+                    <div class="pg-grid">
+                        @foreach($event->ticketTypes as $type)
+                            @php
+                                $eligibilityReason = null;
+                                if ($viewer) {
+                                    if ($type->profile_eligibility !== 'any' && $viewerProfileType !== $type->profile_eligibility) {
+                                        $eligibilityReason = $type->profile_eligibility === 'couple' ? 'Couple profile required' : 'Individual profile required';
+                                    } elseif ($type->membership_required && ! $viewerIsMember) {
+                                        $eligibilityReason = 'Active membership required';
+                                    } elseif ($type->approval_required && ! $viewerApproved) {
+                                        $eligibilityReason = 'Event approval required';
+                                    }
+                                }
+                            @endphp
+                            <article class="pg-card">
+                                <div class="row-between">
+                                    <div>
+                                        <div class="pg-event-meta"><span class="pg-pill">{{ $type->eligibilityLabel() }}</span>@if($type->membership_required)<span class="pg-pill">Members only</span>@endif @if($type->approval_required)<span class="pg-pill">Approval required</span>@endif</div>
+                                        <h3 style="margin:.6rem 0 .25rem">{{ $type->name }}</h3>
+                                        <p class="muted">{{ $type->description }}</p>
+                                    </div>
+                                    <strong style="font-size:1.5rem">{{ $type->price_cents ? '$'.number_format($type->price_cents / 100, 2) : 'Free' }}</strong>
+                                </div>
+                                <div class="pg-actions" style="margin-top:16px">
+                                    @auth
+                                        @if($eligibilityReason)
+                                            <span class="pg-pill pg-pill-warn">{{ $eligibilityReason }}</span>
+                                        @else
+                                            <form method="post" action="{{ route('checkout.store', [$event, $type]) }}" class="inline-controls">
+                                                @csrf
+                                                <label class="pg-sr-only" for="qty-{{ $type->id }}">Quantity</label>
+                                                <input id="qty-{{ $type->id }}" name="quantity" type="number" min="1" max="{{ $type->max_per_order }}" value="1" style="width:84px">
+                                                <button class="button button-primary">Get tickets</button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <a class="button button-primary" href="{{ route('login') }}">Log in for tickets</a>
+                                    @endauth
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
-        @endif
-    </article>
+                </section>
+            @endif
+        </div>
 
-    <aside class="panel event-aside">
-        <h3>Event details</h3>
-        <p><strong>Date</strong><br>{{ $event->starts_at->format('M j, Y g:i A') }}</p>
-        <p><strong>Location</strong><br>{{ $event->public_location_label ?: $event->city }}</p>
+        <aside class="pg-grid" style="position:sticky;top:140px">
+            <section class="pg-card">
+                <span class="pg-eyebrow">YOUR RSVP</span>
+                <h2 style="margin:.45rem 0 1rem">Join the guest list</h2>
+                @auth
+                    <form method="post" action="{{ route('rsvp.store', $event) }}" class="form-stack">
+                        @csrf
+                        <label>Guests<input type="number" name="guest_count" min="1" max="10" value="1"></label>
+                        @foreach($questions as $q)
+                            <label>{{ $q->label }}
+                                @if($q->type === 'textarea')
+                                    <textarea name="answers[{{ $q->id }}]" rows="4" @required($q->required)></textarea>
+                                @elseif($q->type === 'checkbox')
+                                    <span class="row-actions"><input type="checkbox" name="answers[{{ $q->id }}]" value="1" @required($q->required)> Confirm</span>
+                                @else
+                                    <input name="answers[{{ $q->id }}]" @required($q->required)>
+                                @endif
+                            </label>
+                        @endforeach
+                        <button class="button button-primary">{{ $event->rsvp_mode === 'instant' ? 'RSVP now' : 'Request approval' }}</button>
+                    </form>
+                @else
+                    <p class="muted">Log in to RSVP while keeping your account and community activity connected.</p>
+                    <a class="button button-primary" href="{{ route('login') }}">Log in to RSVP</a>
+                @endauth
+            </section>
 
-        @if($event->exact_address_visibility === 'public' && $event->exact_address)
-            <p><strong>Address</strong><br>{{ $event->exact_address }}</p>
-        @elseif($event->exact_address_visibility === 'approved_attendees' && $viewerApproved && $event->exact_address)
-            <p><strong>Approved location</strong><br>{{ $event->exact_address }}</p>
-        @endif
-    </aside>
+            <section class="pg-card">
+                <span class="pg-eyebrow">DETAILS</span>
+                <h3>Date & time</h3><p>{{ $event->starts_at->format('M j, Y · g:i A') }}</p>
+                <h3>Location</h3><p>{{ $publicLocation ?: 'Shared according to the host’s privacy settings.' }}</p>
+                @if($event->exact_address_visibility === 'public' && $event->exact_address)
+                    <p><strong>Address</strong><br>{{ $event->exact_address }}</p>
+                @elseif($event->exact_address_visibility === 'approved_attendees' && $viewerApproved && $event->exact_address)
+                    <p><strong>Approved attendee location</strong><br>{{ $event->exact_address }}</p>
+                @else
+                    <div class="pg-privacy-note">Exact private locations are not exposed before the host’s configured access condition is met.</div>
+                @endif
+            </section>
+        </aside>
+    </div>
 </section>
 @endsection
