@@ -17,10 +17,12 @@ class PublicRouteCompatibilityTest extends TestCase
         $this->assertStringContainsString('/clubs', $rendered);
     }
 
-    public function test_legacy_clubs_url_redirects_to_public_organizations_browser(): void
+    public function test_clubs_url_is_registered_as_the_public_browser(): void
     {
-        $response = $this->get('http://platform.test/clubs');
+        $route = Route::getRoutes()->getByName('clubs.index');
 
-        $response->assertRedirect('/organizations');
+        $this->assertNotNull($route);
+        $this->assertSame('clubs', $route->uri());
+        $this->assertContains('GET', $route->methods());
     }
 }
