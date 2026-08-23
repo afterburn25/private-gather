@@ -5,6 +5,7 @@ declare(strict_types=1);
 session_start();
 require __DIR__.'/lib.php';
 require __DIR__.'/runtime.php';
+require __DIR__.'/database.php';
 require __DIR__.'/community-schema.php';
 require __DIR__.'/product-completion-schema.php';
 
@@ -31,7 +32,7 @@ $defaults = [
     'platform_root_domain' => $detectedHost,
     'timezone' => 'America/Chicago',
     'db_host' => 'localhost',
-    'db_port' => '3306',
+    'db_port' => '',
     'db_database' => 'social_events',
     'db_username' => '',
     'db_password' => '',
@@ -58,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'platform_root_domain' => $rootDomain,
             'timezone' => (string) $_POST['timezone'],
             'db_host' => trim((string) $_POST['db_host']),
-            'db_port' => (int) $_POST['db_port'],
+            'db_port' => trim((string) ($_POST['db_port'] ?? '')),
             'db_database' => trim((string) $_POST['db_database']),
             'db_username' => (string) $_POST['db_username'],
             'db_password' => (string) $_POST['db_password'],
@@ -68,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'admin_password' => (string) $_POST['admin_password'],
         ];
 
-        $pdo = installer_connect_database($installInput);
+        $pdo = installer_connect_database_auto($installInput);
         installer_import_schema($pdo);
         installer_import_private_community($pdo);
         installer_import_product_completion($pdo);
@@ -79,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         installer_create_admin($pdo, $installInput);
         installer_write_env($installInput);
+        installer_finalize_database_env($installInput);
         installer_write_receipt($installInput);
         foreach (glob(installer_base_path().'/bootstrap/cache/*.php') ?: [] as $cacheFile) @unlink($cacheFile);
         $success = true;
@@ -98,7 +100,7 @@ function h(string $value): string { return htmlspecialchars($value, ENT_QUOTES, 
 <form method="post" autocomplete="off"><input type="hidden" name="_token" value="<?php echo h($csrf); ?>">
 <div class="card"><h2>1. Server Requirements</h2><?php foreach ($checks as [$label,$ok]): ?><div class="req"><span><?php echo h($label); ?></span><strong class="<?php echo $ok?'pass':'fail'; ?>"><?php echo $ok?'PASS':'FAIL'; ?></strong></div><?php endforeach; ?><p class="help">Private Gather automatically creates or repairs Laravel runtime directories before these checks run. If an uploaded runtime tree is owned by a different Unix account, the installer also attempts an ownership-neutral rebuild through a writable parent directory. Any remaining failure means the host is preventing the PHP process from modifying both the directory and its parent.</p></div>
 <div class="card"><h2>2. Site & Domain</h2><div class="grid"><div class="full"><label>Site / brand name</label><input name="app_name" required value="<?php echo h((string)$data['app_name']); ?>"></div><div class="full"><label>Application URL</label><input name="app_url" required value="<?php echo h((string)$data['app_url']); ?>"><div class="help">For a subdirectory install include the full path, for example <strong>https://example.com/private-gather</strong>.</div></div><div><label>Site root domain</label><input name="platform_root_domain" required value="<?php echo h((string)$data['platform_root_domain']); ?>"><div class="help">Used for tenant subdomains and central site routing.</div></div><div><label>Timezone</label><select name="timezone"><option value="America/Chicago" selected>America/Chicago</option><option value="UTC">UTC</option><option value="America/New_York">America/New_York</option><option value="America/Denver">America/Denver</option><option value="America/Los_Angeles">America/Los_Angeles</option></select></div></div></div>
-<div class="card"><h2>3. Database</h2><div class="grid"><div><label>Database host</label><input name="db_host" required value="<?php echo h((string)$data['db_host']); ?>"></div><div><label>Database port</label><input name="db_port" type="number" required value="<?php echo h((string)$data['db_port']); ?>"></div><div><label>Database name</label><input name="db_database" required value="<?php echo h((string)$data['db_database']); ?>"></div><div><label>Database username</label><input name="db_username" required value="<?php echo h((string)$data['db_username']); ?>"></div><div class="full"><label>Database password</label><input name="db_password" type="password" value=""></div><div class="full check"><input id="db_create" name="db_create" type="checkbox" value="1" <?php echo !empty($data['db_create'])?'checked':''; ?>><div><label for="db_create" style="margin:0">Create database automatically when permitted</label><div class="help">If your hosting account already created the database, Private Gather will use the named database.</div></div></div></div></div>
+<div class="card"><h2>3. Database</h2><div class="grid"><div><label>Database host</label><input name="db_host" required value="<?php echo h((string)$data['db_host']); ?>"><div class="help">For a database on this server, use <strong>localhost</strong>.</div></div><div><label>Database port</label><input name="db_port" inputmode="numeric" placeholder="Auto" value="<?php echo h((string)$data['db_port']); ?>"><div class="help">Leave blank for Auto. With localhost, Private Gather will use the server's native MySQL socket instead of forcing port 3306.</div></div><div><label>Database name</label><input name="db_database" required value="<?php echo h((string)$data['db_database']); ?>"></div><div><label>Database username</label><input name="db_username" required value="<?php echo h((string)$data['db_username']); ?>"><div class="help">Use the complete username shown by your hosting panel; shared hosting may add an account prefix.</div></div><div class="full"><label>Database password</label><input name="db_password" type="password" value=""></div><div class="full check"><input id="db_create" name="db_create" type="checkbox" value="1" <?php echo !empty($data['db_create'])?'checked':''; ?>><div><label for="db_create" style="margin:0">Create database automatically when permitted</label><div class="help">Private Gather first tries the existing named database. Database-creation privileges are used only if the database is missing.</div></div></div></div></div>
 <div class="card"><h2>4. Administrator</h2><div class="grid"><div><label>Name</label><input name="admin_name" required value="<?php echo h((string)$data['admin_name']); ?>"></div><div><label>Email</label><input name="admin_email" type="email" required value="<?php echo h((string)$data['admin_email']); ?>"></div><div><label>Password</label><input name="admin_password" type="password" required minlength="12"></div><div><label>Confirm password</label><input name="admin_password_confirm" type="password" required minlength="12"></div></div></div>
 <div class="card"><h2>5. Install Private Gather</h2><button class="button" type="submit" <?php echo installer_requirements_pass($checks)?'':'disabled'; ?>>Install Private Gather</button></div></form><?php endif; ?>
 </main></body></html>
