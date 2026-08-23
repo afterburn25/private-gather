@@ -7,3 +7,4 @@ community-media-service=app/Services/CommunityMediaService.php
 community-notifier=app/Services/CommunityNotifier.php
 profile-runtime-regression=true
 baseline-parity=certified-live-1.2.0
+certification-trigger=2
