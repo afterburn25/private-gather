@@ -11,7 +11,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class MessageController
 {
@@ -98,7 +100,7 @@ final class MessageController
     {
         $tenant = $context->requireTenant();
         $this->assertConversationAccess($request, $conversation, $tenant->id);
-        $conversation->participants()->updateExistingPivot($request->user()->id, ['last_read_at' => now()]);
+        $conversation->participants()->updateExistingPivot($request->user()->id, ['last_read_at' => now(), 'typing_at' => null]);
 
         return view('member.messages.show', [
             'tenant' => $tenant,
@@ -125,10 +127,63 @@ final class MessageController
             $conversation->participants()->updateExistingPivot($request->user()->id, ['last_read_at' => now()]);
         }
 
+        $typingSince = now()->subSeconds(8);
+        $typing = DB::table('conversation_participants')
+            ->join('users', 'users.id', '=', 'conversation_participants.user_id')
+            ->where('conversation_participants.conversation_id', $conversation->id)
+            ->where('conversation_participants.user_id', '!=', $request->user()->id)
+            ->whereNotNull('conversation_participants.typing_at')
+            ->where('conversation_participants.typing_at', '>=', $typingSince)
+            ->get(['users.id', 'users.name', 'users.display_name'])
+            ->map(fn ($user) => [
+                'id' => (int) $user->id,
+                'name' => $user->display_name ?: $user->name,
+            ])->values();
+
         return response()->json([
             'messages' => $messages,
             'last_id' => (int) ($messages->last()['id'] ?? $after),
+            'typing' => $typing,
         ])->header('Cache-Control', 'private, no-store, max-age=0');
+    }
+
+    public function typing(Request $request, Conversation $conversation, TenantContext $context): JsonResponse
+    {
+        $tenant = $context->requireTenant();
+        $this->assertConversationAccess($request, $conversation, $tenant->id);
+        $data = $request->validate(['typing' => ['nullable', 'boolean']]);
+        $typing = ! array_key_exists('typing', $data) || (bool) $data['typing'];
+
+        $updated = DB::table('conversation_participants')
+            ->where('conversation_id', $conversation->id)
+            ->where('user_id', $request->user()->id)
+            ->update([
+                'typing_at' => $typing ? now() : null,
+                'updated_at' => now(),
+            ]);
+        abort_unless($updated === 1, 404);
+
+        return response()->json(['typing' => $typing])
+            ->header('Cache-Control', 'private, no-store, max-age=0');
+    }
+
+    public function attachment(Request $request, Message $message, TenantContext $context): StreamedResponse
+    {
+        $tenant = $context->requireTenant();
+        $conversation = Conversation::query()->findOrFail((int) $message->conversation_id);
+        $this->assertConversationAccess($request, $conversation, $tenant->id);
+        abort_if($message->deleted_at !== null, 404);
+
+        $path = trim((string) $message->attachment_path);
+        abort_unless($path !== '' && Storage::disk('local')->exists($path), 404);
+
+        return Storage::disk('local')->response($path, null, [
+            'Content-Type' => trim((string) $message->attachment_mime) ?: 'application/octet-stream',
+            'Content-Disposition' => 'inline',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Security-Policy' => "default-src 'none'; sandbox",
+            'Cache-Control' => 'private, no-store, max-age=0',
+        ]);
     }
 
     public function store(Request $request, Conversation $conversation, TenantContext $context): JsonResponse|RedirectResponse
@@ -155,7 +210,7 @@ final class MessageController
             'status' => 'sent',
         ])->load('user:id,name,display_name');
         $conversation->touch();
-        $conversation->participants()->updateExistingPivot($request->user()->id, ['last_read_at' => now()]);
+        $conversation->participants()->updateExistingPivot($request->user()->id, ['last_read_at' => now(), 'typing_at' => null]);
 
         if ($request->expectsJson()) {
             return response()->json(['message' => $this->serializeMessage($message, (int) $request->user()->id)], 201);
@@ -210,6 +265,12 @@ final class MessageController
             'user_id' => (int) $message->user_id,
             'name' => $message->user?->display_name ?: $message->user?->name ?: 'Former member',
             'body' => $message->body,
+            'attachment' => $message->attachment_path ? [
+                'type' => $message->attachment_type,
+                'mime' => $message->attachment_mime,
+                'size' => $message->attachment_size !== null ? (int) $message->attachment_size : null,
+                'url' => route('messages.attachment', $message),
+            ] : null,
             'created_at' => $message->created_at?->toIso8601String(),
             'mine' => (int) $message->user_id === $viewerId,
         ];
