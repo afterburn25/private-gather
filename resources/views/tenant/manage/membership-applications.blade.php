@@ -1,68 +1,15 @@
 @extends('layouts.app')
-@section('title','Membership Applications')
+@section('title','Membership Applications — '.$tenant->name)
 @section('content')
-<section class="container section">
-<div class="panel-head">
-<div>
-<div class="eyebrow">MEMBERSHIP & SCREENING</div>
-<h1>Membership Applications</h1>
-<p class="muted">Review prospective couples and individual members for {{$tenant->name}}. Decisions apply only to this club or organization and never change a person's global Private Gather account.</p>
-</div>
-<a class="btn" href="{{route('tenant.dashboard')}}">Back to Control Center</a>
-</div>
-
-@if(session('status'))<div class="notice">{{session('status')}}</div>@endif
-@if($errors->any())<div class="alert alert-danger"><ul>@foreach($errors->all() as $error)<li>{{$error}}</li>@endforeach</ul></div>@endif
-
-<form method="get" action="{{route('tenant.membership-applications.index')}}" class="panel form-inline">
-<input name="q" value="{{request('q')}}" placeholder="Search applicant name or email" aria-label="Search applicants">
-<select name="status" aria-label="Application status">
-<option value="">All statuses</option>
-@foreach(['pending'=>'Pending','more_info'=>'Needs more info','approved'=>'Approved','declined'=>'Declined'] as $value=>$label)
-<option value="{{$value}}" @selected(request('status')===$value)>{{$label}}</option>
-@endforeach
-</select>
-<button type="submit">Filter</button>
-@if(request('q')||request('status'))<a class="btn" href="{{route('tenant.membership-applications.index')}}">Clear</a>@endif
-</form>
-
-<div class="stack">
+<section class="pg-page-hero"><div class="pg-shell"><span class="pg-eyebrow">CLUB OS · MEMBERSHIP</span><h1>Membership applications</h1><p>Review prospective members for {{ $tenant->name }}. A club decision is local to this community and never changes the applicant’s global Private Gather account.</p></div></section>
+<section class="pg-page"><div class="pg-shell">
+<form method="get" action="{{ route('tenant.membership-applications.index') }}" class="pg-card form-inline"><input name="q" value="{{ request('q') }}" placeholder="Search applicant name or email" aria-label="Search applicants"><select name="status" aria-label="Application status"><option value="">All statuses</option>@foreach(['pending'=>'Pending','more_info'=>'Needs more info','approved'=>'Approved','declined'=>'Declined'] as $value=>$label)<option value="{{ $value }}" @selected(request('status')===$value)>{{ $label }}</option>@endforeach</select><button class="button button-primary" type="submit">Filter</button>@if(request('q')||request('status'))<a class="button button-ghost" href="{{ route('tenant.membership-applications.index') }}">Clear</a>@endif</form>
+<div class="pg-grid" style="margin-top:18px">
 @forelse($applications as $application)
-<article class="panel">
-<div class="row-between">
-<div>
-<div class="eyebrow">{{strtoupper(str_replace('_',' ',$application->status))}}</div>
-<h2>{{$application->user->display_name ?: $application->user->name}}</h2>
-<p class="muted">{{$application->user->email}} · {{ucfirst($application->profile_type)}} application · Submitted {{$application->created_at->format('M j, Y g:i A')}}</p>
-</div>
-@if($application->reviewer)<span class="muted">Reviewed by {{$application->reviewer->display_name ?: $application->reviewer->name}}</span>@endif
-</div>
-
-@if($application->referred_by)<p><strong>Referred by:</strong> {{$application->referred_by}}</p>@endif
-<div class="prose"><strong>Introduction</strong><br>{!!nl2br(e($application->introduction))!!}</div>
-@if($application->decision_note)<p><strong>Review note:</strong> {{$application->decision_note}}</p>@endif
-
-<form method="post" action="{{route('tenant.membership-applications.update',$application)}}" class="form-card">
-@csrf
-@method('patch')
-<label>Decision
-<select name="decision" required>
-<option value="approved">Approve membership</option>
-<option value="more_info" @selected($application->status==='more_info')>Request more information</option>
-<option value="declined" @selected($application->status==='declined')>Decline application</option>
-</select>
-</label>
-<label>Private review note <span class="muted">(optional)</span>
-<textarea name="decision_note" rows="3" maxlength="2500" placeholder="Add a note about this decision.">{{$application->decision_note}}</textarea>
-</label>
-<button class="btn primary" type="submit">Save Decision</button>
-</form>
+<article class="pg-card"><div class="row-between"><div><div class="pg-event-meta"><span class="pg-pill {{ $application->status==='pending'?'pg-pill-warn':($application->status==='approved'?'pg-pill-good':'') }}">{{ strtoupper(str_replace('_',' ',$application->status)) }}</span><span class="pg-pill">{{ ucfirst($application->profile_type) }} profile</span></div><h2 style="margin:.7rem 0 .2rem">{{ $application->user->display_name ?: $application->user->name }}</h2><p class="muted">{{ $application->user->email }} · submitted {{ $application->created_at->format('M j, Y · g:i A') }}</p></div>@if($application->reviewer)<span class="pg-pill">Reviewed by {{ $application->reviewer->display_name ?: $application->reviewer->name }}</span>@endif</div>
+<div class="pg-grid pg-grid-2" style="margin-top:18px"><div>@if($application->referred_by)<p><strong>Referred by</strong><br>{{ $application->referred_by }}</p>@endif<div class="prose"><strong>Introduction</strong><br>{!! nl2br(e($application->introduction)) !!}</div>@if($application->decision_note)<div class="pg-privacy-note" style="margin-top:14px"><strong>Current private review note</strong><br>{{ $application->decision_note }}</div>@endif</div><form method="post" action="{{ route('tenant.membership-applications.update',$application) }}" class="pg-card form-stack" style="background:rgba(255,255,255,.025)!important">@csrf @method('patch')<span class="pg-eyebrow">CLUB DECISION</span><label>Decision<select name="decision" required><option value="approved">Approve membership</option><option value="more_info" @selected($application->status==='more_info')>Request more information</option><option value="declined" @selected($application->status==='declined')>Decline application</option></select></label><label>Private review note <small class="muted">Not shown as public profile content.</small><textarea name="decision_note" rows="4" maxlength="2500" placeholder="Add context for this club's review record.">{{ $application->decision_note }}</textarea></label><button class="button button-primary" type="submit">Save decision</button></form></div>
 </article>
-@empty
-<div class="panel empty-state">No membership applications match this view.</div>
-@endforelse
-</div>
-
-{{$applications->links()}}
-</section>
+@empty<div class="pg-empty">No membership applications match this view.</div>@endforelse
+</div><div style="margin-top:30px">{{ $applications->links() }}</div>
+</div></section>
 @endsection
