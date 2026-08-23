@@ -6,20 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Models\PlatformSetting;
 use App\Services\PlatformContent;
 use App\Support\Audit;
+use App\Support\ThemeCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PlatformContentController extends Controller
 {
     public function edit(PlatformContent $content)
     {
-        return view('admin.platform-content', ['content' => $content->all()]);
+        return view('admin.platform-content', [
+            'content' => $content->all(),
+            'platformThemes' => ThemeCatalog::platformThemes(),
+        ]);
     }
 
     public function update(Request $request)
     {
         $data = $request->validate([
             'brand_name' => 'required|string|max:120',
-            'logo_url' => 'nullable|string|max:1000',
+            'theme_preset' => ['required', Rule::in(array_keys(ThemeCatalog::platformThemes()))],
             'header_cta_label' => 'nullable|string|max:80',
             'header_cta_url' => 'nullable|string|max:500',
             'hero_eyebrow' => 'nullable|string|max:180',
@@ -43,14 +48,13 @@ class PlatformContentController extends Controller
             'about_image_url' => 'nullable|string|max:1000',
             'hero_image' => 'nullable|image|max:10240',
             'about_image' => 'nullable|image|max:10240',
-            'logo_image' => 'nullable|image|max:10240',
         ]);
 
         foreach (['show_featured_events', 'show_organizations', 'show_domain_section'] as $key) {
             $data[$key] = $request->boolean($key) ? '1' : '0';
         }
 
-        foreach (['logo_image' => 'logo_url', 'hero_image' => 'hero_image_url', 'about_image' => 'about_image_url'] as $uploadKey => $settingKey) {
+        foreach (['hero_image' => 'hero_image_url', 'about_image' => 'about_image_url'] as $uploadKey => $settingKey) {
             if ($request->hasFile($uploadKey)) {
                 $directory = public_path('uploads/platform');
                 if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
@@ -65,6 +69,13 @@ class PlatformContentController extends Controller
             unset($data[$uploadKey]);
         }
 
+        // Never persist an alternate central logo. The main marketplace uses the
+        // official Private Gather crest; tenant sites own their separate branding.
+        PlatformSetting::updateOrCreate(
+            ['key' => 'logo_url'],
+            ['group' => 'content', 'value' => PlatformContent::OFFICIAL_LOGO, 'type' => 'string', 'updated_by' => $request->user()->id]
+        );
+
         foreach ($data as $key => $value) {
             PlatformSetting::updateOrCreate(
                 ['key' => $key],
@@ -73,6 +84,6 @@ class PlatformContentController extends Controller
         }
 
         Audit::write('platform.content.updated', after: array_keys($data), request: $request);
-        return back()->with('status', 'Private Gather website content updated.');
+        return back()->with('status', 'Private Gather website content and theme updated.');
     }
 }
