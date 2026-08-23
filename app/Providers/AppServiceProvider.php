@@ -27,9 +27,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Credential-recovery and verification links must never inherit an
-        // arbitrary/custom request Host. Always send users to the canonical
-        // Private Gather APP_URL, including its configured subdirectory mount.
         ResetPassword::createUrlUsing(function ($notifiable, string $token): string {
             $relative = route('password.reset', [
                 'token' => $token,
@@ -53,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
             return self::canonicalPlatformUrl($relative);
         });
 
-        View::composer('layouts.app', function ($view): void {
+        View::composer(['layouts.app', 'layouts.tenant-site'], function ($view): void {
             $tenant = app(TenantContext::class)->tenant();
             $settings = collect();
             $nav = collect();
