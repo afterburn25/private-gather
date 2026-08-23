@@ -90,7 +90,7 @@ final class V123MessageRuntimeTest extends TestCase
         $this->actingAs($two)
             ->get('https://chat.platform.test/message-media/'.$message->id)
             ->assertOk()
-            ->assertHeader('Content-Type', 'text/plain')
+            ->assertHeader('Content-Type', 'text/plain; charset=utf-8')
             ->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('Cache-Control', 'private, no-store, max-age=0');
 
