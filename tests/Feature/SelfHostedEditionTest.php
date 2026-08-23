@@ -108,7 +108,7 @@ class SelfHostedEditionTest extends TestCase
             'tenant_id' => $this->tenant->id,
             'user_id' => $user->id,
             'role' => 'member',
-            'status' => 'active',
+            'status' => 'pending',
         ]);
     }
 
