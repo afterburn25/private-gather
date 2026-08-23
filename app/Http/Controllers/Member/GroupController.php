@@ -42,7 +42,7 @@ final class GroupController extends Controller
             'contextTitle' => $group->name,
             'contextSubtitle' => $group->description ?: 'A private member group inside this club community.',
             'postAction' => route('groups.posts.store', $group),
-            'backUrl' => route('network.index'),
+            'backUrl' => route('community.index'),
             'canModerate' => $this->tenantManager($request, (int) $tenant->id),
         ]);
     }
