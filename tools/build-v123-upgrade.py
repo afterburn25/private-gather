@@ -27,6 +27,7 @@ FILES = [
     'app/Http/Controllers/Member/CommunityController.php',
     'app/Http/Controllers/Member/EventCommunityController.php',
     'app/Http/Controllers/Member/GroupController.php',
+    'app/Http/Controllers/Member/MessageController.php',
     'app/Http/Controllers/HostedDiscoveryController.php',
     'app/Http/Controllers/Tenant/GrowthCommerceController.php',
     'app/Http/Controllers/Tenant/MembershipManagementController.php',
