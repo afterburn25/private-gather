@@ -7,10 +7,24 @@ function installer_import_private_community(PDO $pdo): void
 {
     $statements = [
         <<<'SQL'
+CREATE TABLE IF NOT EXISTS community_groups (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, tenant_id BIGINT UNSIGNED NOT NULL, created_by BIGINT UNSIGNED NOT NULL, name VARCHAR(120) NOT NULL, slug VARCHAR(140) NOT NULL, description TEXT NULL, visibility VARCHAR(24) NOT NULL DEFAULT 'tenant', join_policy VARCHAR(24) NOT NULL DEFAULT 'approval', status VARCHAR(24) NOT NULL DEFAULT 'active', allow_member_posts TINYINT(1) NOT NULL DEFAULT 1, created_at TIMESTAMP NULL, updated_at TIMESTAMP NULL,
+ PRIMARY KEY(id), UNIQUE KEY community_groups_tenant_slug_unique(tenant_id,slug), KEY community_groups_tenant_status_index(tenant_id,status),
+ CONSTRAINT community_groups_tenant_fk FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE, CONSTRAINT community_groups_creator_fk FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
+        <<<'SQL'
+CREATE TABLE IF NOT EXISTS community_group_members (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, community_group_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NOT NULL, role VARCHAR(24) NOT NULL DEFAULT 'member', status VARCHAR(24) NOT NULL DEFAULT 'active', created_at TIMESTAMP NULL, updated_at TIMESTAMP NULL,
+ PRIMARY KEY(id), UNIQUE KEY community_group_members_group_user_unique(community_group_id,user_id), KEY community_group_members_user_status_index(user_id,status),
+ CONSTRAINT community_group_members_group_fk FOREIGN KEY(community_group_id) REFERENCES community_groups(id) ON DELETE CASCADE, CONSTRAINT community_group_members_user_fk FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+SQL,
+        <<<'SQL'
 CREATE TABLE IF NOT EXISTS community_posts (
- id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, tenant_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NULL, body TEXT NOT NULL, status VARCHAR(24) NOT NULL DEFAULT 'active', is_pinned TINYINT(1) NOT NULL DEFAULT 0, edited_at TIMESTAMP NULL, created_at TIMESTAMP NULL, updated_at TIMESTAMP NULL,
- PRIMARY KEY(id), KEY community_posts_status_index(status), KEY community_posts_pinned_index(is_pinned), KEY community_posts_tenant_pinned_created_idx(tenant_id,is_pinned,created_at),
- CONSTRAINT community_posts_tenant_fk FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE, CONSTRAINT community_posts_user_fk FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, tenant_id BIGINT UNSIGNED NOT NULL, community_group_id BIGINT UNSIGNED NULL, user_id BIGINT UNSIGNED NULL, body TEXT NOT NULL, status VARCHAR(24) NOT NULL DEFAULT 'active', is_pinned TINYINT(1) NOT NULL DEFAULT 0, edited_at TIMESTAMP NULL, created_at TIMESTAMP NULL, updated_at TIMESTAMP NULL,
+ PRIMARY KEY(id), KEY community_posts_status_index(status), KEY community_posts_pinned_index(is_pinned), KEY community_posts_tenant_pinned_created_idx(tenant_id,is_pinned,created_at), KEY community_posts_tenant_group_status_idx(tenant_id,community_group_id,status),
+ CONSTRAINT community_posts_tenant_fk FOREIGN KEY(tenant_id) REFERENCES tenants(id) ON DELETE CASCADE, CONSTRAINT community_posts_group_fk FOREIGN KEY(community_group_id) REFERENCES community_groups(id) ON DELETE SET NULL, CONSTRAINT community_posts_user_fk FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 SQL,
         <<<'SQL'
@@ -76,11 +90,15 @@ SQL,
         catch (Throwable $e) { throw new RuntimeException('Private community schema import failed at statement '.($number + 1).': '.$e->getMessage(),0,$e); }
     }
 
+    installer_add_column_if_missing($pdo,'community_posts','community_group_id','BIGINT UNSIGNED NULL');
+    installer_add_index_if_missing($pdo,'community_posts','community_posts_tenant_group_status_idx','`tenant_id`,`community_group_id`,`status`');
+    installer_add_foreign_key_if_missing($pdo,'community_posts','community_posts_group_fk','community_group_id','community_groups','id','SET NULL');
+
     installer_add_column_if_missing($pdo,'ticket_types','profile_eligibility',"VARCHAR(24) NOT NULL DEFAULT 'any'");
     installer_add_column_if_missing($pdo,'ticket_types','membership_required','TINYINT(1) NOT NULL DEFAULT 0');
     installer_add_column_if_missing($pdo,'ticket_types','approval_required','TINYINT(1) NOT NULL DEFAULT 0');
 
-    $registeredMigrations=['2026_08_22_230000_create_tenant_membership_applications','2026_08_22_231000_add_lifestyle_ticket_eligibility','2026_08_22_232000_create_badge_system','2026_08_22_233000_create_tenant_membership_levels'];
+    $registeredMigrations=['2026_08_22_230000_create_tenant_membership_applications','2026_08_22_231000_add_lifestyle_ticket_eligibility','2026_08_22_232000_create_badge_system','2026_08_22_233000_create_tenant_membership_levels','2026_08_22_234000_create_redesign_community_groups'];
     $stmt=$pdo->prepare('INSERT INTO migrations (migration,batch) SELECT ?,1 WHERE NOT EXISTS (SELECT 1 FROM migrations WHERE migration=?)');
     foreach($registeredMigrations as $migration)$stmt->execute([$migration,$migration]);
 }
@@ -90,4 +108,20 @@ function installer_add_column_if_missing(PDO $pdo,string $table,string $column,s
     if(!preg_match('/^[A-Za-z0-9_]+$/',$table)||!preg_match('/^[A-Za-z0-9_]+$/',$column))throw new InvalidArgumentException('Unsafe installer schema identifier.');
     $check=$pdo->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?');$check->execute([$table,$column]);if((int)$check->fetchColumn()>0)return;
     $pdo->exec(sprintf('ALTER TABLE `%s` ADD COLUMN `%s` %s',$table,$column,$definition));
+}
+
+function installer_add_index_if_missing(PDO $pdo,string $table,string $index,string $columns):void
+{
+    foreach([$table,$index] as $identifier)if(!preg_match('/^[A-Za-z0-9_]+$/',$identifier))throw new InvalidArgumentException('Unsafe installer schema identifier.');
+    if(!preg_match('/^[A-Za-z0-9_`,]+$/',$columns))throw new InvalidArgumentException('Unsafe installer index columns.');
+    $check=$pdo->prepare('SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND INDEX_NAME = ?');$check->execute([$table,$index]);if((int)$check->fetchColumn()>0)return;
+    $pdo->exec(sprintf('ALTER TABLE `%s` ADD INDEX `%s` (%s)',$table,$index,$columns));
+}
+
+function installer_add_foreign_key_if_missing(PDO $pdo,string $table,string $constraint,string $column,string $referencedTable,string $referencedColumn,string $onDelete):void
+{
+    foreach([$table,$constraint,$column,$referencedTable,$referencedColumn] as $identifier)if(!preg_match('/^[A-Za-z0-9_]+$/',$identifier))throw new InvalidArgumentException('Unsafe installer schema identifier.');
+    if(!in_array($onDelete,['CASCADE','SET NULL','RESTRICT'],true))throw new InvalidArgumentException('Unsafe installer foreign-key action.');
+    $check=$pdo->prepare('SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = ? AND CONSTRAINT_NAME = ? AND CONSTRAINT_TYPE = ?');$check->execute([$table,$constraint,'FOREIGN KEY']);if((int)$check->fetchColumn()>0)return;
+    $pdo->exec(sprintf('ALTER TABLE `%s` ADD CONSTRAINT `%s` FOREIGN KEY (`%s`) REFERENCES `%s` (`%s`) ON DELETE %s',$table,$constraint,$column,$referencedTable,$referencedColumn,$onDelete));
 }
