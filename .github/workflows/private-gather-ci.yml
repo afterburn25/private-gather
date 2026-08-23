@@ -40,6 +40,7 @@ jobs:
           php tools/verify-installer.php
           php tools/test-installer-runtime.php
           php tools/test-installer-database-transport.php
+          php tools/verify-showcase-bootstrap.php
           php tools/verify-subdirectory-install.php
           php tools/verify-admin-layout.php
           php tools/verify-upgrader.php
@@ -55,9 +56,10 @@ jobs:
         run: |
           test ! -f .env
           test ! -f storage/app/installed.lock
-          bad="$(git ls-files | grep -Ei '(^|/)\.env($|\.)|(^|/)auth\.json$|^database/database\.sqlite$' | grep -Ev '(^|/)\.env\.example$' || true)"
+          test ! -f storage/app/showcase-bootstrap.pending
+          bad="$(git ls-files | grep -Ei '(^|/)\.env($|\.)|(^|/)auth\.json$|^database/database\.sqlite$|^storage/app/showcase-bootstrap\.(pending|done)$' | grep -Ev '(^|/)\.env\.example$' || true)"
           if [ -n "$bad" ]; then
-            echo 'Secret-bearing environment/auth or live database state is tracked:' >&2
+            echo 'Secret-bearing environment/auth or live deployment state is tracked:' >&2
             printf '%s\n' "$bad" >&2
             exit 1
           fi
