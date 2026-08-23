@@ -6,14 +6,17 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Models\CommunityComment;
+use App\Models\CommunityPollVote;
 use App\Models\CommunityPost;
 use App\Models\CommunityReaction;
-use App\Models\User;
+use App\Services\MemberPrivacy;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class CommunityController extends Controller
 {
@@ -24,6 +27,11 @@ final class CommunityController extends Controller
         $posts = CommunityPost::query()
             ->where('tenant_id', $tenant->id)
             ->where('status', 'active')
+            ->where(function ($query): void {
+                $query->where(function ($plain): void {
+                    $plain->whereNull('group_id')->whereNull('event_id');
+                })->orWhere('share_to_club_wall', true);
+            })
             ->with([
                 'user:id,name,display_name',
                 'comments' => fn ($query) => $query->where('status', 'active')->oldest()->with('user:id,name,display_name'),
@@ -36,7 +44,7 @@ final class CommunityController extends Controller
         return view('member.community.index', [
             'tenant' => $tenant,
             'posts' => $posts,
-            'canModerate' => $this->canModerate($request, $tenant->id),
+            'canModerate' => $this->canModerate($request, (int) $tenant->id),
         ]);
     }
 
@@ -48,6 +56,9 @@ final class CommunityController extends Controller
         CommunityPost::create([
             'tenant_id' => $tenant->id,
             'user_id' => $request->user()->id,
+            'post_type' => 'status',
+            'visibility' => 'members',
+            'share_to_club_wall' => true,
             'body' => trim($data['body']),
             'status' => 'active',
         ]);
@@ -55,10 +66,24 @@ final class CommunityController extends Controller
         return back()->with('status', 'Posted to the private community.');
     }
 
-    public function comment(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
+    public function media(Request $request, CommunityPost $post, TenantContext $context, MemberPrivacy $privacy): StreamedResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
+        $this->assertMemberCanAccessPost($request, $post, (int) $tenant->id, $privacy);
+        abort_unless($post->media_path && Storage::disk('local')->exists($post->media_path), 404);
+
+        return Storage::disk('local')->response($post->media_path, null, [
+            'Content-Type' => $post->media_mime ?: 'application/octet-stream',
+            'X-Content-Type-Options' => 'nosniff',
+            'Content-Security-Policy' => "default-src 'none'; sandbox",
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
+    public function comment(Request $request, CommunityPost $post, TenantContext $context, MemberPrivacy $privacy): RedirectResponse
+    {
+        $tenant = $context->requireTenant();
+        $this->assertMemberCanAccessPost($request, $post, (int) $tenant->id, $privacy);
         $data = $request->validate(['body' => ['required', 'string', 'max:3000']]);
 
         CommunityComment::create([
@@ -72,10 +97,10 @@ final class CommunityController extends Controller
         return back();
     }
 
-    public function react(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
+    public function react(Request $request, CommunityPost $post, TenantContext $context, MemberPrivacy $privacy): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
+        $this->assertMemberCanAccessPost($request, $post, (int) $tenant->id, $privacy);
         $data = $request->validate(['reaction' => ['required', 'in:like,love,celebrate,support']]);
 
         CommunityReaction::updateOrCreate(
@@ -86,10 +111,10 @@ final class CommunityController extends Controller
         return back();
     }
 
-    public function removeReaction(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
+    public function removeReaction(Request $request, CommunityPost $post, TenantContext $context, MemberPrivacy $privacy): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
+        $this->assertMemberCanAccessPost($request, $post, (int) $tenant->id, $privacy);
 
         CommunityReaction::where([
             'tenant_id' => $tenant->id,
@@ -100,22 +125,44 @@ final class CommunityController extends Controller
         return back();
     }
 
+    public function vote(Request $request, CommunityPost $post, TenantContext $context, MemberPrivacy $privacy): RedirectResponse
+    {
+        $tenant = $context->requireTenant();
+        $this->assertMemberCanAccessPost($request, $post, (int) $tenant->id, $privacy);
+        $options = is_array($post->poll_options) ? array_values($post->poll_options) : [];
+        if ($options === []) {
+            throw ValidationException::withMessages(['option_index' => 'This post does not contain an active poll.']);
+        }
+
+        $data = $request->validate(['option_index' => ['required', 'integer', 'min:0', 'max:'.(count($options) - 1)]]);
+        CommunityPollVote::updateOrCreate(
+            ['post_id' => $post->id, 'user_id' => $request->user()->id],
+            ['option_index' => (int) $data['option_index']]
+        );
+
+        return back()->with('status', 'Vote recorded.');
+    }
+
     public function destroy(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
-        abort_unless((int) $post->user_id === (int) $request->user()->id || $this->canModerate($request, $tenant->id), 403);
+        $this->assertPostTenant($post, (int) $tenant->id);
+        abort_unless((int) $post->user_id === (int) $request->user()->id || $this->canModerate($request, (int) $tenant->id), 403);
 
         $post->update(['status' => 'removed']);
 
         return back()->with('status', 'Post removed.');
     }
 
-    public function destroyComment(Request $request, CommunityComment $comment, TenantContext $context): RedirectResponse
+    public function destroyComment(Request $request, CommunityComment $comment, TenantContext $context, MemberPrivacy $privacy): RedirectResponse
     {
         $tenant = $context->requireTenant();
         abort_unless((int) $comment->tenant_id === (int) $tenant->id, 404);
-        abort_unless((int) $comment->user_id === (int) $request->user()->id || $this->canModerate($request, $tenant->id), 403);
+        $post = CommunityPost::query()->findOrFail((int) $comment->post_id);
+        if (! $this->canModerate($request, (int) $tenant->id)) {
+            $this->assertMemberCanAccessPost($request, $post, (int) $tenant->id, $privacy);
+        }
+        abort_unless((int) $comment->user_id === (int) $request->user()->id || $this->canModerate($request, (int) $tenant->id), 403);
 
         $comment->update(['status' => 'removed']);
 
@@ -125,12 +172,18 @@ final class CommunityController extends Controller
     public function pin(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
-        abort_unless($this->canModerate($request, $tenant->id), 403);
+        $this->assertPostTenant($post, (int) $tenant->id);
+        abort_unless($this->canModerate($request, (int) $tenant->id), 403);
 
         $post->update(['is_pinned' => ! $post->is_pinned]);
 
         return back();
+    }
+
+    private function assertMemberCanAccessPost(Request $request, CommunityPost $post, int $tenantId, MemberPrivacy $privacy): void
+    {
+        $this->assertPostTenant($post, $tenantId);
+        abort_unless($privacy->canAccessPost($tenantId, $request->user(), $post), 404);
     }
 
     private function assertPostTenant(CommunityPost $post, int $tenantId): void
@@ -142,6 +195,6 @@ final class CommunityController extends Controller
     {
         $membership = $request->user()->tenants()->whereKey($tenantId)->first()?->pivot;
 
-        return $membership && in_array($membership->role, ['owner', 'admin', 'manager'], true);
+        return $membership && in_array((string) $membership->role, ['owner', 'admin', 'manager'], true);
     }
 }
