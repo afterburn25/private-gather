@@ -1,4 +1,10 @@
-@extends('layouts.app')
+@php
+    $tenantContext = app(\App\Tenancy\TenantContext::class);
+    $isTenantSite = $tenantContext->check();
+    $tenant = $isTenantSite ? $tenantContext->requireTenant()->load('branding') : $event->tenant;
+    $publicShell = $isTenantSite ? 'tenant-shell' : 'pg-shell';
+@endphp
+@extends($isTenantSite ? 'layouts.tenant-site' : 'layouts.app')
 @section('title', $event->title)
 @section('content')
 @php
@@ -9,8 +15,8 @@
     $publicLocation = $event->public_location_label ?: trim($event->city.', '.$event->region, ', ');
 @endphp
 
-<section class="pg-page-hero">
-    <div class="pg-shell pg-grid pg-grid-2" style="align-items:end">
+<section class="pg-page-hero {{ $isTenantSite ? 'tenant-site-hero' : '' }}">
+    <div class="{{ $publicShell }} pg-grid pg-grid-2" style="align-items:end">
         <div>
             <div class="pg-event-meta">
                 <span class="pg-pill">{{ strtoupper($event->category ?: 'Lifestyle event') }}</span>
@@ -30,7 +36,7 @@
 </section>
 
 <section class="pg-page">
-    <div class="pg-shell pg-grid" style="grid-template-columns:minmax(0,1.5fr) minmax(300px,.7fr);align-items:start">
+    <div class="{{ $publicShell }} pg-grid" style="grid-template-columns:minmax(0,1.5fr) minmax(300px,.7fr);align-items:start">
         <div class="pg-grid">
             <article class="pg-card">
                 <span class="pg-eyebrow">THE EXPERIENCE</span>
