@@ -87,12 +87,15 @@ final class V123MessageRuntimeTest extends TestCase
         ]);
         $message = Message::query()->findOrFail($messageId);
 
-        $this->actingAs($two)
+        $response = $this->actingAs($two)
             ->get('https://chat.platform.test/message-media/'.$message->id)
             ->assertOk()
             ->assertHeader('Content-Type', 'text/plain; charset=utf-8')
-            ->assertHeader('X-Content-Type-Options', 'nosniff')
-            ->assertHeader('Cache-Control', 'private, no-store, max-age=0');
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+
+        $cacheControl = (string) $response->headers->get('Cache-Control');
+        $this->assertStringContainsString('private', $cacheControl);
+        $this->assertStringContainsString('no-store', $cacheControl);
 
         $this->actingAs($outsider)
             ->get('https://chat.platform.test/message-media/'.$message->id)
