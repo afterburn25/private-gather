@@ -8,7 +8,7 @@ $required = [
     'config/edition.php' => ['PRIVATE_GATHER_EDITION', 'SELF_HOSTED_VISIBILITY', 'SELF_HOSTED_REGISTRATION'],
     'app/Http/Middleware/EnforceSelfHostedPrivacy.php' => ['selfHostedVisibility', 'registrationEnabled'],
     'app/Http/Middleware/ResolveTenantByDomain.php' => ['selfHostedTenant', 'tenant_self_hosted'],
-    'install/index.php' => ['HOSTED INSTALLER', "'edition' => 'hosted'"],
+    'install/index.php' => ["'edition' => 'hosted'", 'PRIVATE GATHER · INSTALLER', '<h1>Install Private Gather</h1>'],
     'install/self-hosted-index.php' => ['SELF-HOSTED INSTALLER', "'edition' => 'self_hosted'", 'organization_name'],
     'install/runtime.php' => ['installer_prepare_runtime_directories', 'bootstrap/cache'],
     'install/lib.php' => ['installer_create_self_hosted_tenant', 'SELF_HOSTED_TENANT_ID', 'PRIVATE_GATHER_EDITION'],
@@ -42,6 +42,19 @@ if (! str_contains($selfHostedInstaller, 'name="organization_name"')) {
     $failures[] = 'Self-Hosted installer is missing dedicated organization setup.';
 }
 
+$forbiddenHostedPresentation = [
+    'HOSTED INSTALLER',
+    'Install Private Gather Hosted',
+    'Install Hosted Platform',
+    'Hosted platform base',
+    'Self-Hosted mode in this package',
+];
+foreach ($forbiddenHostedPresentation as $needle) {
+    if (str_contains($hostedInstaller, $needle)) {
+        $failures[] = 'Hosted browser installer exposes internal edition wording: '.$needle;
+    }
+}
+
 $layout = (string) @file_get_contents($root.'/resources/views/layouts/app.blade.php');
 if (! str_contains($layout, 'Edition::registrationEnabled()')) {
     $failures[] = 'Shared application layout is not edition-aware.';
@@ -57,4 +70,4 @@ if ($failures !== []) {
     exit(1);
 }
 
-echo "Private Gather separate Hosted/Self-Hosted bases with shared maintained Core: PASS\n";
+echo "Private Gather separate deployment bases with clean Hosted installer presentation and shared maintained Core: PASS\n";
