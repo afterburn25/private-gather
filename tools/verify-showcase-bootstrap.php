@@ -109,7 +109,8 @@ foreach (['/assets/showcase/platform-hero.svg', '/assets/showcase/community.svg'
 if (! str_contains($home, 'cover_image_path') || ! str_contains($events, 'cover_image_path')) {
     $errors[] = 'Platform event surfaces do not render event cover imagery.';
 }
-if (! str_contains($home, "data_get($org->settings,'cover_image_path')") || ! str_contains($organizations, "data_get($org->settings,'cover_image_path')")) {
+$clubImageNeedle = 'data_get($org->settings,\'cover_image_path\')';
+if (! str_contains($home, $clubImageNeedle) || ! str_contains($organizations, $clubImageNeedle)) {
     $errors[] = 'Platform organization surfaces do not render showcase club imagery.';
 }
 if (! str_contains($organizations, 'Fictional showcase')) {
