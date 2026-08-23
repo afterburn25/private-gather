@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Models\CommunityComment;
 use App\Models\CommunityPost;
 use App\Models\CommunityReaction;
-use App\Models\User;
 use App\Tenancy\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,6 +22,7 @@ final class CommunityController extends Controller
 
         $posts = CommunityPost::query()
             ->where('tenant_id', $tenant->id)
+            ->whereNull('community_group_id')
             ->where('status', 'active')
             ->with([
                 'user:id,name,display_name',
@@ -36,7 +36,7 @@ final class CommunityController extends Controller
         return view('member.community.index', [
             'tenant' => $tenant,
             'posts' => $posts,
-            'canModerate' => $this->canModerate($request, $tenant->id),
+            'canModerate' => $this->tenantManager($request, $tenant->id),
         ]);
     }
 
@@ -47,6 +47,7 @@ final class CommunityController extends Controller
 
         CommunityPost::create([
             'tenant_id' => $tenant->id,
+            'community_group_id' => null,
             'user_id' => $request->user()->id,
             'body' => trim($data['body']),
             'status' => 'active',
@@ -58,7 +59,7 @@ final class CommunityController extends Controller
     public function comment(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
+        $this->assertPostAccess($request, $post, $tenant->id);
         $data = $request->validate(['body' => ['required', 'string', 'max:3000']]);
 
         CommunityComment::create([
@@ -75,7 +76,7 @@ final class CommunityController extends Controller
     public function react(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
+        $this->assertPostAccess($request, $post, $tenant->id);
         $data = $request->validate(['reaction' => ['required', 'in:like,love,celebrate,support']]);
 
         CommunityReaction::updateOrCreate(
@@ -89,7 +90,7 @@ final class CommunityController extends Controller
     public function removeReaction(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
+        $this->assertPostAccess($request, $post, $tenant->id);
 
         CommunityReaction::where([
             'tenant_id' => $tenant->id,
@@ -103,9 +104,8 @@ final class CommunityController extends Controller
     public function destroy(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
-        abort_unless((int) $post->user_id === (int) $request->user()->id || $this->canModerate($request, $tenant->id), 403);
-
+        $this->assertPostAccess($request, $post, $tenant->id);
+        abort_unless((int) $post->user_id === (int) $request->user()->id || $this->canModeratePost($request, $post, $tenant->id), 403);
         $post->update(['status' => 'removed']);
 
         return back()->with('status', 'Post removed.');
@@ -115,8 +115,9 @@ final class CommunityController extends Controller
     {
         $tenant = $context->requireTenant();
         abort_unless((int) $comment->tenant_id === (int) $tenant->id, 404);
-        abort_unless((int) $comment->user_id === (int) $request->user()->id || $this->canModerate($request, $tenant->id), 403);
-
+        $post = CommunityPost::query()->findOrFail($comment->post_id);
+        $this->assertPostAccess($request, $post, $tenant->id);
+        abort_unless((int) $comment->user_id === (int) $request->user()->id || $this->canModeratePost($request, $post, $tenant->id), 403);
         $comment->update(['status' => 'removed']);
 
         return back();
@@ -125,23 +126,48 @@ final class CommunityController extends Controller
     public function pin(Request $request, CommunityPost $post, TenantContext $context): RedirectResponse
     {
         $tenant = $context->requireTenant();
-        $this->assertPostTenant($post, $tenant->id);
-        abort_unless($this->canModerate($request, $tenant->id), 403);
-
+        $this->assertPostAccess($request, $post, $tenant->id);
+        abort_unless($this->canModeratePost($request, $post, $tenant->id), 403);
         $post->update(['is_pinned' => ! $post->is_pinned]);
 
         return back();
     }
 
-    private function assertPostTenant(CommunityPost $post, int $tenantId): void
+    private function assertPostAccess(Request $request, CommunityPost $post, int $tenantId): void
     {
         abort_unless((int) $post->tenant_id === $tenantId && $post->status === 'active', 404);
+        if ($post->community_group_id === null || $this->tenantManager($request, $tenantId)) {
+            return;
+        }
+
+        $member = DB::table('community_group_members')
+            ->where('community_group_id', $post->community_group_id)
+            ->where('user_id', $request->user()->id)
+            ->where('status', 'active')
+            ->exists();
+        abort_unless($member, 404);
     }
 
-    private function canModerate(Request $request, int $tenantId): bool
+    private function canModeratePost(Request $request, CommunityPost $post, int $tenantId): bool
+    {
+        if ($this->tenantManager($request, $tenantId)) {
+            return true;
+        }
+        if ($post->community_group_id === null) {
+            return false;
+        }
+
+        return DB::table('community_group_members')
+            ->where('community_group_id', $post->community_group_id)
+            ->where('user_id', $request->user()->id)
+            ->where('status', 'active')
+            ->where('role', 'moderator')
+            ->exists();
+    }
+
+    private function tenantManager(Request $request, int $tenantId): bool
     {
         $membership = $request->user()->tenants()->whereKey($tenantId)->first()?->pivot;
-
-        return $membership && in_array($membership->role, ['owner', 'admin', 'manager'], true);
+        return (bool) ($membership && in_array($membership->role, ['owner', 'admin', 'manager'], true));
     }
 }
