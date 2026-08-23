@@ -117,10 +117,12 @@ jobs:
               manifest = json.loads(z.read('manifest.json'))
               assert manifest['to_version'] == '1.2.3'
               assert manifest['from_versions'] == ['1.2.0', '1.2.1']
-              assert len(manifest['files']) == 32
+              assert len(manifest['files']) == 34
               payload_paths = {f['path'] for f in manifest['files']}
               assert 'app/Models/ProfilePartnerInvite.php' in payload_paths
               assert 'app/Models/Profile.php' in payload_paths
+              assert 'app/Services/CommunityMediaService.php' in payload_paths
+              assert 'app/Services/CommunityNotifier.php' in payload_paths
           print('sha256=' + hashlib.sha256(zpath.read_bytes()).hexdigest())
           PY
 
