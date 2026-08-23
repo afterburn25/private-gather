@@ -1,0 +1,13 @@
+Fresh certification branch for Private Gather 1.2.3 after runtime, installer, and protected-upgrade repair.
+source-release-head=1b394bc189d24907cff7ac7a9e40a8cd00d2a12c
+upgrade-payload-files=33
+partner-invite-model=app/Models/ProfilePartnerInvite.php
+expanded-profile-model=app/Models/Profile.php
+community-media-service=app/Services/CommunityMediaService.php
+community-notifier=app/Services/CommunityNotifier.php
+fresh-installer-schema-modules=4
+fresh-installer-1.2.3-schema-parity=true
+fresh-admin-global-username=true
+protected-env-overlay-excluded=true
+profile-runtime-regression=true
+baseline-parity=certified-live-1.2.0
