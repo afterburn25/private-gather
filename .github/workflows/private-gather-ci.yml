@@ -39,6 +39,7 @@ jobs:
           php tools/verify-foundation.php
           php tools/verify-installer.php
           php tools/test-installer-runtime.php
+          php tools/test-installer-database-transport.php
           php tools/verify-subdirectory-install.php
           php tools/verify-admin-layout.php
           php tools/verify-upgrader.php
