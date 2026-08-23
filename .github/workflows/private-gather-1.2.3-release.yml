@@ -52,7 +52,11 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress
 
       - name: PHP syntax gate
-        run: find app bootstrap config database routes tests -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+        run: |
+          find app bootstrap config database routes tests install tools -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Verify fresh installer structure
+        run: php tools/verify-installer.php
 
       - name: Prepare isolated environment
         run: |
@@ -115,12 +119,13 @@ jobs:
           zpath = Path('dist/Private-Gather-1.2.0-or-1.2.1-to-1.2.3-Upgrade.zip')
           with zipfile.ZipFile(zpath) as z:
               names = z.namelist()
-              assert '.env' not in names
+              assert not any(Path(n).name == '.env' or Path(n).name.startswith('.env.') for n in names)
               assert not any('/storage/' in ('/'+n) or n.startswith('storage/') for n in names)
+              assert not any('/install/' in ('/'+n) or n.startswith('install/') for n in names)
               manifest = json.loads(z.read('manifest.json'))
               assert manifest['to_version'] == '1.2.3'
               assert manifest['from_versions'] == ['1.2.0', '1.2.1']
-              assert len(manifest['files']) == 34
+              assert len(manifest['files']) == 33
               payload_paths = {f['path'] for f in manifest['files']}
               assert 'app/Models/ProfilePartnerInvite.php' in payload_paths
               assert 'app/Models/Profile.php' in payload_paths
