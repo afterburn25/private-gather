@@ -23,6 +23,7 @@ FILES = [
     'app/Http/Controllers/Member/ProfileController.php',
     'app/Http/Controllers/HostedDiscoveryController.php',
     'app/Models/User.php',
+    'app/Models/Profile.php',
     'app/Models/ProfilePartnerInvite.php',
     'app/Models/Verification.php',
     'database/migrations/2026_08_22_200000_global_username_and_age_verification_v123.php',
