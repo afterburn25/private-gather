@@ -7,4 +7,5 @@ return [
     App\Providers\EventWaitlistServiceProvider::class,
     App\Providers\PrivacyAdministrationServiceProvider::class,
     App\Providers\AccountSecurityServiceProvider::class,
+    App\Providers\ProductCompletionServiceProvider::class,
 ];
