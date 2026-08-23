@@ -155,6 +155,44 @@ foreach ($includeRoots as $entry) {
     }
 }
 
+/*
+ * Deployment compatibility mirror.
+ *
+ * Canonical application assets live in public/assets/. The root .htaccess maps
+ * /assets/* to that directory on Apache/LiteSpeed. Some managed hosts execute
+ * the PHP front controller successfully while skipping or partially applying
+ * those static rewrite rules. Ship a byte-identical physical assets/ mirror so
+ * those hosts can serve CSS, JavaScript and branding directly as normal files.
+ */
+$publicAssets = $root.'/public/assets';
+if (! is_dir($publicAssets)) {
+    throw new RuntimeException('Required public/assets directory is missing from release source.');
+}
+
+$assetCount = 0;
+$assetIterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($publicAssets, FilesystemIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::LEAVES_ONLY
+);
+foreach ($assetIterator as $file) {
+    if (! $file->isFile() || $file->isLink()) {
+        continue;
+    }
+
+    $absolute = $file->getPathname();
+    $relative = str_replace('\\', '/', substr($absolute, strlen($publicAssets) + 1));
+    $mirror = 'assets/'.$relative;
+    if (! $zip->addFile($absolute, $mirror)) {
+        throw new RuntimeException('Unable to add static asset compatibility mirror: '.$mirror);
+    }
+    $assetCount++;
+    $added++;
+}
+
+if ($assetCount === 0) {
+    throw new RuntimeException('Required public/assets directory contains no files.');
+}
+
 $metadata = [
     'schema' => 2,
     'product' => 'privategather/private-gather',
@@ -164,6 +202,8 @@ $metadata = [
     'source_commit' => $sourceSha,
     'shared_core' => true,
     'dedicated_installer' => true,
+    'static_asset_mirror' => true,
+    'static_asset_files' => $assetCount,
 ];
 
 $zip->addFromString('EDITION-PRESET', $edition."\n");
@@ -187,5 +227,6 @@ echo json_encode([
     'version' => $version,
     'source_commit' => $sourceSha,
     'files' => $added + 3,
+    'static_asset_files' => $assetCount,
     'sha256' => $sha256,
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)."\n";

@@ -18,8 +18,19 @@ if ($hosted === '' || $selfHosted === '') {
 
 $failures = [];
 $editionSpecific = ['.env.example', 'install/index.php', 'EDITION-PRESET', 'BASE-PRESET', 'PACKAGE-METADATA.json'];
+$requiredAssets = [
+    'app.css',
+    'redesign.css',
+    'redesign-compat.css',
+    'platform-themes.css',
+    'tenant-themes.css',
+    'product-completion.css',
+    'admin.css',
+    'redesign.js',
+    'branding/private-gather-logo.png',
+];
 
-$inspect = static function (string $path, string $expectedEdition) use (&$failures, $editionSpecific): ?array {
+$inspect = static function (string $path, string $expectedEdition) use (&$failures, $editionSpecific, $requiredAssets): ?array {
     if (! is_file($path)) {
         $failures[] = 'Missing package: '.$path;
         return null;
@@ -33,6 +44,8 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
 
     $names = [];
     $sharedHashes = [];
+    $canonicalAssets = [];
+    $mirroredAssets = [];
 
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $name = (string) $zip->getNameIndex($i);
@@ -60,12 +73,21 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
             $failures[] = basename($path).' leaked the packaging-only Self-Hosted installer template.';
         }
 
-        if (! in_array($name, $editionSpecific, true) && ! str_ends_with($name, '/')) {
+        if (! str_ends_with($name, '/')) {
             $contents = $zip->getFromIndex($i);
             if (! is_string($contents)) {
-                $failures[] = basename($path).' cannot read shared entry '.$name;
+                $failures[] = basename($path).' cannot read entry '.$name;
             } else {
-                $sharedHashes[$name] = hash('sha256', $contents);
+                $hash = hash('sha256', $contents);
+                if (str_starts_with($name, 'public/assets/')) {
+                    $canonicalAssets[substr($name, strlen('public/assets/'))] = $hash;
+                } elseif (str_starts_with($name, 'assets/')) {
+                    $mirroredAssets[substr($name, strlen('assets/'))] = $hash;
+                }
+
+                if (! in_array($name, $editionSpecific, true)) {
+                    $sharedHashes[$name] = $hash;
+                }
             }
         }
     }
@@ -76,6 +98,29 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
     ] as $required) {
         if (! in_array($required, $names, true)) {
             $failures[] = basename($path).' missing '.$required;
+        }
+    }
+
+    foreach ($requiredAssets as $asset) {
+        if (! isset($canonicalAssets[$asset])) {
+            $failures[] = basename($path).' missing canonical public asset public/assets/'.$asset;
+        }
+        if (! isset($mirroredAssets[$asset])) {
+            $failures[] = basename($path).' missing root compatibility asset assets/'.$asset;
+        }
+    }
+
+    ksort($canonicalAssets);
+    ksort($mirroredAssets);
+    if ($canonicalAssets === []) {
+        $failures[] = basename($path).' contains no canonical public/assets files.';
+    } elseif ($canonicalAssets !== $mirroredAssets) {
+        $allAssets = array_unique(array_merge(array_keys($canonicalAssets), array_keys($mirroredAssets)));
+        sort($allAssets);
+        foreach ($allAssets as $asset) {
+            if (($canonicalAssets[$asset] ?? null) !== ($mirroredAssets[$asset] ?? null)) {
+                $failures[] = basename($path).' static asset mirror differs or is missing: '.$asset;
+            }
         }
     }
 
@@ -159,12 +204,23 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
         if (($metadata['shared_core'] ?? null) !== true) {
             $failures[] = basename($path).' metadata does not assert shared Core.';
         }
+        if (($metadata['static_asset_mirror'] ?? null) !== true) {
+            $failures[] = basename($path).' metadata does not assert the static asset compatibility mirror.';
+        }
+        if ((int) ($metadata['static_asset_files'] ?? 0) !== count($canonicalAssets)) {
+            $failures[] = basename($path).' metadata static asset count does not match package contents.';
+        }
     }
 
     $zip->close();
     ksort($sharedHashes);
 
-    return ['metadata' => $metadata, 'shared_hashes' => $sharedHashes];
+    return [
+        'metadata' => $metadata,
+        'shared_hashes' => $sharedHashes,
+        'canonical_assets' => $canonicalAssets,
+        'mirrored_assets' => $mirroredAssets,
+    ];
 };
 
 $hostedResult = $inspect($hosted, 'hosted');
@@ -203,3 +259,4 @@ if ($failures !== []) {
 }
 
 echo "EDITION PACKAGE VERIFY: PASS\n";
+echo "STATIC ASSET DELIVERY VERIFY: PASS\n";
