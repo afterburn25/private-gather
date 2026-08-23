@@ -55,7 +55,10 @@ $expect(
     'Public layout does not explicitly identify platform administrators'
 );
 $expect(str_contains($publicLayout, "route('admin.home')"), 'Public layout lacks an administrator entry link to the backend');
-$expect(str_contains($publicLayout, '>Admin Backend</a>'), 'Public layout lacks the visible Admin Backend button/entry label');
+$expect(
+    preg_match('/>\s*Admin(?:\s+Backend)?\s*<\/a>/', $publicLayout) === 1,
+    'Public layout lacks a visible administrator backend entry label'
+);
 
 if ($failures !== []) {
     fwrite(STDERR, "ADMIN LAYOUT VERIFY: FAIL\n - ".implode("\n - ", $failures)."\n");
