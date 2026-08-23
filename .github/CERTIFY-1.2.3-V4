@@ -1,0 +1,9 @@
+Fresh certification branch for Private Gather 1.2.3 after profile/runtime dependency repair.
+source-release-head=f5928528b631d114bf0ff7a77c10c68fc7d76393
+runtime-payload-files=34
+partner-invite-model=app/Models/ProfilePartnerInvite.php
+expanded-profile-model=app/Models/Profile.php
+community-media-service=app/Services/CommunityMediaService.php
+community-notifier=app/Services/CommunityNotifier.php
+profile-runtime-regression=true
+baseline-parity=certified-live-1.2.0
