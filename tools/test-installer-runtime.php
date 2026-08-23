@@ -45,7 +45,32 @@ try {
         }
     }
 
+    $install = $root.'/install';
+    $fallback = $root.'/.install-disabled-test';
+    mkdir($install.'/nested', 0755, true);
+    mkdir($fallback.'/nested', 0755, true);
+    file_put_contents($install.'/index.php', '<?php echo "installer";');
+    file_put_contents($install.'/nested/schema.sql', 'schema');
+    file_put_contents($fallback.'/index.php', '<?php echo "disabled";');
+    file_put_contents($fallback.'/nested/data.txt', 'data');
+    @chmod($install.'/index.php', 0444);
+    @chmod($install.'/nested/schema.sql', 0444);
+    @chmod($fallback.'/index.php', 0444);
+    @chmod($fallback.'/nested/data.txt', 0444);
+    @chmod($install.'/nested', 0555);
+    @chmod($install, 0555);
+    @chmod($fallback.'/nested', 0555);
+    @chmod($fallback, 0555);
+
+    if (! installer_cleanup_after_success($install)) {
+        throw new RuntimeException('Automatic installer deletion reported failure.');
+    }
+    if (file_exists($install) || file_exists($fallback)) {
+        throw new RuntimeException('Installer or disabled fallback remains after automatic cleanup.');
+    }
+
     echo "INSTALLER RUNTIME REPAIR: PASS\n";
+    echo "INSTALLER AUTO-DELETE: PASS\n";
 } finally {
     $remove($root);
 }
