@@ -8,6 +8,8 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Deliberately empty. Use `php artisan tenant:create` for explicit tenant provisioning.
+        if ((bool) config('platform.showcase_content', false)) {
+            $this->call(ShowcaseContentSeeder::class);
+        }
     }
 }
