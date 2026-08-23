@@ -10,6 +10,15 @@
     $membership = auth()->check() ? auth()->user()->tenants()->whereKey($tenant->id)->first()?->pivot : null;
     $isMember = $membership && $membership->status === 'active';
     $canManage = $isMember && in_array($membership->role, ['owner','admin','manager','staff','checkin'], true);
+    $membershipApplicationStatus = null;
+    if (auth()->check() && ! $isMember) {
+        $membershipApplicationStatus = \App\Models\TenantMembershipApplication::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('user_id', auth()->id())
+            ->latest('id')
+            ->value('status');
+    }
+    $applicationCtaLabel = in_array($membershipApplicationStatus, ['pending','more_info','approved'], true) ? 'Application Status' : 'Apply to Join';
     $logo = $branding?->logo_path ? \App\Support\MountUrl::to($branding->logo_path) : null;
     $primary = ($branding?->primary_color && preg_match('/^#[0-9A-Fa-f]{6}$/', $branding->primary_color)) ? $branding->primary_color : '#c49a54';
     $accent = ($branding?->accent_color && preg_match('/^#[0-9A-Fa-f]{6}$/', $branding->accent_color)) ? $branding->accent_color : '#6f2948';
@@ -50,7 +59,7 @@
         <div class="tenant-actions">
             @auth
                 @if($canManage)<a class="tenant-button tenant-button-ghost" href="{{route('tenant.dashboard')}}">Club OS</a>@endif
-                @if($isMember)<a class="tenant-button tenant-button-primary" href="{{route('dashboard')}}">My account</a>@else<a class="tenant-button tenant-button-primary" href="{{route('membership.apply')}}">Apply to Join</a>@endif
+                @if($isMember)<a class="tenant-button tenant-button-primary" href="{{route('dashboard')}}">My account</a>@else<a class="tenant-button tenant-button-primary" href="{{route('membership.apply')}}">{{$applicationCtaLabel}}</a>@endif
             @else
                 <a class="tenant-button tenant-button-ghost" href="{{route('login')}}">Log in</a>
                 <a class="tenant-button tenant-button-primary" href="{{route('membership.apply')}}">Apply to Join</a>
@@ -61,14 +70,17 @@
     <nav id="tenant-mobile-nav" class="tenant-mobile-nav" data-tenant-mobile-nav>
         <a href="{{route('site.home')}}">Home</a><a href="{{route('site.events')}}">Events</a><a href="{{route('site.about')}}">About</a>
         @if($isMember && \Illuminate\Support\Facades\Route::has('community.index'))<a href="{{route('community.index')}}">Community</a><a href="{{route('messages.index')}}">Messages</a>@endif
-        @auth<a href="{{route('dashboard')}}">My Private Gather</a>@endauth
+        @auth
+            <a href="{{route('dashboard')}}">My Private Gather</a>
+            @if(! $isMember)<a href="{{route('membership.apply')}}">{{$applicationCtaLabel}}</a>@endif
+        @endauth
     </nav>
 </header>
 <main class="tenant-main">
     @if(session('status'))<div class="tenant-shell"><div class="tenant-flash">{{session('status')}}</div></div>@endif
     @yield('content')
 </main>
-<footer class="tenant-footer"><div class="tenant-shell tenant-footer-grid"><div><div class="tenant-brand">@if($logo)<img src="{{$logo}}" alt="">@else<span class="tenant-monogram">{{strtoupper(substr($tenant->name,0,2))}}</span>@endif<span class="tenant-brand-copy"><strong>{{$tenant->name}}</strong><small>Private community</small></span></div><p>{{data_get($tenant->settings,'marketplace_summary') ?: 'Events, membership and community on your terms.'}}</p></div><div class="tenant-footer-links"><strong>Explore</strong>@if($footerNav->isNotEmpty())@foreach($footerNav as $item)<a href="{{\App\Support\MountUrl::to($item->url)}}">{{$item->label}}</a>@endforeach @else<a href="{{route('site.events')}}">Events</a><a href="{{route('site.about')}}">About</a>@endif</div><div class="tenant-footer-links"><strong>Members</strong>@auth<a href="{{route('dashboard')}}">My account</a>@if($isMember)<a href="{{route('messages.index')}}">Messages</a>@endif @else<a href="{{route('login')}}">Log in</a><a href="{{route('membership.apply')}}">Apply to Join</a>@endauth</div></div>@if($branding?->show_platform_branding ?? true)<div class="tenant-shell tenant-powered">Powered by Private Gather · {{$tenantTheme['label']}} tenant theme</div>@endif</footer>
+<footer class="tenant-footer"><div class="tenant-shell tenant-footer-grid"><div><div class="tenant-brand">@if($logo)<img src="{{$logo}}" alt="">@else<span class="tenant-monogram">{{strtoupper(substr($tenant->name,0,2))}}</span>@endif<span class="tenant-brand-copy"><strong>{{$tenant->name}}</strong><small>Private community</small></span></div><p>{{data_get($tenant->settings,'marketplace_summary') ?: 'Events, membership and community on your terms.'}}</p></div><div class="tenant-footer-links"><strong>Explore</strong>@if($footerNav->isNotEmpty())@foreach($footerNav as $item)<a href="{{\App\Support\MountUrl::to($item->url)}}">{{$item->label}}</a>@endforeach @else<a href="{{route('site.events')}}">Events</a><a href="{{route('site.about')}}">About</a>@endif</div><div class="tenant-footer-links"><strong>Members</strong>@auth<a href="{{route('dashboard')}}">My account</a>@if($isMember)<a href="{{route('messages.index')}}">Messages</a>@else<a href="{{route('membership.apply')}}">{{$applicationCtaLabel}}</a>@endif @else<a href="{{route('login')}}">Log in</a><a href="{{route('membership.apply')}}">Apply to Join</a>@endauth</div></div>@if($branding?->show_platform_branding ?? true)<div class="tenant-shell tenant-powered">Powered by Private Gather · {{$tenantTheme['label']}} tenant theme</div>@endif</footer>
 <script>
 (()=>{const toggle=document.querySelector('[data-tenant-menu-toggle]'),nav=document.querySelector('[data-tenant-mobile-nav]');if(!toggle||!nav)return;toggle.addEventListener('click',()=>{const open=nav.classList.toggle('is-open');toggle.setAttribute('aria-expanded',open?'true':'false')});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('is-open');toggle.setAttribute('aria-expanded','false')}));})();
 </script>
