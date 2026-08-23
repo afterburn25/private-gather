@@ -45,6 +45,7 @@ FILES = [
     'resources/views/member/verification.blade.php',
     'resources/views/admin/age-verification.blade.php',
     'resources/views/layouts/admin.blade.php',
+    'resources/views/layouts/app.blade.php',
     'resources/views/member/dashboard.blade.php',
     'resources/views/member/profile-show.blade.php',
     'resources/views/member/community/context.blade.php',
