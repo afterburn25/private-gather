@@ -28,6 +28,11 @@ $requiredAssets = [
     'admin.css',
     'redesign.js',
     'branding/private-gather-logo.png',
+    'showcase/platform-hero.svg',
+    'showcase/club-night.svg',
+    'showcase/event-night.svg',
+    'showcase/event-social.svg',
+    'showcase/community.svg',
 ];
 
 $inspect = static function (string $path, string $expectedEdition) use (&$failures, $editionSpecific, $requiredAssets): ?array {
@@ -61,6 +66,8 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
             || $lowerBasename === 'install-record.json'
             || $lower === 'database/database.sqlite'
             || str_ends_with($lower, '/database/database.sqlite')
+            || $lower === 'storage/app/showcase-bootstrap.pending'
+            || $lower === 'storage/app/showcase-bootstrap.done'
         ) {
             $failures[] = basename($path).' contains protected deployment state: '.$name;
         }
@@ -93,7 +100,7 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
     }
 
     foreach ([
-        'index.php', 'private-gather.php', 'artisan', 'composer.json', 'install/index.php', 'install/runtime.php', 'install/cleanup.php', 'vendor/autoload.php',
+        'index.php', 'private-gather.php', 'artisan', 'composer.json', 'install/index.php', 'install/runtime.php', 'install/cleanup.php', 'install/showcase.php', 'vendor/autoload.php',
         'EDITION-PRESET', 'BASE-PRESET', 'PACKAGE-METADATA.json',
     ] as $required) {
         if (! in_array($required, $names, true)) {
@@ -173,11 +180,17 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
                 $failures[] = basename($path).' Hosted installer leaks Self-Hosted field '.$selfHostedField.'.';
             }
         }
+        if (! str_contains($installer, 'installer_seed_hosted_showcase($installInput)')) {
+            $failures[] = basename($path).' Hosted installer does not bootstrap the fictional showcase dataset.';
+        }
     } else {
         foreach (['organization_name', 'self_hosted_visibility', 'self_hosted_registration'] as $requiredField) {
             if (! str_contains($installer, 'name="'.$requiredField.'"')) {
                 $failures[] = basename($path).' Self-Hosted installer missing '.$requiredField.'.';
             }
+        }
+        if (str_contains($installer, 'installer_seed_hosted_showcase($installInput)')) {
+            $failures[] = basename($path).' Self-Hosted installer must not seed the Hosted showcase dataset.';
         }
     }
 
@@ -260,3 +273,4 @@ if ($failures !== []) {
 
 echo "EDITION PACKAGE VERIFY: PASS\n";
 echo "STATIC ASSET DELIVERY VERIFY: PASS\n";
+echo "SHOWCASE PACKAGE VERIFY: PASS\n";
