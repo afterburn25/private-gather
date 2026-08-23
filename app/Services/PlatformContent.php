@@ -3,12 +3,16 @@
 namespace App\Services;
 
 use App\Models\PlatformSetting;
+use App\Support\ThemeCatalog;
 
 final class PlatformContent
 {
+    public const OFFICIAL_LOGO = '/assets/branding/private-gather-logo.png';
+
     public const DEFAULTS = [
         'brand_name' => 'Private Gather',
-        'logo_url' => '/assets/branding/private-gather-logo.png',
+        'logo_url' => self::OFFICIAL_LOGO,
+        'theme_preset' => ThemeCatalog::PLATFORM_DEFAULT,
         'header_cta_label' => 'Join Private Gather',
         'header_cta_url' => '/register',
         'hero_eyebrow' => 'PRIVATE EVENTS • CLUBS • SOCIAL EXPERIENCES • 18+ ONLY',
@@ -42,6 +46,12 @@ final class PlatformContent
         if (! array_key_exists('brand_name', $stored)) {
             $values['brand_name'] = (string) config('app.name', self::DEFAULTS['brand_name']);
         }
+
+        // The central Private Gather identity is fixed to the official crest.
+        // Tenant organizations remain free to upload/use their own brand assets.
+        $values['logo_url'] = self::OFFICIAL_LOGO;
+        $values['theme_preset'] = ThemeCatalog::platform((string) ($values['theme_preset'] ?? ''))['key'];
+
         return $values;
     }
 }
