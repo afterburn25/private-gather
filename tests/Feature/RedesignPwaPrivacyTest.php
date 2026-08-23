@@ -25,6 +25,8 @@ class RedesignPwaPrivacyTest extends TestCase
             './assets/app.css',
             './assets/redesign.css',
             './assets/redesign-compat.css',
+            './assets/platform-themes.css',
+            './assets/tenant-themes.css',
             './assets/redesign.js',
             './assets/branding/private-gather-logo.png',
             './offline.html',
