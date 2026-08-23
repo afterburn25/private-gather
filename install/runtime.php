@@ -9,11 +9,15 @@ declare(strict_types=1);
  * does not own the uploaded tree and cannot chmod/create these paths, the
  * installer will still fail closed and report the affected directory.
  *
+ * The optional base path exists for regression testing; production callers use
+ * installer_base_path().
+ *
  * @return array<string,bool>
  */
-function installer_prepare_runtime_directories(): array
+function installer_prepare_runtime_directories(?string $base = null): array
 {
-    $base = installer_base_path();
+    $base ??= installer_base_path();
+    $base = rtrim($base, '/\\');
     $paths = [
         'storage',
         'storage/app',
