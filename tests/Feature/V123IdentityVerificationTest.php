@@ -44,7 +44,15 @@ final class V123IdentityVerificationTest extends TestCase
             'display_name' => 'new.member',
             'email' => 'new-member@example.test',
         ]);
-        $this->assertDatabaseHas('profiles', ['region' => 'Illinois']);
+        $profile = Profile::query()->whereHas('user', fn ($query) => $query->where('email', 'new-member@example.test'))->firstOrFail();
+        $this->assertSame('Illinois', $profile->region);
+        $this->assertSame('single_man', $profile->lifestyle_identity);
+        $this->assertSame('Testing safely', $profile->headline);
+        $this->assertSame([], $profile->looking_for);
+        $this->assertSame([], $profile->lifestyle_interests);
+        $this->assertSame('members', $profile->message_permissions);
+        $this->assertFalse($profile->show_age);
+        $this->assertTrue($profile->show_last_active);
     }
 
     public function test_username_is_case_normalized_before_global_uniqueness_validation(): void
