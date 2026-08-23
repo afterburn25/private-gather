@@ -72,7 +72,7 @@
                 @endif
                 <span class="pg-brand-copy"><span>{{ $tenant->name }}</span><small>Private lifestyle community</small></span>
             @else
-                <img src="{{ $platformLogo }}" alt="{{ $platformName }} logo">
+                <img class="platform-brand-logo" src="{{ $platformLogo }}" alt="{{ $platformName }} logo">
                 <span class="pg-brand-copy"><span>{{ $platformName }}</span><small>Private by nature</small></span>
             @endif
         </a>
@@ -199,7 +199,7 @@
                 @elseif ($tenant)
                     <span class="pg-brand-mark">{{ strtoupper(substr($tenant->name, 0, 1)) }}</span>
                 @else
-                    <img src="{{ $platformLogo }}" alt="{{ $platformName }} logo">
+                    <img class="platform-brand-logo" src="{{ $platformLogo }}" alt="{{ $platformName }} logo">
                 @endif
                 <span class="pg-brand-copy"><span>{{ $tenant?->name ?? $platformName }}</span><small>Discreet. Consent-led. Community-first.</small></span>
             </a>
