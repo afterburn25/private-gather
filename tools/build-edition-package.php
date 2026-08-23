@@ -113,6 +113,15 @@ $addFile = static function (string $absolute, string $relative) use (
         if ($count !== 1) {
             throw new RuntimeException('.env.example edition preset marker must occur exactly once.');
         }
+
+        if ($edition === 'hosted') {
+            $contents = preg_replace('/^SELF_HOSTED_[A-Z0-9_]+=.*\R?/m', '', $contents) ?? $contents;
+        } else {
+            $contents = preg_replace('/^PLATFORM_WILDCARD_ENABLED=.*$/m', 'PLATFORM_WILDCARD_ENABLED=false', $contents) ?? $contents;
+            $contents = preg_replace('/^PLATFORM_DOMAIN_TARGET=.*\R?/m', '', $contents) ?? $contents;
+            $contents = preg_replace('/^PLATFORM_WILDCARD_TARGET=.*\R?/m', '', $contents) ?? $contents;
+        }
+
         $zip->addFromString($relative, $contents);
     } else {
         $zip->addFile($absolute, $relative);
