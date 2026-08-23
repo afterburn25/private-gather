@@ -58,7 +58,7 @@
         <div class="pg-grid pg-grid-3">
             @forelse($events as $event)
                 <article class="pg-card pg-card-interactive pg-event-card">
-                    <div class="pg-media"><div class="pg-media-overlay"><span class="pg-pill">{{ $event->starts_at->format('M j') }}</span></div></div>
+                    <div class="pg-media">@if($event->cover_image_path)<img src="{{ \App\Support\MountUrl::to($event->cover_image_path) }}" alt="{{ $event->title }} showcase image">@endif<div class="pg-media-overlay"><span class="pg-pill">{{ $event->starts_at->format('M j') }}</span></div></div>
                     <div class="pg-event-body">
                         <div class="pg-event-meta"><span class="pg-pill">{{ $event->public_location_label ?: $event->city ?: 'Location protected' }}</span>@if($event->category)<span class="pg-pill">{{ $event->category }}</span>@endif</div>
                         <h3 class="pg-event-title">{{ $event->title }}</h3>
@@ -81,6 +81,7 @@
         <div class="pg-grid pg-grid-3">
             @forelse($organizations as $org)
                 <article class="pg-card pg-card-interactive">
+                    @if(data_get($org->settings,'cover_image_path'))<div class="pg-media" style="margin-bottom:16px"><img src="{{ \App\Support\MountUrl::to(data_get($org->settings,'cover_image_path')) }}" alt="{{ $org->name }} showcase image"><div class="pg-media-overlay">@if(data_get($org->settings,'showcase_content'))<span class="pg-pill">Showcase</span>@endif</div></div>@endif
                     <span class="pg-pill">{{ str_replace('_', ' ', ucfirst($org->type)) }}</span>
                     <h3 style="font-size:1.45rem;margin:.8rem 0 .35rem">{{ $org->name }}</h3>
                     <p class="muted">{{ $org->primaryDomain?->domain ?: 'Private Gather hosted community' }}</p>
