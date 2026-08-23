@@ -132,6 +132,9 @@ jobs:
       - name: Re-run tenant navigation matrix
         run: php artisan test tests/Feature/Live120TenantLinkMatrixTest.php --stop-on-failure
 
+      - name: Run Self-Hosted 1.2.3 compatibility regressions
+        run: php artisan test tests/Feature/SelfHostedEditionTest.php --stop-on-failure
+
       - name: Run 1.2.3 community runtime tests
         run: php artisan test tests/Feature/V123CommunityRuntimeTest.php --stop-on-failure
 
@@ -170,7 +173,7 @@ jobs:
               manifest = json.loads(z.read('manifest.json'))
               assert manifest['to_version'] == '1.2.3'
               assert manifest['from_versions'] == ['1.2.0', '1.2.1']
-              assert len(manifest['files']) == 49
+              assert len(manifest['files']) == 50
               payload_paths = {f['path'] for f in manifest['files']}
               required = {
                   'app/Models/ProfilePartnerInvite.php',
@@ -192,6 +195,7 @@ jobs:
                   'resources/views/tenant/manage/growth.blade.php',
                   'resources/views/tenant/manage/growth-members.blade.php',
                   'resources/views/tenant/manage/dashboard.blade.php',
+                  'resources/views/layouts/app.blade.php',
               }
               assert required.issubset(payload_paths)
           print('sha256=' + hashlib.sha256(zpath.read_bytes()).hexdigest())
