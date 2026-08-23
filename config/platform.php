@@ -16,11 +16,16 @@ $wildcardEnabled = filter_var(env('PLATFORM_WILDCARD_ENABLED', true), FILTER_VAL
 if ($wildcardEnabled === null) {
     $wildcardEnabled = true;
 }
+$showcaseContent = filter_var(env('PRIVATE_GATHER_SHOWCASE_CONTENT', false), FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+if ($showcaseContent === null) {
+    $showcaseContent = false;
+}
 
 return [
     'terms_version' => env('PLATFORM_TERMS_VERSION', '1.0'),
     'privacy_version' => env('PLATFORM_PRIVACY_VERSION', '1.0'),
     'root_domain' => $rootDomain,
+    'showcase_content' => $showcaseContent,
 
     // Public hosted tenant addresses. PLATFORM_TENANT_MOUNT_PATH defaults to the
     // APP_URL path, so a demo installed at /private-gather automatically creates
