@@ -16,7 +16,8 @@ class TenantRoutingTest extends TestCase
         config(['platform.central_domains' => ['platform.test']]);
         $this->get('http://platform.test/')
             ->assertOk()
-            ->assertSee('Gather privately. Connect confidently.');
+            ->assertSee('Exclusive events.')
+            ->assertSee('Private communities.');
     }
 
     public function test_active_tenant_domain_loads_tenant_homepage(): void
