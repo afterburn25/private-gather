@@ -71,7 +71,7 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
     }
 
     foreach ([
-        'index.php', 'private-gather.php', 'artisan', 'composer.json', 'install/index.php', 'install/runtime.php', 'vendor/autoload.php',
+        'index.php', 'private-gather.php', 'artisan', 'composer.json', 'install/index.php', 'install/runtime.php', 'install/cleanup.php', 'vendor/autoload.php',
         'EDITION-PRESET', 'BASE-PRESET', 'PACKAGE-METADATA.json',
     ] as $required) {
         if (! in_array($required, $names, true)) {
@@ -93,6 +93,23 @@ $inspect = static function (string $path, string $expectedEdition) use (&$failur
     $env = (string) $zip->getFromName('.env.example');
     if (! preg_match('/^PRIVATE_GATHER_EDITION='.preg_quote($expectedEdition, '/').'$/m', $env)) {
         $failures[] = basename($path).' .env.example does not preset '.$expectedEdition.'.';
+    }
+    if ($expectedEdition === 'hosted') {
+        if (preg_match('/^SELF_HOSTED_[A-Z0-9_]+=/m', $env)) {
+            $failures[] = basename($path).' Hosted .env.example still exposes Self-Hosted options.';
+        }
+    } else {
+        foreach (['SELF_HOSTED_TENANT_ID=', 'SELF_HOSTED_VISIBILITY=', 'SELF_HOSTED_REGISTRATION='] as $requiredSetting) {
+            if (! str_contains($env, $requiredSetting)) {
+                $failures[] = basename($path).' Self-Hosted .env.example missing '.$requiredSetting;
+            }
+        }
+        if (! preg_match('/^PLATFORM_WILDCARD_ENABLED=false$/m', $env)) {
+            $failures[] = basename($path).' Self-Hosted .env.example must disable platform wildcard mode.';
+        }
+        if (preg_match('/^PLATFORM_(DOMAIN_TARGET|WILDCARD_TARGET)=/m', $env)) {
+            $failures[] = basename($path).' Self-Hosted .env.example still exposes Hosted wildcard target options.';
+        }
     }
 
     $installer = (string) $zip->getFromName('install/index.php');
