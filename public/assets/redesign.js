@@ -1,6 +1,14 @@
 (() => {
   const scriptUrl = document.currentScript?.src || new URL('assets/redesign.js', document.baseURI).href;
   const appRoot = new URL('../', scriptUrl);
+  const compatHref = new URL('assets/redesign-compat.css', appRoot).href;
+  if (!document.querySelector(`link[href="${compatHref}"]`)) {
+    const compat = document.createElement('link');
+    compat.rel = 'stylesheet';
+    compat.href = compatHref;
+    document.head.appendChild(compat);
+  }
+
   const drawer = document.querySelector('[data-pg-drawer]');
   const toggle = document.querySelector('[data-pg-menu-toggle]');
 
