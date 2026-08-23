@@ -1,4 +1,6 @@
 (() => {
+  const scriptUrl = document.currentScript?.src || new URL('assets/redesign.js', document.baseURI).href;
+  const appRoot = new URL('../', scriptUrl);
   const drawer = document.querySelector('[data-pg-drawer]');
   const toggle = document.querySelector('[data-pg-menu-toggle]');
 
@@ -27,9 +29,29 @@
     });
   });
 
+  let deferredInstallPrompt = null;
+  const installButtons = [...document.querySelectorAll('[data-pg-install]')];
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButtons.forEach((button) => { button.hidden = false; });
+  });
+  installButtons.forEach((button) => button.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice.catch(() => null);
+    deferredInstallPrompt = null;
+    installButtons.forEach((item) => { item.hidden = true; });
+  }));
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    installButtons.forEach((button) => { button.hidden = true; });
+  });
+
   if ('serviceWorker' in navigator && document.documentElement.hasAttribute('data-pwa')) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      const swUrl = new URL('service-worker.js', appRoot);
+      navigator.serviceWorker.register(swUrl.href, { scope: appRoot.pathname }).catch(() => {});
     });
   }
 })();
