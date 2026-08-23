@@ -1,0 +1,10 @@
+Fresh certification branch for Private Gather 1.2.3 after exact runtime, installer, protected-overlay, admin-verifier, and MySQL fresh-install repairs.
+source-release-head=45954bfcc1d095e4bafaf51c3c31a2dcb8171d5a
+upgrade-payload-files=33
+admin-layout-verifier=certified-label-compatible
+mysql-installer-smoke=mysql-8.4
+mysql-installer-retry-safety=true
+fresh-admin-global-username=true
+fresh-installer-1.2.3-schema-parity=true
+protected-env-overlay-excluded=true
+baseline-parity=certified-live-1.2.0
