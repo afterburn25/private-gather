@@ -1,52 +1,84 @@
-# Private Gather Unified Editions
+# Private Gather Deployment Bases
 
-Private Gather uses one shared application core and two runtime editions. This is intentionally not a fork: shared features, security fixes, database changes, and Upgrade Center releases remain on the same source line.
+Private Gather is distributed as two **separate deployment bases** with separate browser installers:
 
-## Shared Core
+- **Hosted Base** — multi-organization Private Gather platform.
+- **Self-Hosted Base** — single-organization installation for one club, organizer, or private host.
 
-Both editions use the same authentication, members/profiles, events, RSVP, invitations, messaging, tickets, check-in, CMS, media, branding, navigation, staff permissions, security/2FA, analytics, migrations, and upgrade engine.
+There is no edition selector in either deployable installer. The user downloads the base they intend to run.
 
-## Hosted Edition
+Internally, compatible application code remains maintained from one shared Core so security fixes, migrations, and common product improvements do not have to be duplicated across two unrelated forks. Deployment identity, installer behavior, environment presets, and edition-only capabilities are separated at package-build time and verified in CI.
+
+## Hosted Base
 
 `PRIVATE_GATHER_EDITION=hosted`
 
-Hosted Edition is the multi-organization Private Gather SaaS platform. It keeps tenant isolation, Create Website, My Sites, wildcard hosted subdomains, marketplace/discovery behavior, platform plans, and platform administration.
+Hosted is the multi-organization Private Gather platform. It includes tenant isolation, Create Website, My Sites, hosted tenant domains/subdomains, marketplace/discovery behavior, platform plans, and platform administration.
 
-## Self-Hosted Edition
+The Hosted package:
+
+- has a Hosted-only `install/index.php`;
+- has no edition selector;
+- has no Self-Hosted organization/visibility/registration fields;
+- presets `PRIVATE_GATHER_EDITION=hosted`;
+- removes `SELF_HOSTED_*` settings from its packaged `.env.example`;
+- identifies its installation base as `hosted-platform` in package metadata.
+
+## Self-Hosted Base
 
 `PRIVATE_GATHER_EDITION=self_hosted`
 
-Self-Hosted Edition is installed by one customer on hosting they control. The installer creates one organization, assigns the first administrator as owner, and records that tenant in `SELF_HOSTED_TENANT_ID`. All requests resolve to that one organization instead of looking up a tenant from a wildcard hostname.
+Self-Hosted is installed by one customer on hosting they control. Its dedicated installer creates one organization, assigns the first owner, and records that tenant in `SELF_HOSTED_TENANT_ID`. Requests resolve to that one organization rather than a Hosted wildcard-tenant control plane.
 
-Self-Hosted does not use Create Website or the multi-site switcher. The same `/manage` event, CMS, media, staff, branding, ticketing, and analytics tools operate on the single local organization.
+The Self-Hosted package:
+
+- receives its own dedicated `install/index.php` during packaging;
+- has no Hosted-platform option or edition selector;
+- asks for organization name/type, site visibility, and member-registration policy during install;
+- presets `PRIVATE_GATHER_EDITION=self_hosted`;
+- disables Hosted wildcard mode in its packaged environment preset;
+- removes Hosted wildcard target settings from its packaged `.env.example`;
+- identifies its installation base as `self-hosted-organization` in package metadata.
+
+Self-Hosted does not use Create Website or the Hosted multi-site switcher. Event, CMS, media, staff, branding, ticketing, membership, community, and analytics tools operate on the single local organization.
 
 ### Privacy
 
-`SELF_HOSTED_VISIBILITY=private` is the default. Anonymous visitors are redirected to login before organization or event content is rendered. Authentication and password-recovery pages remain reachable. `public` can be chosen for installations that want a public-facing club site.
+`SELF_HOSTED_VISIBILITY=private` is the default. Anonymous visitors are redirected to login before organization or event content is rendered. Authentication and password-recovery pages remain reachable. `public` can be selected when the owner wants a public-facing club site.
 
 ### Registration
 
-`SELF_HOSTED_REGISTRATION=approval` is the default. New members are created with pending account status and cannot log in until a local owner, administrator, or manager activates them in **Manage → Members & Approvals**.
+`SELF_HOSTED_REGISTRATION=approval` is the default. New members remain pending until a local owner/administrator/manager approves them.
 
-The member-management screen is tenant-scoped and does not expose Hosted Edition platform administration. Local managers can review/search member-role accounts and change account status between pending, active, suspended, and banned. Users outside the Self-Hosted organization and privileged owner/admin/manager/staff accounts cannot be changed through the member endpoint.
+Other supported policies are:
 
-Other modes:
-
-- `open` — account is active immediately.
+- `open` — account becomes active immediately.
 - `disabled` — public registration is unavailable.
 
 ### Local administration
 
-The installer-created local administrator can use `/admin` for installation-level operations when that account is both marked as an installation administrator and has an active `owner` or `admin` membership in the configured Self-Hosted organization.
+The installer-created owner can use the installation administration tools appropriate to the Self-Hosted base. Hosted-only SaaS controls such as multi-organization platform management, platform plans, and central Hosted website administration remain unavailable.
 
-Self-Hosted Local Administration includes the local dashboard, user administration, moderation, System Health, and the Update Center. Hosted-only SaaS controls remain unavailable even by direct URL: Organizations, platform Plans, and Platform Website administration return 404 in Self-Hosted Edition.
+## Automatic runtime provisioning
 
-This keeps system maintenance and upgrades available to the customer who owns the installation without turning a single-site deployment into the multi-tenant Hosted control plane.
+Both bases run the same safety-critical installer bootstrap before requirements are evaluated. It creates/repairs the Laravel runtime tree to mode `0775` and performs real write probes. This covers `storage/`, Laravel cache/session/view directories, logs, and `bootstrap/cache/`.
 
-## Release rule
+Neither base falls back to `0777`. If the operating system prevents the PHP/web-server account from modifying the uploaded tree, the installer fails closed.
 
-Shared product work belongs in Core unless it is inherently edition-specific. Hosted-only infrastructure such as wildcard tenant DNS stays behind Hosted behavior. Self-Hosted-only deployment policy stays behind Self-Hosted behavior. CI runs Hosted runtime tests and a separate Self-Hosted policy/runtime lane on every branch and pull request.
+## Installer deletion
 
-Release packaging is also synchronized in CI. Hosted and Self-Hosted ZIPs are built from the exact same source commit, then a verifier confirms that every shared Core entry is byte-identical between the packages. Only the declared edition preset files may differ. The package gate also rejects deployment/runtime state such as environment secrets, Composer credentials, installer receipts, SQLite state, and runtime logs.
+After successful installation, both bases write the permanent installation lock first and then remove installer code automatically. The normal path recursively deletes `/install`. If a restrictive filesystem forces the safe rename fallback, a shutdown cleanup pass attempts to remove that fallback as well. CI includes a regression test that starts with restrictive file/directory modes and requires the installer tree to be gone after cleanup.
 
-The Upgrade Center product ID remains `privategather/private-gather` for both editions so a shared release can deliver compatible Core updates to both products. Each generated package records the same source commit and version in its package metadata and receives its own SHA-256 sidecar for release verification.
+## Release and verification rule
+
+Hosted and Self-Hosted packages are built from the same reviewed source commit, but they are no longer treated as one selectable installer artifact. Package verification requires:
+
+- separate installer identities;
+- no edition selector;
+- no cross-edition installer fields;
+- no cross-edition environment options;
+- correct `BASE-PRESET` (`hosted-platform` or `self-hosted-organization`);
+- protected deployment-state exclusion;
+- exact shared-Core parity outside declared edition-specific files.
+
+The Upgrade Center product ID remains `privategather/private-gather` so compatible shared-Core fixes can still be delivered consistently, while each deployment base retains its own installer and environment identity.
