@@ -4,6 +4,48 @@ declare(strict_types=1);
 
 require dirname(__DIR__).'/install/lib.php';
 require dirname(__DIR__).'/install/runtime.php';
+require dirname(__DIR__).'/install/database.php';
+
+$installerSource = (string) file_get_contents(dirname(__DIR__).'/install/index.php');
+$forbiddenVisibleLabels = [
+    'Install Hosted Platform',
+    'This installer always provisions the Hosted platform base',
+    'There is no edition selector and no Self-Hosted mode in this package',
+    'Install Private Gather Hosted',
+    'PRIVATE GATHER · HOSTED INSTALLER',
+    'Private Gather Hosted Installer',
+    'Private Gather Hosted is configured and ready',
+];
+foreach ($forbiddenVisibleLabels as $label) {
+    if (str_contains($installerSource, $label)) {
+        throw new RuntimeException('Hosted browser installer still exposes edition jargon: '.$label);
+    }
+}
+if (! str_contains($installerSource, '<h2>5. Install Private Gather</h2>') || ! str_contains($installerSource, '>Install Private Gather</button>')) {
+    throw new RuntimeException('Hosted browser installer does not expose the clean Private Gather install action.');
+}
+
+$autoDsn = installer_database_dsn('localhost', null, 'private_gather');
+if ($autoDsn !== 'mysql:host=localhost;dbname=private_gather;charset=utf8mb4' || str_contains($autoDsn, 'port=3306')) {
+    throw new RuntimeException('localhost Auto mode is forcing an unexpected MySQL port: '.$autoDsn);
+}
+if (installer_database_port(['db_port' => '']) !== null) {
+    throw new RuntimeException('Blank database port must resolve to Auto/null.');
+}
+if (installer_database_port(['db_port' => '3307']) !== 3307) {
+    throw new RuntimeException('Explicit MySQL port was not preserved.');
+}
+if (! str_contains($installerSource, "'db_port' => ''") || str_contains($installerSource, "'db_port' => '3306'")) {
+    throw new RuntimeException('Installer database port default is not Auto/blank.');
+}
+if (! str_contains($installerSource, 'installer_connect_database_auto') || ! str_contains($installerSource, 'installer_finalize_database_env')) {
+    throw new RuntimeException('Installer is not using automatic MySQL transport end-to-end.');
+}
+
+$databaseConfig = (string) file_get_contents(dirname(__DIR__).'/config/database.php');
+if (! str_contains($databaseConfig, "'port' => \$mysqlPort === '' ? null : \$mysqlPort")) {
+    throw new RuntimeException('Laravel database config does not preserve blank/automatic port mode.');
+}
 
 $root = sys_get_temp_dir().'/private-gather-installer-runtime-'.bin2hex(random_bytes(5));
 if (! mkdir($root, 0755, true) && ! is_dir($root)) {
@@ -111,6 +153,8 @@ try {
         throw new RuntimeException('Installer or disabled fallback remains after automatic cleanup.');
     }
 
+    echo "INSTALLER PRESENTATION CLEANUP: PASS\n";
+    echo "INSTALLER DATABASE AUTO-TRANSPORT: PASS\n";
     echo "INSTALLER OWNERSHIP-NEUTRAL REBUILD: PASS\n";
     echo "INSTALLER RUNTIME REPAIR: PASS\n";
     echo "INSTALLER AUTO-DELETE: PASS\n";
