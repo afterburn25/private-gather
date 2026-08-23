@@ -26,7 +26,7 @@
         <div class="pg-grid pg-grid-3">
             @forelse($events as $event)
                 <article class="pg-card pg-card-interactive pg-event-card">
-                    <div class="pg-media"><div class="pg-media-overlay"><span class="pg-pill">{{ $event->starts_at->format('M j') }}</span></div></div>
+                    <div class="pg-media">@if($event->cover_image_path)<img src="{{ \App\Support\MountUrl::to($event->cover_image_path) }}" alt="{{ $event->title }} showcase image">@endif<div class="pg-media-overlay"><span class="pg-pill">{{ $event->starts_at->format('M j') }}</span>@if(data_get($event->tenant->settings,'showcase_content'))<span class="pg-pill">Showcase</span>@endif</div></div>
                     <div class="pg-event-body">
                         <div class="pg-event-meta">
                             @if($event->category)<span class="pg-pill">{{ $event->category }}</span>@endif
