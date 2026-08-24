@@ -1,3 +1,0 @@
-@extends('layouts.app')
-@section('title','My Tickets')
-@section('content')<div class="container section"><h1>My Tickets</h1><div class="card-grid">@forelse($tickets as $t)<article class="card"><span class="pill">{{$t->status}}</span><h3>{{$t->orderItem?->order?->event?->title}}</h3><code>{{$t->qr_token}}</code><p>{{$t->checked_in_at?'Checked in '.$t->checked_in_at:'Ready for check-in'}}</p></article>@empty<div class="empty-state">No tickets yet.</div>@endforelse</div>{{$tickets->links()}}</div>@endsection

@@ -1,3 +1,0 @@
-@extends('layouts.app')
-@section('title','Order')
-@section('content')<div class="container narrow section"><h1>{{$order->event->title}}</h1>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif<div class="panel"><p><strong>Order</strong><br>{{$order->public_id}}</p><p><strong>Status</strong><br>{{$order->status}}</p><p><strong>Total</strong><br>${{number_format($order->total_cents/100,2)}} {{$order->currency}}</p>@foreach($order->items as $item)<hr><strong>{{$item->ticketType->name}} × {{$item->quantity}}</strong>@foreach($item->tickets as $ticket)<div class="ticket-token"><span>Ticket {{$ticket->public_id}}</span><code>{{$ticket->qr_token}}</code><span>{{$ticket->status}}</span></div>@endforeach @endforeach</div></div>@endsection

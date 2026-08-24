@@ -1,3 +1,0 @@
-@extends('layouts.app')
-@section('title','Orders')
-@section('content')<div class="container section"><h1>Orders</h1>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif<div class="panel">@foreach($orders as $o)<div class="row-between"><div><strong>{{$o->event?->title}}</strong><small>{{$o->user?->display_name}} · {{$o->status}} · ${{number_format($o->total_cents/100,2)}}</small></div>@if(in_array($o->status,['pending','processing']))<form method="post" action="{{route('tenant.orders.paid',$o)}}">@csrf<button>Mark Paid / Issue Tickets</button></form>@endif</div>@endforeach</div>{{$orders->links()}}</div>@endsection

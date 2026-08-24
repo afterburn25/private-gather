@@ -1,3 +1,0 @@
-@extends('layouts.app')
-@section('title','Placeholders')
-@section('content')<div class="container narrow"><h1>Template Placeholders</h1><p>Use these tokens in supported CMS and communication templates. Unknown tokens are left unchanged rather than executed.</p><div class="panel"><div class="placeholder-grid">@foreach($placeholders as $p)<code>@{{'{{ '.$p.' }}'}}</code>@endforeach</div></div></div>@endsection

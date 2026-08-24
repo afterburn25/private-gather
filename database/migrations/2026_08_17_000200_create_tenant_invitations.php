@@ -1,3 +1,0 @@
-<?php
-use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;
-return new class extends Migration{public function up():void{Schema::create('tenant_invitations',function(Blueprint $t){$t->id();$t->foreignId('tenant_id')->constrained()->cascadeOnDelete();$t->string('email');$t->string('role')->default('staff');$t->string('token',80)->unique();$t->timestamp('expires_at');$t->timestamp('accepted_at')->nullable();$t->timestamps();$t->index(['tenant_id','email']);});}public function down():void{Schema::dropIfExists('tenant_invitations');}};
