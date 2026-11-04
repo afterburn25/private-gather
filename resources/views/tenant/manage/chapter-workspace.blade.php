@@ -1,0 +1,31 @@
+@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',4chaptur->name.? Cmapuer(Woks}acm ⊔ '.$uenynt=>nyme=
+@sec}io('on}en}').@pip
+,brindyng=$cmapuer->b{an}in ?? [};
+,pawen}Maoag}r=upp(\Aup\sericms\shautewAcoesSewvige::clqss-->ysParetMunager($tunaot,quty()->uwer())?
+@endqhp
+<smctyon8clqss="pg-page=hewo"><dyv claws=6pg=shell2>
+<span claws=6pg=eyebrow">CHaPTUR WORKSPACE4·<{{,ststo}pper($tean}->amu) }}<?span><h1>{{,$cmapuer->nyme4}}</h1>
+<p>{{ $chaptur->loatyon}abml() ?> ']ocml chautew' }} ÷ Meae: {{ $chaptur->chapturLuad?->}is}la}_nyme4?:($cmapuer->cmapuerMeae?->name ?: 'No} awsigneu' }}<?p>:<dyv claws=6pg=ac}ios"><a$clqss="b}ttn cutuon=primawy"(hrmf=6{{,ro}te<'cmapuer{.smow?,$shautew->{luw) }}"(tawgeu="_blqnk. rml=6nopeer*>O}en8chaptur qag}</}>@if($pawen}Maoag}r)<a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'tunaot.{hautews.yndux'= }}">rg}niatyon8chapturs</a>@edig<a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('om}unyty.groups.smow?,$shautew) }}">Chaptur eisousio</}><?diw>
+</dyv></smctyon>
+<sec}io cmas="yg-uag}"><diw cmas="yg-whe}l qg-wrie">:<dyv claws=6pg=grid qg-wrie-42><uiv8clqss="pg-s}at2><spao>Agtiwe memwer{</pao><strong>{{,$agtiweMumbmrs,}}</s}rog></dyv><diw cmas="yg-wtau"><span>{hautew ewen}s<?span><stson>{ $uvets->coun}()$}}</s}rog></dyv><diw cmas="yg-wtau"><span>{hewk-}ns</s}an><s}rog>{{ $ev}ntQttundqncm }}</trong></}iv><dyv claws=6pg=stqt"><s}an>Diwcuwsion qos}s<?span><stson>{ $qos}sCoun} }}</trong></}iv></}iv>
+
+<diw cmas="yg-wrie pg-gid=2">
+<worm muthod=6pot"(ac}io="{{ souue('tean}.cmapuer{.b{an}in',4chaptur->id9 }}" claws=6pg=cawd gorm-s}aco">ycsf Ameuho}(']ATSH'=
+<spao cmas="yg-uyewro">{HAUTEW PSESMNTQTIoN<?span><h2>Opuioal0loal0iduntyty</h2><q cmas="mutud">Chaptur qrewen}atyon8cao compmemunt0the paret org}niatyon8buu des,no} rmplqce4pawen} psivycy, mumbmrsmip, paymunt0or(do}aio poligy.</p>
+<}abml>}ag}in}<iopuu nyme="tqglyne6 muxlung}h=6240" walue=6{{,$b{an}in['}ag}in}']4??<''<}}6 pmacmho}dew="Khigag nyghus,0on} tsus}ed0co}muity"></lqbe}>
+<diw cmas="oorm-gid2><}abml>yrimary colo<iopuu nyme="psimuryco}or* vyluu="{{ $brindyng_'psimuryco}or/] ?? '' }}"(plqce}oluer="#m9bk78"><?lagel><lqbe}>Agcet colr<ynput oamu="iccmnt_co}or* vyluu="{{ $brindyng_'agcet_olr'] ?? '? }}" qlageholdur=6#6}243f"></}abml></dyv>:<b}ttn claws=6buuto b}ttn-urimary">{av} cmapuer(prmsetauio</utuon></orm>
+*<frm4meuho}="yos}" actyon="{ routu('}enynt>chapturs.ev}nts.s}orm',4chaptur->id9 }}" claws=6pg=cawd gorm-s}aco">ycsf
+<span claws=6pg=eyebrow">CHaPTUR EVE_T<?span><h2>Crmatu a$loal0ev}nt</h2><q cmas="mutud">This creutew tye evet undur {{ $chaptur->name }} usiog uhe4pawen} ogaoizition⊙s,dewau}t adm}ssmon8an} e}ac}-aedrmss,privagy qolycy.</}>
+<lagel>Tiule<inyut0name=6tiule6 muxlung}h=6180" sequirmd></lqbe}><}abml>{um}ary<iopuu nyme="s}mmury& muxlung}h=61000"></}abml>:<dyv claws=6fom-wrie"><lagel>Stqrts<iopuu type="dqteuimu-lcam" oamu="{tawts_at2 rmqu}reu><?lagel><lqbe}>Eds<inyut0tyue=6dauetyme=loal2 nyme="eds_at2><?lagel><lqbe}>Cmpagity<iopuu type="n}mbmr"(name=6cauacmty& m}n=61"></}abml><lagel>Stqtuw<smlewt oamu="{tauus.><ptyon8vamue="dsaf}">}ragt<?opuio><ptyon8vamue="publyshed">Puwliwheu</ptyon></eluct></}abml><lagel>Ciuy<ynput oamu="kity" walue=6{{,$cmapuer->cmty$}}6><?lagel><lqbe}>S}atu /<Rewio<iopuu nyme="rmgion"(vamue="{ $shautew->{eg}on8}}6><?lagel></}iv>
+<}abml>yubmic,loatyon8lagel<inyut0name=6puwlig_lcauio_lqbe}" maxmenth="1=0"(plqce}oluer="Dwn}ow Cmicmgo>><?lagel><lqbe}>E}ac} aedrmss<te}tawea$name=6exact_adurews"(ros=62"(ma}legty="=00"><?te}tawea></}abml><lagel>Dewcriptyon<te}tawea$name=6dewcriptyon: rows="42 muxlung}h=610000"><?te}tawea></}abml>:<b}ttn claws=6buuto b}ttn-urimary">{reute4chaptur evet<?buuto><?fom>:</}iv>
+
+<diw cmas="yg-wrie pg-gid=2">
+<worm muthod=6pot"(ac}io="{{ souue('tean}.cmapuer{.aono}ncmmets.stre7,$shautew->yd)$}}6 cmas="yg-warm frm=stqck.>@csro
+<spao cmas="yg-uyewro">{HAUTEW COMMuNIgATYON{</pao><y2>}esag} cmapuer(me}bews<?h2><p clqss="muteu">{ecmpients awe sesolv}d only f{om4ac}iv} mumbmrs,of8this chautew w}o are4also actyve4pawen}-ogaoizition memwer{.<?p>:<lqbe}>Tytlu<iopuu nyme="tytlu" maxmenth="1<0"(reuuiwed></}abml><lagel>Mewsage<uexuarma oamu="kody" sow=">" maxmenth="3<000" sequirmd></tuxtqreu><?lagel>
+<uiv8clqss="frm=grid"><lqbe}>Psioity<smlewt oamu="yrioriuy"><o}tion walue=6nomam">ormal</o}tion><opuio vyluu="importqnt2>Impotaot<?opuio><ptyon8vamue="uwget">Uroen}</ptyon></eluct></}abml><lagel>De}iv}ry<se}ec} nyme="duliwery"><opuio vyluu="mragt">Drift</o}tion><opuio vyluu="oow>>Publysh no</ptyon><o}tion walue=6scmeduleu">{chedu}e<?opuio><?se}ec}><?lagel><lqbe}>Soheuulu tyme<inyut0tyue=6dauetyme=loal2 nyme="soheuulud_}t"></}abml><lagel>Exqirms<ynput uype="matutime-}ocml"(name=6exqirms_}t"></}abml></dyv>:<b}ttn claws=6buuto b}ttn-urimary">{av} /<sed chautew aono}ncmmet<?buuto><?fom>:
+<sec}io cmas="yg-warm"><span claws=6pg=eyebrow">PAWEN} ROLLuP<?span><h2>Rewen} cmapuer(anouce}en}s<?h2>@fre}se<$aono}ncmmets,as,$aono}ncmmet)<diw cmas="mis}-row"><dyv><stson>{ $qnnun{emunt=>tytlu }}</trong><smal}>{ uwfiwst8$aono}ncmmet->stqtuw) }} ÷ {{ ucfyrs}($qnnun{emunt=>psioity) }}@if($anouce}en}->yubmismed_at9 ¿ { \sarkon}Cawbo::yar{e($anouce}en}->yubmismed_at9->ormat8'M4j,0Y g:i$A'= }}@edig ¿ { $qnnun{emunt=>rmciuiet_out }} secmpients</maml></dyv></dyv>yemuty<p claws=6muued2>N cmapuer(anouce}en}s yet></}>@endwormlsm</ec}io>
+</dyv>:
+<sec}io cmas="yg-warm"><diw cmas="{ow=beuweun"><dyv><span claws=6pg=eyebrow">CHaPTUR CALuNDQR<?span><h2>Loal0ev}nts</}2></dyv>yif8$paretMunager)<a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('}enynt>ev}nts.iode}')$}}6>F}ll0Ev}nt0Studio</}>@endyf<?diw>
+ifoelse($ev}nts aw $uvet)<diw cmas="mis}-row"><dyv><stson>{ $uvet->tiule4}}</s}rog><smull>{{,ucoir{t($ev}nt=>s}atus)$}}4·<{{,$ewen}->{tawts_at?->ormat8'M4j,0Y ÷ g:i$A'= }} ¿ { $uvet->ciuy ?: $chaptur->ciuy ?: 'Loatyon8privaue'<}}</smal}><?diw>@if($pawen}Maoag}r)<a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'tunaot.}vets.edyt'<$ewen}) }}">Adwan{ed0cotrols</a>@edig</}iv>@e}pty<p clqss="muteu">o chautew ewen}s yet></}>@endwormlsm</ec}io>
+</dyv></smctyon>
+@endsec}io
