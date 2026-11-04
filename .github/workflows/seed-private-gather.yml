@@ -1,0 +1,49 @@
+name: Seed Private Gather full source
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  seed:
+    if: ${{ hashFiles('.seed/part-000') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify seed parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd .seed
+          sha256sum -c SHA256SUMS
+          cat part-* > /tmp/private-gather-source.tar.xz
+          echo "1a141884cbe01e7738760dbdb3aaa11f68902b96e202839941dbb01ba62c8e7d  /tmp/private-gather-source.tar.xz" | sha256sum -c -
+
+      - name: Expand exact Private Gather source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/private-gather-source
+          tar -xJf /tmp/private-gather-source.tar.xz -C /tmp/private-gather-source
+          cp -a /tmp/private-gather-source/. .
+          rm -rf .seed
+
+      - name: Commit recovered source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "Private Gather Recovery"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "Seed Private Gather 1.1.174 full source"
+          git push
