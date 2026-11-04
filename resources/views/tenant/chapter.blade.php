@@ -1,0 +1,16 @@
+@extends('layouts.tenant-site')
+@section('title',$chapter->name.' — '.$tenant->name)
+@section('content')
+@php($branding=$chapter->branding ?? [])
+<section class="pg-page-hero" @if(!empty($branding['primary_color'])) style="--gold:{{ $branding['primary_color'] }};--gold2:{{ $branding['primary_color'] }};@if(!empty($branding['accent_color']))--plum:{{ $branding['accent_color'] }};@endif" @endif><div class="pg-shell">
+<span class="pg-eyebrow">{{ strtoupper($tenant->name) }} · LOCAL CHAPTER</span><h1>{{ $chapter->name }}</h1>
+<p>{{ $branding['tagline'] ?? $chapter->description ?? 'A local chapter of '.$tenant->name.'.' }}</p>
+<div class="pg-event-meta">@if($chapter->locationLabel())<span class="pg-pill">{{ $chapter->locationLabel() }}</span>@endif<span class="pg-pill">{{ $chapter->visibility === 'public' ? 'Public chapter page' : ($chapter->visibility === 'invite_only' ? 'Invite-only chapter' : 'Organization members') }}</span>@if($chapter->chapterLead)<span class="pg-pill">Lead · {{ $chapter->chapterLead->display_name ?: $chapter->chapterLead->name }}</span>@endif</div>
+@if(auth()->check())<div class="pg-actions" style="margin-top:18px"><a class="button button-primary" href="{{ route('community.groups.show',$chapter) }}">Open chapter discussion</a></div>@endif
+</div></section>
+<section class="pg-page"><div class="pg-shell pg-grid">
+<section><div class="pg-section-head"><div><span class="pg-eyebrow">LOCAL CALENDAR</span><h2>Upcoming chapter events</h2><p>Event admission and exact-address privacy still follow {{ $tenant->name }} policy.</p></div></div><div class="pg-grid pg-grid-2">@forelse($events as $event)<article class="pg-card pg-card-interactive"><span class="pg-pill">{{ $event->starts_at?->format('M j') }}</span><h3>{{ $event->title }}</h3><p>{{ $event->summary ?: \Illuminate\Support\Str::limit((string)$event->description,180) }}</p><p class="muted">{{ $event->city ?: $chapter->city ?: 'Location shared according to event policy' }} · {{ $event->starts_at?->format('g:i A') }}</p><a class="text-link" href="{{ route('events.show',$event) }}">View event →</a></article>@empty<div class="pg-empty"><h3>No upcoming chapter events</h3><p>Local events will appear here when published.</p></div>@endforelse</div></section>
+@if($isChapterMember)<section><div class="pg-section-head"><div><span class="pg-eyebrow">MEMBER UPDATES</span><h2>Chapter announcements</h2><p>These updates are shown only to active members of this chapter.</p></div></div><div class="pg-grid">@forelse($announcements as $announcement)<article class="pg-card"><span class="pg-pill">{{ strtoupper($announcement->priority) }}</span><h3>{{ $announcement->title }}</h3><p style="white-space:pre-wrap">{{ $announcement->body }}</p>@if($announcement->published_at)<small>{{ \Carbon\Carbon::parse($announcement->published_at)->diffForHumans() }}</small>@endif</article>@empty<div class="pg-empty"><h3>No member announcements</h3></div>@endforelse</div></section>@endif
+<div class="pg-privacy-note">This chapter remains part of {{ $tenant->name }}. Parent membership, privacy, trust, payment and safety rules remain authoritative even when the chapter has its own local presentation.</div>
+</div></section>
+@endsection

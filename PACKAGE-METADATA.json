@@ -1,0 +1,15 @@
+{
+    "schema": 2,
+    "product": "privategather/private-gather",
+    "version": "1.4.5",
+    "edition": "hosted",
+    "installation_base": "hosted-platform",
+    "source_commit": null,
+    "shared_core": true,
+    "dedicated_installer": true,
+    "static_asset_mirror": true,
+    "static_asset_files": 32,
+    "source_base_commit": "a67c8096cb30ec5f4a84d93b4733840e3092ec79",
+    "source_modified": true,
+    "parent_release": "1.4.1"
+}

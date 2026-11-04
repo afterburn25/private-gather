@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Verify Email')
+@section('content')<div class="auth-wrap"><div class="panel form-card"><h1>Verify your email</h1><p>Use the verification link sent to your email. You can resend it below.</p>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif<form method="post" action="{{route('verification.send')}}">@csrf<button class="button button-primary">Resend Verification Email</button></form></div></div>@endsection

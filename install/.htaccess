@@ -1,0 +1,5 @@
+Options -Indexes
+DirectoryIndex index.php
+<FilesMatch "^(schema\.sql|lib\.php)$">
+    Require all denied
+</FilesMatch>

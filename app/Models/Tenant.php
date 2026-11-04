@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+class Tenant extends Model
+{
+    use HasFactory;
+    public const TYPE_CLUB='club'; public const TYPE_ORGANIZATION='organization'; public const TYPE_ORGANIZER='organizer'; public const TYPE_PRIVATE_HOST='private_host';
+    protected $fillable=['name','slug','type','status','plan','settings'];
+    protected function casts():array{return ['settings'=>'array'];}
+    public static function publicNetworkTypes():array{return [self::TYPE_CLUB,self::TYPE_ORGANIZATION,self::TYPE_ORGANIZER];}
+    public function normalizedType():string{return $this->type===self::TYPE_ORGANIZER?self::TYPE_ORGANIZATION:$this->type;}
+    public function isClub():bool{return $this->normalizedType()===self::TYPE_CLUB;}
+    public function isOrganization():bool{return $this->normalizedType()===self::TYPE_ORGANIZATION;}
+    public function domains():HasMany{return $this->hasMany(TenantDomain::class);} public function primaryDomain():HasOne{return $this->hasOne(TenantDomain::class)->where('is_primary',true);}
+    public function users():BelongsToMany{return $this->belongsToMany(User::class,'tenant_users')->withPivot(['role','status'])->withTimestamps();}
+    public function membershipApplications():HasMany{return $this->hasMany(TenantMembershipApplication::class);}
+    public function membershipLevels():HasMany{return $this->hasMany(TenantMembershipLevel::class);}
+    public function membershipTerms():HasMany{return $this->hasMany(TenantMembershipTerm::class);}
+    public function badges():HasMany{return $this->hasMany(Badge::class);} public function badgeAssignments():HasMany{return $this->hasMany(UserBadge::class);}
+    public function events():HasMany{return $this->hasMany(Event::class);} public function pages():HasMany{return $this->hasMany(CmsPage::class);} public function settingsRecords():HasMany{return $this->hasMany(SiteSetting::class);} public function branding():HasOne{return $this->hasOne(TenantBranding::class);} public function subscription():HasOne{return $this->hasOne(TenantSubscription::class);}
+    public function isActive():bool{return $this->status==='active';}
+
+    public function networkVisibility(): string
+    {
+        $configured = data_get($this->settings, 'network_visibility');
+        if (in_array($configured, ['listed', 'private', 'invite_only'], true)) return $configured;
+        return (bool) data_get($this->settings, 'marketplace_enabled', false) ? 'listed' : 'private';
+    }
+
+    public function isNetworkListed(): bool
+    {
+        return $this->isActive()
+            && in_array($this->type, self::publicNetworkTypes(), true)
+            && $this->networkVisibility() === 'listed'
+            && (bool) data_get($this->settings, 'marketplace_enabled', false);
+    }
+
+    public function scopeNetworkListed($query)
+    {
+        return $query
+            ->whereIn('type', self::publicNetworkTypes())
+            ->where('settings->marketplace_enabled', true)
+            ->where(function ($visibility): void {
+                $visibility->whereNull('settings->network_visibility')
+                    ->orWhere('settings->network_visibility', 'listed');
+            });
+    }
+}
