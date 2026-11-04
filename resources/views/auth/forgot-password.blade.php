@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Forgot Password')
+@section('content')<div class="auth-wrap"><form class="panel form-card" method="post">@csrf<h1>Reset password</h1><p>Enter your account email and we’ll send a reset link when mail delivery is configured.</p><input name="email" type="email" value="{{old('email')}}" required>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif @error('email')<p class="error">{{$message}}</p>@enderror<button class="button button-primary">Send Reset Link</button></form></div>@endsection

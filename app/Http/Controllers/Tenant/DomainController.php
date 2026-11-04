@@ -1,0 +1,9 @@
+<?php
+namespace App\Http\Controllers\Tenant;
+use App\Http\Controllers\Controller;use App\Models\TenantDomain;use App\Services\CustomDomainService;use App\Services\DomainHealthService;use App\Services\TenantDomainCache;use App\Tenancy\TenantContext;use App\Support\Audit;use Illuminate\Http\Request;use Illuminate\Support\Facades\DB;
+class DomainController extends Controller{
+ public function index(TenantContext $c,CustomDomainService $s){$t=$c->requireTenant()->load('domains');return view('tenant.manage.domains',['tenant'=>$t,'domains'=>$t->domains,'service'=>$s]);}
+ public function store(Request $r,TenantContext $c,CustomDomainService $s){$d=$r->validate(['domain'=>'required|string|max:253']);$domain=$s->request($c->requireTenant(),$d['domain']);Audit::write('domain.requested',$domain,tenantId:$domain->tenant_id,request:$r);return back()->with('status','Domain added. Add the DNS records shown below, then verify it.');}
+ public function verify(Request $r,TenantContext $c,TenantDomain $domain,DomainHealthService $health,TenantDomainCache $cache){$t=$c->requireTenant();abort_unless($domain->tenant_id===$t->id,404);$result=$health->verify($domain);$cache->forget($domain->domain);return back()->with('status',$result['verified']?'Domain ownership verified. HTTPS provisioning is now eligible.':'Verification record is not visible yet.');}
+ public function primary(Request $r,TenantContext $c,TenantDomain $domain,TenantDomainCache $cache){$t=$c->requireTenant();abort_unless($domain->tenant_id===$t->id&&$domain->status==='active',404);DB::transaction(function()use($t,$domain){$t->domains()->update(['is_primary'=>false]);$domain->update(['is_primary'=>true]);});$cache->forget($domain->domain);return back()->with('status','Primary domain updated.');}
+}

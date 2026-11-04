@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Website Pages')
+@section('content')<section class="container section"><div class="panel-head"><div><div class="eyebrow">CMS</div><h1>Website pages</h1></div><div class="row-actions"><a class="button button-ghost" href="{{route('tenant.cms.placeholders')}}">Placeholders</a><a class="button button-primary" href="{{route('tenant.cms.create')}}">New page</a></div></div><div class="panel">@foreach($pages as $page)<div class="list-row"><div><strong>{{$page->title}}</strong><small>/{{$page->is_homepage?'':$page->slug}} · {{$page->status}}</small></div><a class="button button-ghost" href="{{route('tenant.cms.edit',$page)}}">Edit</a></div>@endforeach</div></section>@endsection

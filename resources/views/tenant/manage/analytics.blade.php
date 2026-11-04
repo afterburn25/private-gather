@@ -1,0 +1,5 @@
+@extends('layouts.app')
+@section('title','Analytics')
+@section('content')<div class="container"><div class="title-row"><div><h1>Analytics</h1><p>Since {{$from->format('M j, Y')}}</p></div><a class="button secondary" href="{{route('tenant.analytics.export')}}">Export CSV</a></div>
+<div class="stats"><div class="stat"><strong>{{$stats['event_views']}}</strong><span>Event views</span></div><div class="stat"><strong>{{$stats['rsvps']}}</strong><span>RSVPs</span></div><div class="stat"><strong>{{$stats['checkins']}}</strong><span>Check-ins</span></div><div class="stat"><strong>{{$stats['orders']}}</strong><span>Orders</span></div><div class="stat"><strong>${{number_format($stats['gross_cents']/100,2)}}</strong><span>Gross sales</span></div></div>
+<div class="panel"><h2>Event performance</h2>@foreach($events as $e)<div class="row-between"><span>{{$e->title}}</span><strong>{{$e->rsvps_count}} RSVPs</strong></div>@endforeach</div></div>@endsection

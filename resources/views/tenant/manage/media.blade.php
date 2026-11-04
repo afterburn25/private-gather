@@ -1,0 +1,5 @@
+@extends('layouts.app')
+@section('title','Media Library')
+@section('content')<div class="container"><h1>Media Library</h1>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif
+<form class="panel form-inline" method="post" enctype="multipart/form-data" action="{{route('tenant.media.store')}}">@csrf<input type="file" name="file" accept="image/*" required><select name="visibility"><option value="tenant">Tenant only</option><option value="public">Public</option><option value="private">Private members/staff</option></select><input name="alt_text" placeholder="Alt text"><button>Upload</button></form>
+<div class="card-grid">@foreach($assets as $a)<div class="card"><strong>{{$a->original_name}}</strong><p>{{$a->visibility}} · {{number_format($a->size/1024)}} KB</p><a href="{{route('tenant.media.show',$a)}}">View</a><form method="post" action="{{route('tenant.media.destroy',$a)}}">@csrf @method('delete')<button class="link danger">Delete</button></form></div>@endforeach</div>{{$assets->links()}}</div>@endsection
