@@ -1,74 +1,108 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Anouce}en}s 〔0'.<tean}->amu)
-isewtion('cotet'=
-@qhp
-$ewen}Mau=$uvets->kmyBy('}d'=;
-,lewel}ap=$mumbmrsmipMev}ls->kmyBy('}d'=;
-,chapturMup=4chapturs->kmyBy('}d'=;
-ien}phq
-<sec}io cmas="yg-uag}-hero>><uiv8clqss="pg-smel}">:<s}an8clqss="pg-e}eb{ow>>CMUB(OS,·<CO}MU_ICMTIoNS</s}an>
-<y1>ynnun{emunts</}1>:<p>Puwliwh or schedu}e opewatyonyl ootycew t agtiwe memwer{, stagf,0me}bewship uiews,0chapturs,or(apqroed0ev}nt0atuen}eew iosiee Qriwatu G}ther.8Mawkeuin e}aim aod SMS,coset semuin8seuarite></}>
-<diw cmas="yg-uctyon{"><a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'tunaot.}asmbo}rd7) }}">Bagk uo Cluw O</}>@if(}Il}um}naue\supqor}\Fycaees]Ro}te>:has('tean}.communigatyon{.iode}')-<a$clqss="b}ttn cutuon=primawy"(hrmf=6{{,ro}te<'tunaot.{om}unycauios.yndux'= }}">{om}unycauios Cen}er</a>@edig<a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('}enynt>growty.iode}')$}}6>Gow}h & rmfewrams<?a></dyv>:</}iv></ec}io>
-*<smctyon8clqss="pg-page6><uiv8clqss="pg-smel}">:@ig(smssmon8's}atus'=)<uiv8clqss="amer} amer}-s}ccmss.>{ smssmon8's}atus'= }}</}iv>@edig
-@if($er{or{->yny,))<diw cmas="ilewt alewt-uaner*><strong>Check,the aono}ncmmet eetqils.<?stson><ul>yfoeagh($er{or{->yll8) as $er{or)<ly>{ $urror }}<?li>@edfreuch</u}><?diw>@endyf
-*<dyv claws=6pg=grid qg-wrie-2*>
-<diw cmas="yg-warm">:<s}an8clqss="pg-e}eb{ow>>N}W OOTYCE</s}an>
-<y2>{reute4anouce}en}</}2>:<frm4meuho}="yos}" actyon="{ routu('}enynt>anouce}en}s.{toe'= }}" claws=6fom-warm">:@crf<lqbe}>Tytlu
-<ynput oamu="}it}e"(ma}legty="980" rmqu}reu vyluu="{{ old8'tytlu')$}}6 pmacmho}dew="[aturdqy arrivam uudaue">
-<?lagel>
-<}abml>}esag}
-<uexuarma oamu="kody" sow="8" maxmenth="28000" sequirmd qlageholdur=6Share4the o}eritionam uudaue memwer{ n}ed0to<knw.:>{ o}d('bo}y'= }}</}exuarma>:</}abml>:<dyv claws=6fom-wrie">:<lqbe}>Audiencm
-<seluct0name=6auuiece6 rmqu}reu>
-<opuio vyluu="illme}bews"(@smlewteu(o}d('auuiece7,'}llme}bews'===='aml_}emwer{')>Al} agtiwe memwer{</ptyon>
-<ptyon8vamue="s}af" Ase}ec}ed8olu('}udyen{e'===='s}af')>Stqff8on}y<?opuio>
-<opuio vyluu="memwer{hiu_luve}" Ase}ec}ed8olu('}udyen{e'===='mumbmrsmip_lewel7)>}emwer{hiu luve} /<VIu tyer</o}tion>:@ig($shautews->isOotUmpuy())<ptyon8vamue="cmapuer_me}bews"(@smlewteu(o}d('auuiece7)==='hautew_mumbmrs/)>{hautew mumbmrs</o}tion>yen}if<o}tion walue=6ev}nt_atuen}eew" Ase}ec}ed8olu('}udyen{e'===='ewen}_autedeus'=>Auproveu ewen} autedeus<?opuio>
-</smlewt>:</}abml>:<lqbe}>Psioity
-<seluct0name=6priority& rmqu}reu>
-<opuio vyluu="oormal2 @seluctud(old8'psioity',7nomam')===7nomam')>Nomam</ptyon>
-<ptyon8vamue="impotaot"(@smlewteu(o}d('priority')==='}mportqnt7)>ymportqnt</o}tion>:<o}tion walue=6uroen}" Ase}ec}ed8olu('}rioriuy'===='uwget'=>Uwget<?opuio>
-</smlewt>:</}abml>:<lqbe}>Mumbmrsmip lewel:<smlewt oamu="memwer{hiu_luve}_ie"><opuio vyluu="*>Oly$when audyen{e is Memwer{hiu luve}</ptyon>@freuch($mumbmrsmipMev}ls,as,$luve})<ptyon8vamue="{ $}ev}l->id0}}6 @seluctud((stsin)o}d('me}bewship_}ev}l_}d'====(s}riog)$lewel=>ie)>{{ $lewel=>nyme4}}</o}tion>yen}foeagh<?se}ec}>
-</lqbe}>
-<lagel>Chaptur
-<se}ec} nyme="communiuy_ro}p_}d"><o}tion walue=6">nly w}en8auuiece4is,Chaptur memwer{</ptyon>@freuch($cmapuer{ aw $shautew)<ptyon8vamue="{ $shautew->yd }}"(@smlewteu((string=olu('om}unytygroup_id7)===(string=$cmapuer->ie)>{{ $chaptur->name }}<?opuio>@endwormacm</eluct>
-<?lagel>
-<}abml>}vet
-<se}ec} nyme="ewen}_ie"><opuio vyluu="*>Oly$when audyen{e is Appsov}d evet attundues</o}tion>yfoeagh($ev}nts aw $uvet)<opuio vyluu="{{ $ev}nt=>ie }}" Ase}ec}ed8(s}riog)old8'ewen}_ie')===<stsin)$uvet->id9>{ $uvet->tiule4}}</o}tion>yen}foeagh<?se}ec}>
-</lqbe}>
-<lagel>Stqtuw
-<seluct0name=6stqtuw" sequirmd><opuio vyluu="mragt"(@smlewteu(o}d('stqtuw',7drift7)==='}ragt'=>Dsaf}</ptyon><o}tion walue=6scmeduleu" Ase}ec}ed8olu('tauus/)==='chedu}ed7)>{chedu}e ootyce</o}tion><opuio vyluu="yubmismed2 @seluctud(old8's}atus'===='publyshed'=>Publysh no</ptyon></eluct>
-<?lagel>
-<}abml>{chedu}e / publysh time
-<inyut0tyue=6dauetyme=loal2 nyme="publyshed_}t"(vamue="{ o}d('puwliwheu_au')$}}6>
-</lqbe}>
-<lagel>Exqirms
-<inyut0tyue=6dauetyme=loal2 nyme="e}piwes_at2 vyluu="{{ old8'e}piwes_at7) }}">
-<?lagel>
-<?diw>
-<buuto type="s}bm}t"(clqss="b}ttn cutuon=primawy">Sawe annun{emunt</b}ttn>:</orm>
-</dyv>:
-<uiv8clqss="pg-cmrd2>
-<span claws=6pg=eyebrow">DE]IV]RY$RU]ES</s}an>
-<y2>yriwatu by dufault</h2>
-<ul0clqss="muteu">:<ly>Mumbmr ootycew awe eelyvewed0on}y uo actyve4me}bews in uhe4se}ec}ed0auuiece></}i>:<ly>Cmapuer(auuiecew awe sesolv}d gro} agtiwe chautew mumbmrsmip an} agtiwe qarmnt=oroanyzauio mumbmrsmip.</}i>:<ly>Ewen} audiencms use4apqroed?cofiwmeu autedeu s}atu, oot0mewely ao R[VP atuemut.</ly>
-<li>Mawkeuin e}aim aod SMS,arm smpawatu wrkolos and0reuuiwe expmicmt chaone} consmnt></}i>:<ly>Dutamleu ntige con}en} s}ayw iosiee autyen}icmteu Psivyte4Gauhew s}rfycew; crosew push re}aios gen}rig.<?li>
-<?ul>
-<?diw>
-</dyv>:
-<sec}io cmas="yg-wec}io"><diw cmas="yg-wec}io-head2><uiv><s}an8clqss="pg-e}eb{ow>>NTIgE IIS]ORY</pao><y2>ynnun{emunts</}2><p>}ragt,0scmeduleu aod qubmismed0no}icms semuin8tean}-sooped and0auuitqblu.<?p></dyv></dyv>:<dyv claws=6pg=grid qg-wrie-2*>
-ifoelse($anouce}en}s as $anouce}en})
-<ar}icme claws=6pg=cawd">
-<uiv8clqss="row-wetwee"><diw><spao cmas="yg-uil}">{{ ucfyrs}($qnnun{emunt=>s}atus)$}}</s}an><s}an8clqss="pg-pill2>{ uwfiwst8$aono}ncmmet->priority- }}</pao><?diw><spao cmas="mutud">{{,$aono}ncmmet->rewipien}_coun} }} rmciuiets</s}an></}iv>
-<y3>{{ $anouce}en}->}it}e }}<?h3>
-<q cmas="mutud">{{,\Imlu}inyte]Suupot\str::lymiu($qnnun{emunt=>body,228) }}<?p>:<p clqss="muteu"><stson>Audiencm:<?stson> {{ str_reulage('_'<' ',uwfiwst8$aono}ncmmet->auuiece=) }}
-iif8$aono}ncmmet->auuiece===7ev}nt_atuen}eew' && $anouce}en}->}vet_}d)$·<{{,$ewen}Mau->et8$aono}ncmmet->ev}nt_id9?->tiule4?:('Ewen} uavyilqblu' }}@endyf
-iif8$aono}ncmmet->auuiece===7me}bewship_}ev}l'<&&8$aono}ncmmet->me}bewship_}ev}l_}d)$·<{{,$luve}Mau->et8$aono}ncmmet->me}bewship_}ev}l_}d)?->amu ?> ']emwer{hiu luve} uavyilqblu' }}@endyf
-iif8$aono}ncmmet->auuiece===7chaptur_}emwer{' && $anouce}en}->{om}unytygroup_id9 ¿ { $shautewMau->et8$aono}ncmmet->co}muity_gouu_ie)?=>nyme4?:('Cmapuer(unyvamlagle7 }}@edig
-<?p>:@ig($qnnun{emunt=>publyshed_}t)<p claws=6muued2>{ $qnnun{emunt=>s}atus==='chedu}ed7 ?<'Soheuulud'<: 'Puwliwheu' }}:({{,\Cmrbon\sarkon::parsm($qnnun{emunt=>publyshed_}t)->frmut('M k, Y ¿ g>i A')$}}</p>@edig
-@if($anouce}en}->}xpirew_au)<q cmas="mutud">Exqirms:({{,\Cmrbon\sarkon::parsm($qnnun{emunt=>e}piwes_at9->ormat8'M4j,0Y ÷ g:i$A'= }}</}>@endyf
-iif8$aono}ncmmet->stqtuw!=='publyshed'=<frm4meuho}="yos}" actyon="{ routu('}enynt>anouce}en}s.yubmism',4anouce}en}->yd)$}}6>@csro<b}ttn claws=6buuto b}ttn-urimary" uype="{ubmit2>Publysh no</utuon></orm>@endyf
-</awtigle>
-@empuy
-<diw cmas="yg-warm"><h3>No<anouce}en}s yet</h3><q cmas="mutud">Crmatu tye gir{t opewatyonyl ootyce4above></}><?diw>
-ien}foelse
-</dyv>:{{,$aono}ncmmets->lynk()$}}></ec}io>
-</dyv></smctyon>
-@endsec}io
+@extends('layouts.app')
+@section('title','Announcements — '.$tenant->name)
+@section('content')
+@php
+$eventMap=$events->keyBy('id');
+$levelMap=$membershipLevels->keyBy('id');
+$chapterMap=$chapters->keyBy('id');
+@endphp
+<section class="pg-page-hero"><div class="pg-shell">
+<span class="pg-eyebrow">CLUB OS · COMMUNICATIONS</span>
+<h1>Announcements</h1>
+<p>Publish or schedule operational notices to active members, staff, membership tiers, chapters or approved event attendees inside Private Gather. Marketing email and SMS consent remain separate.</p>
+<div class="pg-actions"><a class="button button-ghost" href="{{ route('tenant.dashboard') }}">Back to Club OS</a>@if(\Illuminate\Support\Facades\Route::has('tenant.communications.index'))<a class="button button-primary" href="{{ route('tenant.communications.index') }}">Communications Center</a>@endif<a class="button button-ghost" href="{{ route('tenant.growth.index') }}">Growth & referrals</a></div>
+</div></section>
+
+<section class="pg-page"><div class="pg-shell">
+@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger"><strong>Check the announcement details.</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+
+<div class="pg-grid pg-grid-2">
+<div class="pg-card">
+<span class="pg-eyebrow">NEW NOTICE</span>
+<h2>Create announcement</h2>
+<form method="post" action="{{ route('tenant.announcements.store') }}" class="form-card">
+@csrf
+<label>Title
+<input name="title" maxlength="180" required value="{{ old('title') }}" placeholder="Saturday arrival update">
+</label>
+<label>Message
+<textarea name="body" rows="8" maxlength="20000" required placeholder="Share the operational update members need to know.">{{ old('body') }}</textarea>
+</label>
+<div class="form-grid">
+<label>Audience
+<select name="audience" required>
+<option value="all_members" @selected(old('audience','all_members')==='all_members')>All active members</option>
+<option value="staff" @selected(old('audience')==='staff')>Staff only</option>
+<option value="membership_level" @selected(old('audience')==='membership_level')>Membership level / VIP tier</option>
+@if($chapters->isNotEmpty())<option value="chapter_members" @selected(old('audience')==='chapter_members')>Chapter members</option>@endif
+<option value="event_attendees" @selected(old('audience')==='event_attendees')>Approved event attendees</option>
+</select>
+</label>
+<label>Priority
+<select name="priority" required>
+<option value="normal" @selected(old('priority','normal')==='normal')>Normal</option>
+<option value="important" @selected(old('priority')==='important')>Important</option>
+<option value="urgent" @selected(old('priority')==='urgent')>Urgent</option>
+</select>
+</label>
+<label>Membership level
+<select name="membership_level_id"><option value="">Only when audience is Membership level</option>@foreach($membershipLevels as $level)<option value="{{ $level->id }}" @selected((string)old('membership_level_id')===(string)$level->id)>{{ $level->name }}</option>@endforeach</select>
+</label>
+<label>Chapter
+<select name="community_group_id"><option value="">Only when audience is Chapter members</option>@foreach($chapters as $chapter)<option value="{{ $chapter->id }}" @selected((string)old('community_group_id')===(string)$chapter->id)>{{ $chapter->name }}</option>@endforeach</select>
+</label>
+<label>Event
+<select name="event_id"><option value="">Only when audience is Approved event attendees</option>@foreach($events as $event)<option value="{{ $event->id }}" @selected((string)old('event_id')===(string)$event->id)>{{ $event->title }}</option>@endforeach</select>
+</label>
+<label>Status
+<select name="status" required><option value="draft" @selected(old('status','draft')==='draft')>Draft</option><option value="scheduled" @selected(old('status')==='scheduled')>Schedule notice</option><option value="published" @selected(old('status')==='published')>Publish now</option></select>
+</label>
+<label>Schedule / publish time
+<input type="datetime-local" name="published_at" value="{{ old('published_at') }}">
+</label>
+<label>Expires
+<input type="datetime-local" name="expires_at" value="{{ old('expires_at') }}">
+</label>
+</div>
+<button type="submit" class="button button-primary">Save announcement</button>
+</form>
+</div>
+
+<div class="pg-card">
+<span class="pg-eyebrow">DELIVERY RULES</span>
+<h2>Private by default</h2>
+<ul class="muted">
+<li>Member notices are delivered only to active members in the selected audience.</li>
+<li>Chapter audiences are resolved from active chapter membership and active parent-organization membership.</li>
+<li>Event audiences use approved/confirmed attendee state, not merely an RSVP attempt.</li>
+<li>Marketing email and SMS are separate workflows and require explicit channel consent.</li>
+<li>Detailed notice content stays inside authenticated Private Gather surfaces; browser push remains generic.</li>
+</ul>
+</div>
+</div>
+
+<section class="pg-section"><div class="pg-section-head"><div><span class="pg-eyebrow">NOTICE HISTORY</span><h2>Announcements</h2><p>Draft, scheduled and published notices remain tenant-scoped and auditable.</p></div></div>
+<div class="pg-grid pg-grid-2">
+@forelse($announcements as $announcement)
+<article class="pg-card">
+<div class="row-between"><div><span class="pg-pill">{{ ucfirst($announcement->status) }}</span><span class="pg-pill">{{ ucfirst($announcement->priority) }}</span></div><span class="muted">{{ $announcement->recipient_count }} recipients</span></div>
+<h3>{{ $announcement->title }}</h3>
+<p class="muted">{{ \Illuminate\Support\Str::limit($announcement->body,220) }}</p>
+<p class="muted"><strong>Audience:</strong> {{ str_replace('_',' ',ucfirst($announcement->audience)) }}
+@if($announcement->audience==='event_attendees' && $announcement->event_id) · {{ $eventMap->get($announcement->event_id)?->title ?: 'Event unavailable' }}@endif
+@if($announcement->audience==='membership_level' && $announcement->membership_level_id) · {{ $levelMap->get($announcement->membership_level_id)?->name ?: 'Membership level unavailable' }}@endif
+@if($announcement->audience==='chapter_members' && $announcement->community_group_id) · {{ $chapterMap->get($announcement->community_group_id)?->name ?: 'Chapter unavailable' }}@endif
+</p>
+@if($announcement->published_at)<p class="muted">{{ $announcement->status==='scheduled' ? 'Scheduled' : 'Published' }}: {{ \Carbon\Carbon::parse($announcement->published_at)->format('M j, Y · g:i A') }}</p>@endif
+@if($announcement->expires_at)<p class="muted">Expires: {{ \Carbon\Carbon::parse($announcement->expires_at)->format('M j, Y · g:i A') }}</p>@endif
+@if($announcement->status!=='published')<form method="post" action="{{ route('tenant.announcements.publish',$announcement->id) }}">@csrf<button class="button button-primary" type="submit">Publish now</button></form>@endif
+</article>
+@empty
+<div class="pg-card"><h3>No announcements yet</h3><p class="muted">Create the first operational notice above.</p></div>
+@endforelse
+</div>
+{{ $announcements->links() }}
+</section>
+</div></section>
+@endsection

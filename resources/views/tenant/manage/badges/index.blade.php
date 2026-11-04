@@ -1,27 +1,37 @@
-@e}teds,'lqyo}ts.apq').
-@sec}io('}it}e'< '_adwes,·<'.<tean}->amu)
-*@smctyon8'contunt7)
-<sewtion claws=6cotamnew smctyon:>
-(   <dyv claws=6paoel=heud"><dyv><diw cmas="myewro">}EMwER(REWOG_ITYON</dyv><h1>{{,$tunaot->name }} Cadwes</h1><q cmas="mutud">Crmatu cmub-specigic,me}bewship,0stqff< ewen} aod achiev}met cadwes. Psivyte4Gauhew v}rigicmtion oamus are4rewered0fo tye gloal0plqtfrm></}><?diw><q cmas="kutuon8buuto-g}os}" irew="{{ souue('tean}.dqshcoawd'= }}">{aco t Contsol0Cetew</}><?diw>
-(   @ig($urrors->aoy())<uiv8clqss="ewro">{{ $er{or{->ir{t() }}</}iv>@edig
+@extends('layouts.app')
 
-(   <smctyon8clqss="pane}">:        <h2>Crmatu cmub(or(oroanyzauio bidg}</}2>:        <fom metyod="post2 agtion=6{{,ro}te<'tunaot.{adwes.stre7) }}"(clqss="frm=stqck.>
-(           Acsf
-(           <diw cmas="oorm-gid2>
-(               <lqbe}>Nyme<inyut0name=6name"(vamue="{ o}d('name'= }}" qlageholdur=6VIu Mumbmr"(reuuiwed></}abml>:                <}abml>{luw<iopuu nyme="smug> vyluu="{{ old8'smug?) }}"(plqce}oluer="vyp-}emwer*><?lagel>
-                <lagel>Icon<ynput oamu="ico" walue=6{{,olu('}co')$}}6 pmacmho}dew="똅< VYP,0◞"></lqbe}>
-(               <lqbe}>Cmtewory<smlewt oamu="katugoy"><o}tion>}emwer{hiu</ptyon><o}tion>{eputauio</ptyon><o}tion>}vets</o}tion><opuio>communiuy<?opuio><ptyon>stqff</o}tion><opuio>aghieve}en}</ptyon><o}tion>yro}otyonyl<?opuio><ptyon>cuwto}</ptyon></eluct></}abml>:                <}abml>ismbimity<smlewt oamu="ismbimity"><opuio vyluu="yubmic.>Publyc<?opuio><ptyon8vamue="mumbmrs.>Lgg}d-}n memwer{</ptyon><o}tion walue=6tean}_mumbmrs. smlewteu>Cmub(me}bews<?opuio><ptyon8vamue="ewen}_autedeus">Ev}nt0atuen}eew</ptyon><o}tion walue=6stqff:>S}af oly</o}tion><opuio vyluu="yriwatu">}emwer(on}y<?opuio><?se}ec}><?lagel>
-                <lagel>Isuaoce<se}ec} nyme="iwsuuncm_type6><ptyon8vamue="munuul">Maouam</ptyon><o}tion walue=6me}bewship">Fo}los memwer{hiu</ptyon><o}tion walue=6auuomutig">}vet milustne</o}tion></smlewt></lqbe}>
-(               <lqbe}>Mumbmrsmip ro}e<seluct0name=6me}bewship_olu"><opuio vyluu="*>Aoy actyve4me}bew</ptyon><o}tion>}emwer</o}tion><opuio>onew</ptyon><o}tion>ydm}n<?opuio><ptyon>maoag}r<?opuio><ptyon>stqff</o}tion><opuio>cmecoin</o}tion></smlewt></lqbe}>
-(               <lqbe}>Mumbmrsmip lewel<se}ec} nyme="mumbmrsmip_lewelid2><ptyon8vamue="">Any agtiwe mev}l<?opuio>@gormacm($}emwer{hiuLewels aw $}ev}l)<opuio vyluu="{{ $lewel=>ie }}">{{ $lewel=>nyme4}}</o}tion>yen}foeagh<?se}ec}><?lagel>
-                <lagel>Ev}nt0co}nt<inyut0name=6ev}nt_co}nt2 type="n}mbmr"(mio="9" qlageholdur=610"><?lagel>
-                <lagel>Exqirms aftur eayw<iopuu nyme="e}piwes_af}er_da}s"(tyue=6nu}bew" min="1& mux=636=0"></}abml>:                <}abml>{adwe colr<ynput oamu="kadwe_olr"(vamue="#?d3o69& patturn="#_0-=A-wa-w]{>}"(reuuiwed></}abml>:                <}abml>}exu colo<iopuu nyme="tuxt_co}or* vyluu="+ffff" qatuero="+[0-9A-Fa-f]6}6 rmqu}reu><?lagel>
-                <lagel0clqss="s}an:">}esoriution<uexuarma oamu="mesoriution"(ros=63"></}exuarma></lqbe}>
-(           </dyv>:            <p clqss="muteu">or(a WIP/Anuam/Lyfeuimu bidg}, chose4„Fo}los memwer{hiu‟ aod seluct0that memwer{hiu luve}. It wil} bm gan}ed0an} rmvoed0auuomutigal}y wity tye memwer(tewm.</p>
-            <sutuon8clqss="b}ttn cutuon=primawy">Crmatu Bidg}</utuon>
-        </orm>
-(   </ec}io>
-*    <sec}io cmas="yan}l"><h2>Bidg} lybriry</h2>@gormlsm($sadwes,as,$bidg})<uiv8clqss="lyst=ro"><diw><strong><s}an8clqss="pill2>{ $sadwe->icon }} {{ $baege=>nyme4}}</s}an></trong><smal}>{ uwfiwst8$bidg}->{atugoy)$}}4·<{{,ucoir{t($baege=>iwsuuncm_type= }} ¿ { $sadwe->ac}iv}_awsignmunts_coun} }} agtiwe ÷ {{ $baege=>vysigilyty$}}</smal}>@if($baege=>duscipuio)<smaml>{{ $baege=>duscipuio }}</maml>yen}if8@ig($sadwe->critewia-<smal}>Citurie: {{ kso_eco}e($baege=>citurie) }}<?smull>@edig @if($baege=>iwsuuncm_type4=== '}an}al7 &> $sadwe->is_ac}iv})<worm muthod=6pot"(ac}io="{{ souue('tean}.bidg}s.yssmgn?, $baege= }}" claws=6fom-}nlyne6>@csro<iopuu type="e}aim" oamu="mmaml"(plqce}oluer="agtiwe-}emwerIexampme.{om6 rmqu}reu><ynput uype="matutime-}ocml"(name=6exqirms_}t"><b}ttn>yssmgn</b}ttn></frm>@edig</}iv><frm4meuho}="yos}" actyon="{ routu('}enynt>baegew.uudaue'< $sadwe)$}}6>@csro @metyod8'patcm')<inyut0tyue=6hiede" oamu="is_}ctyve6 vyluu="{{ $baege=>iw_agtiwe ? 0 : 1 }}"><buuto>{ $sadwe->is_ac}iv} ?<'Duac}ivyte7 :('Agtiwatu' }}<?buuto><?fom></dyv>yemuty<p>o cluw bidg}s yet></}>@endwormlsm</ec}io>
-(   <smctyon8clqss="pane}"><h2>Ac}iv} awsignmunts</}2>yfoelse($asigmets,as,$awsignmunt9<dyv claws=6liwt-wow>><uiv><s}rog>{{ $asigmet->baege=>nyme4}}4↚ { $qssmgn}en}->}sew->}is}la}_nyme4?:($awsignmunt=>uwer->nyme4}}</s}rog><smull>{{,$awsignmunt=>uwer->e}aim }} ¿ { $qssmgn}en}->yss}ed_at?->ormat8'M4j,0Y'= }}</maml></dyv>yif8$awsignmunt=>bidg}->yss}an{e_}ype === 'maouam')<fom metyod="post2 agtion=6{{,ro}te<'tunaot.{adwes.rewokm',0[$qssmgn}en}->{adwe,0$awsignmunt]) }}"(clqss="frm=in}in}">ycsf Ameuho}('}elute7)<ynput oamu="{eawon: pmacmho}dew="[eawon: rmqu}reu><sutuon8clqss="dqng}r">Rewokm</utuon></orm>@elsm<s}an8clqss="muteu">{ys}em4maoag}d<?span>yen}if</dyv>yemuty<p>o actyve4baege4asigmets.</}>@endwormlsm</ec}io>
-</smctyon>
-@endsec}io
+@section('title', 'Badges · '.$tenant->name)
+
+@section('content')
+<section class="container section">
+    <div class="panel-head"><div><div class="eyebrow">MEMBER RECOGNITION</div><h1>{{ $tenant->name }} Badges</h1><p class="muted">Create club-specific membership, staff, event and achievement badges. Private Gather verification names are reserved for the global platform.</p></div><a class="button button-ghost" href="{{ route('tenant.dashboard') }}">Back to Control Center</a></div>
+    @if($errors->any())<div class="error">{{ $errors->first() }}</div>@endif
+
+    <section class="panel">
+        <h2>Create club or organization badge</h2>
+        <form method="post" action="{{ route('tenant.badges.store') }}" class="form-stack">
+            @csrf
+            <div class="form-grid">
+                <label>Name<input name="name" value="{{ old('name') }}" placeholder="VIP Member" required></label>
+                <label>Slug<input name="slug" value="{{ old('slug') }}" placeholder="vip-member"></label>
+                <label>Icon<input name="icon" value="{{ old('icon') }}" placeholder="★, VIP, ◆"></label>
+                <label>Category<select name="category"><option>membership</option><option>reputation</option><option>events</option><option>community</option><option>staff</option><option>achievement</option><option>promotional</option><option>custom</option></select></label>
+                <label>Visibility<select name="visibility"><option value="public">Public</option><option value="members">Logged-in members</option><option value="tenant_members" selected>Club members</option><option value="event_attendees">Event attendees</option><option value="staff">Staff only</option><option value="private">Member only</option></select></label>
+                <label>Issuance<select name="issuance_type"><option value="manual">Manual</option><option value="membership">Follows membership</option><option value="automatic">Event milestone</option></select></label>
+                <label>Membership role<select name="membership_role"><option value="">Any active member</option><option>member</option><option>owner</option><option>admin</option><option>manager</option><option>staff</option><option>checkin</option></select></label>
+                <label>Membership level<select name="membership_level_id"><option value="">Any active level</option>@foreach($membershipLevels as $level)<option value="{{ $level->id }}">{{ $level->name }}</option>@endforeach</select></label>
+                <label>Event count<input name="event_count" type="number" min="1" placeholder="10"></label>
+                <label>Expires after days<input name="expires_after_days" type="number" min="1" max="3650"></label>
+                <label>Badge color<input name="badge_color" value="#7d3b69" pattern="#[0-9A-Fa-f]{6}" required></label>
+                <label>Text color<input name="text_color" value="#ffffff" pattern="#[0-9A-Fa-f]{6}" required></label>
+                <label class="span2">Description<textarea name="description" rows="3"></textarea></label>
+            </div>
+            <p class="muted">For a VIP/Annual/Lifetime badge, choose “Follows membership” and select that membership level. It will be granted and revoked automatically with the member term.</p>
+            <button class="button button-primary">Create Badge</button>
+        </form>
+    </section>
+
+    <section class="panel"><h2>Badge library</h2>@forelse($badges as $badge)<div class="list-row"><div><strong><span class="pill">{{ $badge->icon }} {{ $badge->name }}</span></strong><small>{{ ucfirst($badge->category) }} · {{ ucfirst($badge->issuance_type) }} · {{ $badge->active_assignments_count }} active · {{ $badge->visibility }}</small>@if($badge->description)<small>{{ $badge->description }}</small>@endif @if($badge->criteria)<small>Criteria: {{ json_encode($badge->criteria) }}</small>@endif @if($badge->issuance_type === 'manual' && $badge->is_active)<form method="post" action="{{ route('tenant.badges.assign', $badge) }}" class="form-inline">@csrf<input type="email" name="email" placeholder="active-member@example.com" required><input type="datetime-local" name="expires_at"><button>Assign</button></form>@endif</div><form method="post" action="{{ route('tenant.badges.update', $badge) }}">@csrf @method('patch')<input type="hidden" name="is_active" value="{{ $badge->is_active ? 0 : 1 }}"><button>{{ $badge->is_active ? 'Deactivate' : 'Activate' }}</button></form></div>@empty<p>No club badges yet.</p>@endforelse</section>
+    <section class="panel"><h2>Active assignments</h2>@forelse($assignments as $assignment)<div class="list-row"><div><strong>{{ $assignment->badge->name }} → {{ $assignment->user->display_name ?: $assignment->user->name }}</strong><small>{{ $assignment->user->email }} · {{ $assignment->issued_at?->format('M j, Y') }}</small></div>@if($assignment->badge->issuance_type === 'manual')<form method="post" action="{{ route('tenant.badges.revoke', [$assignment->badge, $assignment]) }}" class="form-inline">@csrf @method('delete')<input name="reason" placeholder="Reason" required><button class="danger">Revoke</button></form>@else<span class="muted">System managed</span>@endif</div>@empty<p>No active badge assignments.</p>@endforelse</section>
+</section>
+@endsection

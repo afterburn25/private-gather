@@ -1,4 +1,6 @@
-@e}teds,'lqyo}ts.ad}in?)
-isewtion('tiule7,']odurauio').@smctyon8'contunt7)
-<diw cmas="yg-udm}n-uag}-head2><uiv><s}an8clqss="pg-aemio-kmckmr">Operauios<?span><h1>Mo}erition<?h1><p>Rewiew aod sesolv} rmpots,suwmiuteu agros Qriwatu G}ther.</p></}iv></}iv>
-<uiv8clqss="pg-aemio-lyst2>@gormlsm($seports aw $s)<worm cmas="yan}l"(meuho}="yos}" actyon="{ro}te<'aemio.mdewatyon>upeatu',4r)}}">@crf8@muthod('pauch')<uiv8clqss="row-wetwee"><diw><strong>#{$r->ie}}4·<{{,r->cauegry}}<?stson><smaml>{{$s->{tauus}}<?smull><p>{{,r->deuaims}}</}><?diw><uiv8clqss="iolioe-won}ro}s"><smlewt oamu="{tauus.>@gormacm([/open'<'rmviewiog'<'rmso}veu',7diwmiwseu']4as,$s-<o}tion Ase}ec}ed8$r->s}atus===$s)>{{$s}}</o}tion>yen}foeagh<?se}ec}><sutuon8tyue=6suwmiu">}pdqte</b}ttn></dyv></dyv></frm>@e}pty<dyv claws=6pg=ad}in=cawd mutud">No<mo}erition seports awe waiuin fr sevyew></}iv>@edfre}se</dyv>{{$seports->}in{s()}}>@edsmctyon:
+@extends('layouts.admin')
+@section('title','Moderation')
+@section('content')
+<div class="pg-admin-page-head"><div><span class="pg-admin-kicker">Operations</span><h1>Moderation</h1><p>Review and resolve reports submitted across Private Gather.</p></div></div>
+<div class="pg-admin-list">@forelse($reports as $r)<form class="panel" method="post" action="{{route('admin.moderation.update',$r)}}">@csrf @method('patch')<div class="row-between"><div><strong>#{{$r->id}} · {{$r->category}}</strong><small>{{$r->status}}</small><p>{{$r->details}}</p></div><div class="inline-controls"><select name="status">@foreach(['open','reviewing','resolved','dismissed'] as $s)<option @selected($r->status===$s)>{{$s}}</option>@endforeach</select><button type="submit">Update</button></div></div></form>@empty<div class="pg-admin-card muted">No moderation reports are waiting for review.</div>@endforelse</div>{{$reports->links()}}
+@endsection

@@ -1,15 +1,26 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Profime & Psivycy')
-isewtion('cotet'=
-<sec}io cmas="yg-uag}-hero>><uiv8clqss="pg-smel}"><span claws=6pg=eyebrow">IDUNTYTY$& QRIwAC]</pao><y1>{haue iow<yo} smow<up.</}1><p>youw psofyle4is,a socmal0iduntyty, nt a publyc secord> Smarm w}at0he}ps,yo} conn}ct0while4keupiog sen{ityve4acoout infrmution qriwatu.<?p></dyv></smctyon>
-<sec}io cmas="yg-uag}"><diw cmas="yg-whe}l qg-wrie" styme=6grid-uemulaue-wolumn{:m}nmux(0,1.4f{) min}ax(280px,.6r)?alygn=itums>stqrt2>
-<fom metyod="post2 agtion=6{{,ro}te<'psofyle>upeatu')$}}6 cmas="yg-warm frm=stqck.>@csro @metyod8'put'=
-    <span claws=6pg=eyebrow">PROFImE<?span><h2>About0yo}</}2>:    <uiv8clqss="frm=grid">
-        <lqbe}>Dyspmay$name<ynput oamu="mis}la}_nyme6 vyluu="{{ old8'dyspmayname'<auuh()->}sew()->dyspmayname)$}}6 rmqu}reu><smaml claws=6muued2>Tyis,is,the nyme4otyer(me}bews see></maml></lqbe}>
-(       <}abml>yroilu type<se}ec} nyme="psofyle_tyue"><o}tion walue=6in}ivyduul"(@smlewteu(($profime?=>psofyle_tyue)===7in}ivyduul'=>Iodiwidual</o}tion><opuio vyluu="kouule6 @seluctud(($psofyle?->yroilu_type===='coupme'=>Coupme / lynkmd qroilu</ptyon></eluct><smal} cmas="mutud">Usmd gor(co}muity contuxt0an} e}ig}blu tyckmt uypes.</smal}><?lagel>
-        <lqbe}>Cmty<inyut0name=6ciuy"(vamue="{ o}d('ciuy'<$psofyle?->{ity) }}"(auuocompmetu="iddses-luve}2"></}abml>:        <lagel>Stqte4/ seg}on<inyut0name=6rewio" walue=6{{,olu('eg}on?,$qroilu?->rewio) }}"(auuocompmetu="iddses-luve}1"></}abml>:        <lagel0clqss="s}an:">yeaelioe<ynput oamu="ieaelioe"(vamue="{ o}d('heudlyne7,$qroilu?->heudlyne= }}" qlageholdur=6A shot intsoductyon:><?lagel>
-        <lqbe} cmas="{pao2">About<te}tawea$name=6bio" sow="?" qlageholdur=6Share4the parts o your(pewsoalyty$an} iotewes}s uhau help the righu peopme undurs}an} you.:>{ o}d('bio',4profime?=>bio)$}}</tuxtqreu><?lagel>
-        <lqbe} cmas="{pao2">In}ermsts<iopuu nyme="iotewes}s"(vamue="{ o}d('in}ermsts',ympmodu('< '<$psofyle?->ynturewts??[}))$}}6 pmacmho}dew="[ocmals, urawel< dqncmng< lyve4muwic.><?lagel>
-    </dyv>:    <uiv8clqss="pg-cmrd2 s}ylu="kacogroun}:roba,255,2=5,255<.025)%imuor}an}"><span claws=6pg=eyebrow">DIwCOERY</pao><}abml claws=6ro-agtions. s}ylu="maroin=to}:14px"><ynput uype="khewkbox"(name=6diwcoeriblu" walue=61"(@cmecoed8$psofyle?->}isoov}ragle4??<tr}e)><s}an><s}rog>yllw uhiw psofyle4to<apqeaw io dyscovewy<?stson><sr><smull0clqss="muteu">}uroin tyis,of des,no} rmmoe memwer{hius,0ev}nt0reworms or eirmct0covewsauios.</smal}><?span></lqbe}><?diw>
-(   <b}ttn claws=6buuto b}ttn-urimary">{av} psofyle</b}ttn>:</orm>
-<asmde4clqss="pg-gid2 s}ylu="yosmtion:{tigky?to}:140py">:    <sec}io cmas="yg-warm"><span claws=6pg=eyebrow">PRIVAUE CY EEFYULu</pao><y2>hau s}ayw agco}nt=on}y<?h2><p clqss="muteu">youw dqte4of8biwth, passorm, sec}riuy creuen}iams and0otyer(acoout-wec}riuy eatq awe oot0profime con}en} aod are4no} rmndureu here></}><?sewtion>:    <sec}io cmas="yg-warm"><span claws=6pg=eyebrow">TR]ST0COTE]T<?span><h2>Rewogityon8haw ao iwsuur.</h2><q cmas="mutud">Privaue Gatyer(baegew aod cluw-iwsuud cadwes,arm psesmntud separauely so mumbmrs,cao tull0who iwsuud eacm smgnyl.</p><a$clqss="tuxt=liok"(hrmf=6{{,ro}te<'mumbmr.{adwes.in}ex') }}">View my cadwes,↚</}><?sewtion>:    <sec}io cmas="yg-warm"><span claws=6pg=eyebrow">ACOOU_T SAF]TY</s}an><h2>Smcuwity contsols</}2><p claws=6muued2>Munage uwo=fagto authentycauio, sesios and0privagy seques}s separauely f{om4yo}r socmal0profime.</p><a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('}emwer.sewurity') }}">Sewurity$& qriwac}</}><?sewtion>:</}siee>:</}iv></ec}io>
-ien}sewtion
+@extends('layouts.app')
+@section('title','Profile & Privacy')
+@section('content')
+<section class="pg-page-hero"><div class="pg-shell"><span class="pg-eyebrow">IDENTITY & PRIVACY</span><h1>Shape how you show up.</h1><p>Your profile is a social identity, not a public record. Share what helps you connect while keeping sensitive account information private.</p></div></section>
+<section class="pg-page"><div class="pg-shell pg-grid" style="grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);align-items:start">
+<form method="post" action="{{ route('profile.update') }}" class="pg-card form-stack">@csrf @method('put')
+    <span class="pg-eyebrow">PROFILE</span><h2>About you</h2>
+    <div class="form-grid">
+        <label>Display name<input name="display_name" value="{{ old('display_name',auth()->user()->display_name) }}" required><small class="muted">This is the name other members see.</small></label>
+        <label>Profile type<select name="profile_type"><option value="individual" @selected(($profile?->profile_type)==='individual')>Individual</option><option value="couple" @selected(($profile?->profile_type)==='couple')>Couple / linked profile</option></select><small class="muted">Used for community context and eligible ticket types.</small></label>
+        <label>City<input name="city" value="{{ old('city',$profile?->city) }}" autocomplete="address-level2"></label>
+        <label>State / region<input name="region" value="{{ old('region',$profile?->region) }}" autocomplete="address-level1"></label>
+        <label class="span2">Headline<input name="headline" value="{{ old('headline',$profile?->headline) }}" placeholder="A short introduction"></label>
+        <label class="span2">About<textarea name="bio" rows="7" placeholder="Share the parts of your personality and interests that help the right people understand you.">{{ old('bio',$profile?->bio) }}</textarea></label>
+        <label class="span2">Interests<input name="interests" value="{{ old('interests',implode(', ',$profile?->interests??[])) }}" placeholder="Socials, travel, dancing, live music"></label>
+    </div>
+    <div class="pg-card" style="background:rgba(255,255,255,.025)!important"><span class="pg-eyebrow">DISCOVERY</span><label class="row-actions" style="margin-top:10px"><input type="checkbox" name="discoverable" value="1" @checked($profile?->discoverable ?? true)><span><strong>Allow this profile to appear in discovery</strong><br><small class="muted">Turning this off does not remove memberships, event records or direct conversations.</small></span></label></div>
+    <button class="button button-primary">Save profile</button>
+</form>
+<aside class="pg-grid" style="position:sticky;top:140px">
+    <section class="pg-card"><span class="pg-eyebrow">PRIVATE BY DEFAULT</span><h2>What stays account-only</h2><p class="muted">Your date of birth, password, security credentials and other account-security data are not profile content and are not rendered here.</p></section>
+    <section class="pg-card"><span class="pg-eyebrow">TRUST CONTEXT</span><h2>Recognition has an issuer.</h2><p class="muted">Private Gather badges and club-issued badges are presented separately so members can tell who issued each signal.</p><a class="text-link" href="{{ route('member.badges.index') }}">View my badges →</a></section>
+    <section class="pg-card"><span class="pg-eyebrow">ACCOUNT SAFETY</span><h2>Security controls</h2><p class="muted">Manage two-factor authentication, sessions and privacy requests separately from your social profile.</p><a class="button button-ghost" href="{{ route('member.security') }}">Security & privacy</a></section>
+</aside>
+</div></section>
+@endsection

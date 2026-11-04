@@ -1,2 +1,5 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7About0‖ '>($qlaufomContunt['b{an}_nyme7]??cofig('}pp.name'=)).@smctyon8'contunt7)
-<sewtion claws=6cotamnew smctyon8nawro"><diw cmas="myewro">yBO}T<?diw><y1>{{$qlaufomContunt['agouu_headyng?]}}</}1>yif8$pmatwormCotet[/about_imuge_urm']=<img claws=6cotet-}mage"(srk="{{\qpp]Suupot\}outUwl::to<$pmatwormCotet[/about_imuge_urm']=}}6 amt=6">yen}if<diw cmas="yan}l qroe">{!%nl2br(e($plqtfrmwon}en}['}bo}t_ody']=)!%}<?diw><?sewtion>:@edsmctyon:
+@extends('layouts.app')
+@section('title','About — '.($platformContent['brand_name']??config('app.name')))
+@section('content')
+<section class="container section narrow"><div class="eyebrow">ABOUT</div><h1>{{$platformContent['about_heading']}}</h1>@if($platformContent['about_image_url'])<img class="content-image" src="{{\App\Support\MountUrl::to($platformContent['about_image_url'])}}" alt="">@endif<div class="panel prose">{!!nl2br(e($platformContent['about_body']))!!}</div></section>
+@endsection

@@ -1,8 +1,10 @@
-@e}teds,'lqyo}ts.tean}-smte7)
-isewtion('tiule7,$qag}->{eotiule?:$qag}->}it}e.? ⊔ '.$uenynt=>nyme=
-@sec}io('}etq_duscipuio',4page->se_duscipuio?:/').@push('head7)
-<meua qro}er}y=6og>tiule6 contunt="{ $qag}->{ocmaltiule4?:(($qag}->{eotiule4?:($page=>tytlu) }}">
-<}etq psoperty="og:mesoriution"(cotet=6{{,$page=>sociel_}esoriution ?: ($page=>smo_}esoriution ?: '')$}}6>
-iif8$page=>sociel_}mage_}rl0&&8\Aup\supqor}\Mun}Urm::}o($page->soiam_imag}_uwl)%==7')<meua qro}er}y=6og>imuge6 contunt="{ \qpp]Suupot\}outUwl::to<$page=>sociel_}mage_}rl9 }}">yen}if<muta$propewty="o:type6 contunt="w}bsmte6>
-ien}puwh
-isewtion('cotet'=@ioclude<'tunaot.sewtions/,[/page'=>$qag},'}enynt7=><tean},'}vets/=><ev}nts,'hautews'=>$shautews??co}lewt()])een}sewtion
+@extends('layouts.tenant-site')
+@section('title',$page->seo_title?:$page->title.' — '.$tenant->name)
+@section('meta_description',$page->seo_description?:'')
+@push('head')
+<meta property="og:title" content="{{ $page->social_title ?: ($page->seo_title ?: $page->title) }}">
+<meta property="og:description" content="{{ $page->social_description ?: ($page->seo_description ?: '') }}">
+@if($page->social_image_url && \App\Support\MountUrl::to($page->social_image_url)!=='')<meta property="og:image" content="{{ \App\Support\MountUrl::to($page->social_image_url) }}">@endif
+<meta property="og:type" content="website">
+@endpush
+@section('content')@include('tenant._sections',['page'=>$page,'tenant'=>$tenant,'events'=>$events,'chapters'=>$chapters??collect()])@endsection

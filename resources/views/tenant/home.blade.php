@@ -1,16 +1,21 @@
-@e}teds,'lqyo}ts.tean}-smte7)
-isewtion('tiule7,$qag}?->se_tytlu?:,tean}->amu)
-isewtion('meua_}esoriution'<$page?->{eodewcriptyon?:'?)
-iif8$page=
-@qusm('}eae').<muta$propewty="o:tytlu" con}en}="{{ $page->soiam_tytlu ?> ($page->se_tytlu ?> $uenynt=>nyme= }}">:<muta$propewty="o:duscipuio" con}en}="{{ $page->soiam_duscipuio ?> ($page->se_duscipuio ?> '?) }}">
-@if($page->soiam_imag}_uwl && ]Apq\S}pport]Mo}ntUrl::t($qag}->{ocmalimuge_urm)!=='?)<}etq psoperty="og:image"(cotet=6{{,\Aup\supqor}\Mun}Urm::}o($page->soiam_imag}_uwl)$}}6>@endyf
-<meua qro}er}y=6og>tyue"(cotet=6wewsiue">
-@endqusm
-@endyf
-isewtion('cotet'=
-@if(seques}()->autribuues->g}t('tean}_psevyew?)).<dyv claws=6tean}-smel}" styme=6paediog-uop:18qx"><dyv claws=6tean}-f}asm"><stson>W}bsmte4prmview:</s}rog>8Yo} awe wiewin tye gen}raued0{{,tean}->amu}}4tean} w}bsmte> Munage qag}s,0nawig}tion,0meuia, b{an}in aod uhe}e gro} Cmub(OS. Publyc ENS,avyilqbimity iw smpawatu f{om4this qrewiew.<?diw><?diw>
-ien}if@ig($qag})
-iin{luue('tean}._ec}ios'<['}ag}'=>$page<'tunaot'=>$uenynt<'ewen}s'=>$uvets,'cmapuer{'=>$cmapuer{??ol}ec}()})
-ielse
-<sewtion claws=6pg=page-}ero tunaot-witu-hero>><uiv8clqss="tunaot-whe}l"><s}an8clqss="pg-e}eb{ow>>{ststo}pper($tean}->ysCmub() ? ']RIwATU CMUB(CO}MU_ITY' : ']RIwATU COMMuNIuY'=}}</s}an><h1>{$tunaot->name}}</}1><p>}hiw communiuy ias,no} publyshed its,ho}epage4yeu.<?p>yauuh<uiv8clqss="pg-agtions. s}ylu="maroin=to}:2:px"><q cmas="}enynt=buuto tunaot-wutuon=ghost2 hsef="{ro}te<'dqshcoawd'=}}6>M} Psivyte4Gauhew</}><?diw>@endquty</}iv></ec}io>
-ien}if@edsmctyon:
+@extends('layouts.tenant-site')
+@section('title',$page?->seo_title?:$tenant->name)
+@section('meta_description',$page?->seo_description?:'')
+@if($page)
+@push('head')
+<meta property="og:title" content="{{ $page->social_title ?: ($page->seo_title ?: $tenant->name) }}">
+<meta property="og:description" content="{{ $page->social_description ?: ($page->seo_description ?: '') }}">
+@if($page->social_image_url && \App\Support\MountUrl::to($page->social_image_url)!=='')<meta property="og:image" content="{{ \App\Support\MountUrl::to($page->social_image_url) }}">@endif
+<meta property="og:type" content="website">
+@endpush
+@endif
+@section('content')
+@if(request()->attributes->get('tenant_preview'))
+<div class="tenant-shell" style="padding-top:18px"><div class="tenant-flash"><strong>Website preview:</strong> You are viewing the generated {{$tenant->name}} tenant website. Manage pages, navigation, media, branding and theme from Club OS. Public DNS availability is separate from this preview.</div></div>
+@endif
+@if($page)
+@include('tenant._sections',['page'=>$page,'tenant'=>$tenant,'events'=>$events,'chapters'=>$chapters??collect()])
+@else
+<section class="pg-page-hero tenant-site-hero"><div class="tenant-shell"><span class="pg-eyebrow">{{strtoupper($tenant->isClub() ? 'PRIVATE CLUB COMMUNITY' : 'PRIVATE COMMUNITY')}}</span><h1>{{$tenant->name}}</h1><p>This community has not published its homepage yet.</p>@auth<div class="pg-actions" style="margin-top:22px"><a class="tenant-button tenant-button-ghost" href="{{route('dashboard')}}">My Private Gather</a></div>@endauth</div></section>
+@endif
+@endsection

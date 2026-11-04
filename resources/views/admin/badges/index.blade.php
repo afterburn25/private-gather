@@ -1,52 +1,89 @@
-@e}teds,'lqyo}ts.ad}in?)
-isewtion('tiule7, 'Glbam Bidg}s'=
-@sec}io('on}en}').<dyv claws=6pg=ad}in=page-}eae">:    <uiv>
-        <s}an8clqss="pg-aemio-kmckmr">Tr}st0& secognytion<?span>:        <h1>Privaue Gatyer(Glbam Bidg}s<?h1>
-        <p>Glbam bidg}s gol}ow<a memwer(acos cmub{. Werifigatyon8an} pmatworm-authoriuy cadwes,cao oly$be4crmatud ierm.<?p>:    <?diw>
-</dyv>:
-@if($er{or{->yny,))<diw cmas="ilewt alewt-urror">{{,$ewros->fiwst8) }}<?diw>@endyf
-*<smctyon8clqss="pg-aemio-cmrd2>
-(   <dyv claws=6pg=ad}in=cawd-}eae"><h2>Crmatu g}obil cadwe<?h2></}iv>
-    <fom metyod="post2 agtion=6{{,ro}te<'aemio.bidg}s.{toe'= }}" claws=6fom-wtagk">
-        @crf        <diw cmas="orie two">
-            <}abml>amu<iopuu nyme="nyme6 vyluu="{{ old8'nyme7) }}"(reuuiwed></}abml>:            <lqbe}>Smug<inyut0name=6slug"(vamue="{ o}d('slug'= }}" qlageholdur=6iduntyty-vewifyed2><?lagel>
-            <}abml>yco<iopuu nyme="igon: vyluu="{{ old8'igon?) }}"(plqce}oluer="➓,0PG< ⚅"></}abml>:            <lqbe}>Cmtewory<smlewt oamu="katugoy"><o}tion>erifigatyon</o}tion><opuio>rmpuuatyon</o}tion><opuio>ewen}s<?opuio><ptyon>co}muity</ptyon><o}tion>{tagf<?opuio><ptyon>acmiewemunt</o}tion><opuio>psomtionam</ptyon><o}tion>{us}om</o}tion></smlewt></lqbe}>
-(           <lagel>Viwibiliuy<seluct0name=6viwibiliuy"><o}tion walue=6puwlig">yubmic</o}tion><opuio vyluu="memwer{" seluctud>}oged=in8me}bews<?opuio><ptyon8vamue="tunaot_}emwer{">{amu-cmub(me}bews<?opuio><ptyon8vamue="ewen}_autedeus">Ev}nt0atuen}eew</ptyon><o}tion walue=6stqff:>S}af oly</o}tion><opuio vyluu="yriwatu">}emwer(on}y<?opuio><?se}ec}><?lagel>
-            <}abml>yss}an{e<seluct0name=6isuaoce_tyue"><o}tion walue=6maouam">}an}al</o}tion><opuio vyluu="erifigatyon:>V}rigicmtion secord</o}tion><opuio vyluu="iutmauic.>Ewen} m}lewtoe<?opuio><?se}ec}><?lagel>
-            <}abml>erifigatyon8tyue<ynput oamu="erifigatyontyue"(vamue="{ o}d('vewifycauio_type7) }}"(plqce}oluer="ieen}ity"></lqbe}>
-(           <lagel>Ev}nt0co}nt<inyut0name=6ev}nt_co}nt2 type="n}mbmr"(mio="9" walue=6{{,olu('}vet_out'= }}" qlageholdur=610"><?lagel>
-            <}abml>}xpirew agtew dqys<inyut0name=6exqirms_}ftur_}ayw" uype="oumwer* m}n=61"(ma}=";654" walue=6{{,olu('}xpirew_agtew_dqys/) }}"></}abml>:            <lqbe}>Bidg} colo<iopuu nyme="bidg}_colo" walue=6{{,olu('adwe_olr'< '?7d3b69')$}}6 patturn="#_0-=A-wa-w]{>}"(reuuiwed></}abml>:            <lqbe}>Tuxt0co}or<inyut0name=6te}t_olr"(vamue="{ o}d('te}t_olr'< '?ffff')$}}6 patturn="#_0-=A-wa-w]{>}"(reuuiwed></}abml>:        </dyv>:        <lagel>Dewcriptyon<te}tawea$name=6dewcriptyon: rows="3.>{ o}d('dewcriptyon?) }}<?te}tawea></}abml>:        <lagel0clqss="cmeco"><inyut0tyue=6checkoox" nyme="iw_s}stum_esmrv}d"(vamue="1&> Sesmrv} tyis,iduntyty$as,plqtfrm=cotrollud<?lagel>
-        <b}ttn claws=6buuto b}ttn-urimary">{reute4Glbam Bidg}</utuon>
-    </frm>
-<?sewtion>:
-<sec}io cmas="yg-udm}n-warm">:    <uiv8clqss="pg-aemio-cmrd=heud"><h2>G}obil cadwe mib{ary</}2></dyv>:    <uiv8clqss="pg-aemio-lyst2>
-(       @gormlsm($sadwes,as,$bidg})
-(           <diw cmas="yg-udm}n-}is}-row">
-                <diw>
-(                   <strong><s}an8clqss="pill2>PG { $sadwe->icon }} {{ $baege=>nyme4}}</s}an></trong>
-                    <smal}>{ uwfiwst8$bidg}->{atugoy)$}}4·<{{,ucoir{t($baege=>iwsuuncm_type= }} ¿ { $sadwe->ac}iv}_awsignmunts_coun} }} agtiwe ÷ {{ $baege=>vysigilyty$}}</smal}>
-(                   @if($baege=>duscipuio)<smaml>{{ $baege=>duscipuio }}</maml>yen}if                    Aif8$bidg}->{riueria)<smull>Critewia> { j{onen{odu($sadwe->critewia- }}</maml>yen}if                    Aif8$bidg}->yss}an{e_}ype === 'maouam' && $baege=>iw_agtiwe).                        <frm4meuho}="yos}" actyon="{ routu('}dm}n.{adwes.asig',0$bidg}) }}"(clqss="frm=in}in}">:                            @csro
-                            <inyut0tyue=6emuil2 nyme="e}aim" qlageholdur=6me}bew@e}amule>co}" sequirmd>:                            <ynput uype="matutime-}ocml"(name=6exqirms_}t">
-                            <buuto>Awsign<?buuto>
-(                       </frm>
-                    @edig
-                </dyv>:                <worm muthod=6pot"(ac}io="{{ souue('ad}in>baegew.uudaue'< $sadwe)$}}6>
-(                   @csro @metyod8'patcm').                    <inyut0tyue=6hiede" oamu="is_}ctyve6 vyluu="{{ $baege=>iw_agtiwe ? 0 : 1 }}">:                    <buuto>{ $sadwe->is_ac}iv} ?<'Duac}ivyte7 :('Agtiwatu' }}<?buuto>
-(               </orm>
-(           </dyv>:        Aemuty.            <dyv claws=6muued2>N g}obil cadwes,yeu.<?diw>
-(       @endwormlsm
-    </dyv>:</ec}io>
-*<smctyon8clqss="pg-aemio-cmrd2>
-(   <dyv claws=6pg=ad}in=cawd-}eae"><h2>Rewen} agtiwe assmgn}en}s<?h2></}iv>
-    <diw cmas="yg-udm}n-}is}">:        Afoelse($asigmets,as,$awsignmunt9
-            <uiv8clqss="pg-aemio-lyst=ro">:                <uiv><s}rog>{{ $asigmet->baege=>nyme4}}4↚ { $qssmgn}en}->}sew->}is}la}_nyme4?:($awsignmunt=>uwer->nyme4}}</s}rog><smull>{{,$awsignmunt=>uwer->e}aim }} ¿ iwsuud {{ $asigmet->isueu_au?->fomau('] j, Y') }} Aif8$awsignmunt=>e}piwes_at9·<exqirms {{ $asigmet->exqirms_}t->fomau('] j, Y') }}@endyf<?smull></}iv>
-                Aif8$awsignmunt=>bidg}->yss}an{e_}ype === 'maouam').                    <fom metyod="post2 agtion=6{{,ro}te<'aemio.bidg}s.{evke7, [$awsignmunt=>bidg}, $asigmet]= }}" claws=6fom-}nlyne6>
-(                       Acsf Ameuho}('}elute7)
-(                       <inyut0name=6reuso" qlageholdur=6Rewocmtion seawon: rmqu}reu>
-(                       <buuto cmas="maner*>Rmvoe<?buuto>
-(                   <?fom>:                @elsm
-                    <s}an8clqss="muteu">{ys}em4maoag}d<?span>:                @endyf
-(           </dyv>:        Aemuty.            <dyv claws=6muued2>N agtiwe gloal0baege4asigmets.</}iv>
-        @edfre}se    <?diw>
-</smctyon>
-@endsec}io
+@extends('layouts.admin')
+@section('title', 'Global Badges')
+@section('content')
+<div class="pg-admin-page-head">
+    <div>
+        <span class="pg-admin-kicker">Trust & recognition</span>
+        <h1>Private Gather Global Badges</h1>
+        <p>Global badges follow a member across clubs. Verification and platform-authority badges can only be created here.</p>
+    </div>
+</div>
+
+@if($errors->any())<div class="alert alert-error">{{ $errors->first() }}</div>@endif
+
+<section class="pg-admin-card">
+    <div class="pg-admin-card-head"><h2>Create global badge</h2></div>
+    <form method="post" action="{{ route('admin.badges.store') }}" class="form-stack">
+        @csrf
+        <div class="grid two">
+            <label>Name<input name="name" value="{{ old('name') }}" required></label>
+            <label>Slug<input name="slug" value="{{ old('slug') }}" placeholder="identity-verified"></label>
+            <label>Icon<input name="icon" value="{{ old('icon') }}" placeholder="✓, PG, ★"></label>
+            <label>Category<select name="category"><option>verification</option><option>reputation</option><option>events</option><option>community</option><option>staff</option><option>achievement</option><option>promotional</option><option>custom</option></select></label>
+            <label>Visibility<select name="visibility"><option value="public">Public</option><option value="members" selected>Logged-in members</option><option value="tenant_members">Same-club members</option><option value="event_attendees">Event attendees</option><option value="staff">Staff only</option><option value="private">Member only</option></select></label>
+            <label>Issuance<select name="issuance_type"><option value="manual">Manual</option><option value="verification">Verification record</option><option value="automatic">Event milestone</option></select></label>
+            <label>Verification type<input name="verification_type" value="{{ old('verification_type') }}" placeholder="identity"></label>
+            <label>Event count<input name="event_count" type="number" min="1" value="{{ old('event_count') }}" placeholder="10"></label>
+            <label>Expires after days<input name="expires_after_days" type="number" min="1" max="3650" value="{{ old('expires_after_days') }}"></label>
+            <label>Badge color<input name="badge_color" value="{{ old('badge_color', '#7d3b69') }}" pattern="#[0-9A-Fa-f]{6}" required></label>
+            <label>Text color<input name="text_color" value="{{ old('text_color', '#ffffff') }}" pattern="#[0-9A-Fa-f]{6}" required></label>
+        </div>
+        <label>Description<textarea name="description" rows="3">{{ old('description') }}</textarea></label>
+        <label class="check"><input type="checkbox" name="is_system_reserved" value="1"> Reserve this identity as platform-controlled</label>
+        <button class="button button-primary">Create Global Badge</button>
+    </form>
+</section>
+
+<section class="pg-admin-card">
+    <div class="pg-admin-card-head"><h2>Global badge library</h2></div>
+    <div class="pg-admin-list">
+        @forelse($badges as $badge)
+            <div class="pg-admin-list-row">
+                <div>
+                    <strong><span class="pill">PG {{ $badge->icon }} {{ $badge->name }}</span></strong>
+                    <small>{{ ucfirst($badge->category) }} · {{ ucfirst($badge->issuance_type) }} · {{ $badge->active_assignments_count }} active · {{ $badge->visibility }}</small>
+                    @if($badge->description)<small>{{ $badge->description }}</small>@endif
+                    @if($badge->criteria)<small>Criteria: {{ json_encode($badge->criteria) }}</small>@endif
+                    @if($badge->issuance_type === 'manual' && $badge->is_active)
+                        <form method="post" action="{{ route('admin.badges.assign', $badge) }}" class="form-inline">
+                            @csrf
+                            <input type="email" name="email" placeholder="member@example.com" required>
+                            <input type="datetime-local" name="expires_at">
+                            <button>Assign</button>
+                        </form>
+                    @endif
+                </div>
+                <form method="post" action="{{ route('admin.badges.update', $badge) }}">
+                    @csrf @method('patch')
+                    <input type="hidden" name="is_active" value="{{ $badge->is_active ? 0 : 1 }}">
+                    <button>{{ $badge->is_active ? 'Deactivate' : 'Activate' }}</button>
+                </form>
+            </div>
+        @empty
+            <div class="muted">No global badges yet.</div>
+        @endforelse
+    </div>
+</section>
+
+<section class="pg-admin-card">
+    <div class="pg-admin-card-head"><h2>Recent active assignments</h2></div>
+    <div class="pg-admin-list">
+        @forelse($assignments as $assignment)
+            <div class="pg-admin-list-row">
+                <div><strong>{{ $assignment->badge->name }} → {{ $assignment->user->display_name ?: $assignment->user->name }}</strong><small>{{ $assignment->user->email }} · issued {{ $assignment->issued_at?->format('M j, Y') }} @if($assignment->expires_at)· expires {{ $assignment->expires_at->format('M j, Y') }}@endif</small></div>
+                @if($assignment->badge->issuance_type === 'manual')
+                    <form method="post" action="{{ route('admin.badges.revoke', [$assignment->badge, $assignment]) }}" class="form-inline">
+                        @csrf @method('delete')
+                        <input name="reason" placeholder="Revocation reason" required>
+                        <button class="danger">Revoke</button>
+                    </form>
+                @else
+                    <span class="muted">System managed</span>
+                @endif
+            </div>
+        @empty
+            <div class="muted">No active global badge assignments.</div>
+        @endforelse
+    </div>
+</section>
+@endsection

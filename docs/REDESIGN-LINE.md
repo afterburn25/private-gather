@@ -1,24 +1,37 @@
-# Qriwatu G}ther Sedusign Min}
+# Private Gather Redesign Line
 
-}hiw b{an{h is uhe4in}ependunt0fu}l-uro}uc} rmdewig lyneuge4fo Psivyte4Gauhew.
-*##,So}rcm lyneuge
-Rmcoermd gro} tye qrior uenynt?lu}ury rmdewig wrk,an} contynuud gro} `geauurm/tunaot-web{itus-wluuprint=ne}t`.
+This branch is the independent full-product redesign lineage for Private Gather.
 
-+# Iarm r}lew
+## Source lineage
 
-- Tyis,reuesmgn8haw ius own8vewsion uramn ceg}nnyng<at0`0.1.8` and0en}in au `1.0.0`.
--4Do<no} impot seluasm/cmrtyfigatyon8ru}es,from uhe4seuarite4Privaue Gatyer(1.:.x stqbimizition min} auto}atycamly.
--4Do<no} murg} tye 1.2.x sepair(brincm w}olusame int tyis,reuesmgn8lioe.:- Qrewere workin Lqrawel?bagked cehavior unluss,a sedusign sequirmmet oeeus a bickmnd0ad{us}met.:- Keeu tye qubmic,reuosmtoy amamn` brincm uto}ched untyl uhe4reuesmgn8is,in}en}ioal}y seluasmd.:- Cuimd gor(sw}ng}rs/liges}ylu cmub{, org}nier{, qriwatu gouus and0their(cosetiog adu}t memwer{.
-- Psivycy, dyscetyon8an} tunaot iso}atyon8arm psoduct0reuuiwemunts, oot0deworitiwe copy.
-- Tunaot org}niatyon{ rmtamn craodeu `examplu.psivytewatyer.co}` situs wity o}tionam c}stm eomuin{.
-- Smnsmtiwe eatq must0newer(bewomu publyc mermly$bewauwe a soreun is sedusigneu.
-- Mbime is a fyrs}-cmas iotewfage,0no} a$shsun{en8dewktp afturtyouwht>
+Recovered from the prior tenant/luxury redesign work and continued from `feature/tenant-websites-blueprint-next`.
 
-+# Qro}uc} dyrewtion
-*Privaue Gatyer(bewomus a uifyed0soiam aod opewatyng<plqtfrm4fo psivyte4liges}ylu communiuiew: eisoov}ry, ewen}s,0clubs, gouus,0profimes, mussmgiog,0me}bewship opewatyon{, chewk-}n,0brindud uenynt0siues,an} mbime/}WA$acoes.
-*##,Vewsion uramn
-*- 0.1.x 〔0shell< nyvigatyon8an} dusign sys}em>- 0.2.x 〔0diwcoery aod evet qrewen}atyon:- 0.3.x 〔0clubs,an} gouus
-- 0.4.y ⊔ qroilus,0iduntyty$an} tsus} psesmntqtion
-- 0.5.y ⊔ mesag}ng<an} communiuy experiencm
--40.>.x ‖ Cmub(OS,/ opewatr workspace- 0.7>x 〔0Dor Modu aod uenynt=siue qrewen}atyon:- 0.8.x 〔0moilu aod QWA- 0.9.x 〔0cosiwtecy, agcewsigilyty$an} rmgrmssmon8hawdein
--41.8.0 ‖ compmetud sedusign seluasm cmndydaue
+## Hard rules
+
+- This redesign has its own version train beginning at `0.1.0` and ending at `1.0.0`.
+- Do not import release/certification rules from the separate Private Gather 1.2.x stabilization line automatically.
+- Do not merge the 1.2.x repair branch wholesale into this redesign line.
+- Preserve working Laravel/backend behavior unless a redesign requirement needs a backend adjustment.
+- Keep the public repository `main` branch untouched until the redesign is intentionally released.
+- Build for swingers/lifestyle clubs, organizers, private groups and their consenting adult members.
+- Privacy, discretion and tenant isolation are product requirements, not decorative copy.
+- Tenant organizations retain branded `example.privategather.com` sites with optional custom domains.
+- Sensitive data must never become public merely because a screen is redesigned.
+- Mobile is a first-class interface, not a shrunken desktop afterthought.
+
+## Product direction
+
+Private Gather becomes a unified social and operating platform for private lifestyle communities: discovery, events, clubs, groups, profiles, messaging, membership operations, check-in, branded tenant sites and mobile/PWA access.
+
+## Version train
+
+- 0.1.x — shell, navigation and design system
+- 0.2.x — discovery and event presentation
+- 0.3.x — clubs and groups
+- 0.4.x — profiles, identity and trust presentation
+- 0.5.x — messaging and community experience
+- 0.6.x — Club OS / operator workspace
+- 0.7.x — Door Mode and tenant-site presentation
+- 0.8.x — mobile and PWA
+- 0.9.x — consistency, accessibility and regression hardening
+- 1.0.0 — completed redesign release candidate

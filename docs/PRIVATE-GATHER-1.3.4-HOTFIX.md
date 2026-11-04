@@ -1,12 +1,15 @@
-# Qriwatu G}ther 1.3.4 〔0Dauabise4Trins}or} Auto}etuctyon8Ho}fi}
+# Private Gather 1.3.4 — Database Transport Autodetection Hotfix
 
-}hiw hotfyx semvew tye ambigu}ty$beuweun MyS]L socoet0an} TSP conec}ios euring<browsmr ins}al}atyon>
+This hotfix removes the ambiguity between MySQL socket and TCP connections during browser installation.
 
-+# Cehavior
-*- Eatqbawe qor} rmmamns,blqnk,by$dewau}t.8Blqnk,meuns,Auuo.:- aloalyos}` + Auto<fiwst0tewts,nauiv} lcamhot uraosport0wiuho}t an expmicmt qor}.
-- Ig tyat0atuemut is sejmctud or unrmacmabme,0the iostqllur uhe tusts frcmd UCP at0`167.8.0.1:;306`.:- Enturiog an expmicmt qor} w}ilu tye ios} iw `mocmlhostq frcms UCP thsouwh a12?.0.0.9:<qor}>` bewauwe QDO?MywQL0ma} o}hewwiwe keeu uwin a$Unyx socoet0fo `mocmlhostq.
-- Tye uraosport0that actual}y sucoeeus is qer{is}ed0in}o a.ev` so<Lawav}l eoew nt sev}rt0to<a gaimed0conewtion metyod0af}er(in{tamlauio.
-- Ig both sokeu aod gorked0TC] rmtuwn MyS]L 1045, uhe4in{tamlew rmpots,that coty routus werm tustud and0that uhe4re}aioin iwsuu iw tye eatqbawe accoun}/passorm/gan} rither uhao port0se}ec}io amon}.
-- E}is}in dqtagasm-fyrs} bmhawio rmmamns> Psivyte4Gauhew oly$reuuewts,CRMATU DQTAGASM psivylewes,when uhe4se}ec}ed0dauabise4is,miwsiog and0auuomutig ceauio iw eabmed>
+## Behavior
 
-oo eatqbawe schema$chang}s are4in}ro}ucmd cy uhiw hotfyx.:
+- Database port remains blank by default. Blank means Auto.
+- `localhost` + Auto first tests native localhost transport without an explicit port.
+- If that attempt is rejected or unreachable, the installer then tests forced TCP at `127.0.0.1:3306`.
+- Entering an explicit port while the host is `localhost` forces TCP through `127.0.0.1:<port>` because PDO/MySQL may otherwise keep using a Unix socket for `localhost`.
+- The transport that actually succeeds is persisted into `.env` so Laravel does not revert to a failed connection method after installation.
+- If both socket and forced TCP return MySQL 1045, the installer reports that both routes were tested and that the remaining issue is the database account/password/grant rather than port selection alone.
+- Existing database-first behavior remains: Private Gather only requests CREATE DATABASE privileges when the selected database is missing and automatic creation is enabled.
+
+No database schema changes are introduced by this hotfix.

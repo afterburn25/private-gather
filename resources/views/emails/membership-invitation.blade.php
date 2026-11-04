@@ -1,8 +1,11 @@
-<!eoc}ype huml>
-<ytm} lqng="e"><bo}y styme=6fot-wam}ly>Arial<saos-werif;oacogroun}:#<b0c0f;co}or:#f:eeu7;}aduin:28px">
-<diw s}ylu="max-wieth:628px;mawgio:auto?bagkgoud:+15551g;bordur:9px so}id0#2k2970;oormer-raeiuw:16px;paediog::8py">:<p style="luttur-wpagin:.94e};tuxt=trinsoorm:uupewcawe;oolr:+d9gc7<;fnt=sie:92py">yriwatu G}ther memwer{hiu ioviuatyon</p>
-<y1 styme=6fot-wizm:2>px;mawgio:0 0 14py">you7re4initud uo koio { $uenynt=>nyme4}}</h1>
-<p>{{ $tean}->amu }} has invyteu your(existyng<Privaue Gatyer(acoout uo koio aw <strong>{{,$luve}->amu }}</trong>.<?p>:@ig($ynvytauioMewsage)<p styme=6paediog:94py 16px;bodew-luft:3py solie #m9bk78;bagkgoud:+0f8f14">{{ $initqtionMussmge4}}</p>@edig
-<q><q hsef="{ $qccmptUrl0}}6 s}ylu="mis}la}:iolioe-wlok;oacogroun}:#m9bk78;co}or:#1713<c;}exu-ducoatyon:noe;}aduin:16px 18qx;oormer-raeiuw:9=9py;fnt=we}ghu:7<0">Rewiew ioviuatyon</a></}>
-<p styme=6fot-wizm:17px;co}or:#b8b4qd">Fo psivycy, smgn8in8to<the Psivyte4Gauhew agco}nt0that usew tye invyteu e}aim aedrmss. Tye min{ cmnnt ce accmptud cy ano}hew agco}nt></}>
-</dyv>:</ody><?ht}l>:
+<!doctype html>
+<html lang="en"><body style="font-family:Arial,sans-serif;background:#0b0b0f;color:#f2eee7;padding:28px">
+<div style="max-width:620px;margin:auto;background:#15151c;border:1px solid #2b2930;border-radius:16px;padding:28px">
+<p style="letter-spacing:.14em;text-transform:uppercase;color:#d9bc78;font-size:12px">Private Gather membership invitation</p>
+<h1 style="font-size:26px;margin:0 0 14px">You're invited to join {{ $tenant->name }}</h1>
+<p>{{ $tenant->name }} has invited your existing Private Gather account to join as <strong>{{ $level->name }}</strong>.</p>
+@if($invitationMessage)<p style="padding:14px 16px;border-left:3px solid #d9bc78;background:#0f0f14">{{ $invitationMessage }}</p>@endif
+<p><a href="{{ $acceptUrl }}" style="display:inline-block;background:#d9bc78;color:#17130c;text-decoration:none;padding:12px 18px;border-radius:999px;font-weight:700">Review invitation</a></p>
+<p style="font-size:13px;color:#b8b4ad">For privacy, sign in to the Private Gather account that uses the invited email address. The link cannot be accepted by another account.</p>
+</div>
+</body></html>

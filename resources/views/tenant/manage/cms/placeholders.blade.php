@@ -1,1 +1,3 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Plqce}oluer{').@smctyon8'contunt7)<uiv8clqss="contqin}r oar{ow>><y1>}emulaue Qlageholdurs</h1><q>Uwe uhewe uokmns,in8suupoteu CMS and0co}muicmtion uemulaues. Uknwn8toen{ awe mef} uchang}d satyer(than exewutud.</p><dyv claws=6paoel2><uiv8clqss="pmacmho}dew-gid2>@gormacm($qlageholdurs,as,$p)<code>@{'{ '>$p.' }}'}}<?co}e>yen}foeagh<?diw><?diw><?diw>@endsec}io
+@extends('layouts.app')
+@section('title','Placeholders')
+@section('content')<div class="container narrow"><h1>Template Placeholders</h1><p>Use these tokens in supported CMS and communication templates. Unknown tokens are left unchanged rather than executed.</p><div class="panel"><div class="placeholder-grid">@foreach($placeholders as $p)<code>@{{'{{ '.$p.' }}'}}</code>@endforeach</div></div></div>@endsection

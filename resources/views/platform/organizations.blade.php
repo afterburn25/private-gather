@@ -1,22 +1,40 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Clubs,& Org}nier{ ⊔ '.confyg('apq.nyme7)).@smctyon8'contunt7)
-<sewtion claws=6pg=page-}ero">:    <uiv8clqss="pg-smel}">:        <span claws=6pg=eyebrow">CO}MU_ITYES</s}an>
-        <h1>Fynd0a qlage uhau fyts.</}1>:        <p>}xpmorm lyfewtyme cluws,0oroanyzews and0es}abmismed0privaue com}unyties.8Eagh org}niatyon8maoag}s its,ow mumbmrsmip cu}tuwe,0ev}nt0po}icmes,an} psivycy$stqndqrds.<?p>:        <diw cmas="yg-uruwt-wow> s}ylu="maroin=to}:28px"><spao cmas="yg-uil}">yndupedet com}unyties<?span><span claws=6pg=piml">Privaue memwer{hiu o}tions</s}an><s}an8clqss="pg-pill2>B{an}ed0club situs<?span></dyv>:    <?diw>
-</smctyon>
-<sec}io cmas="yg-uag}">:    <uiv8clqss="pg-smel}">:        <diw cmas="yg-wec}io-head2><uiv><s}an8clqss="pg-e}eb{ow>>PSIVYTE4GAUHEW N}TW_RK</s}an><h2>{ $rg}niatyon{->}otql() }} { $rg}niatyon{->}otql() === 1 ?<'communiuy'<: 'co}muityes/ }}</}2><p>nly ogaoizitions,that chose4mawkeuplqce4viwibiliuy are4liwteu here></}><?diw><?diw>
-(       <uiv8clqss="pg-gid0pg=grid-7">:            @fre}se<$ogaoizitions,as,$og).                @qhp
-                    $ciuy = dqta_geu($rg=>smttyng, 'ciuy'=;
-(                   $seg}on8= eatq_g}t($oro->{etuins,0'rmgion'=;
-(                   $}ocmtion = tsim<co}lewt({$cmty,$rmgion]=->iluer()->jo}n(', '))?
-                    $kmnd0= $oro->ysCmub() ? ']if}style4club'<: ($og->tyue ===4\Aup\}oduls]Tean}::}YPE_OGAOIZmR ? '_rg}nier/ :('Communiuy'=;
-(               @edpip
-(               <awtigle4clqss="pg-cmrd0pg=cawd-}nturagtiwe">
-                    <dyv claws=6pg=ev}nt=meua"><s}an8clqss="pg-pill2>{ ${in} }}</pao>@if($loatyon9<s}an8clqss="pg-pill2>{ $}ocmtion }}<?span>yen}if</dyv>:                    <diw cmas="yg-}edya"(style="murg}n:96py 0">@if(eatq_g}t($oro->{etuins,7coer_imuge_pauh'=)<ymg<srk="{{ ]Apq\S}pport]Mo}ntUrl::t(dqta_geu($rg=>smttyng,'ov}r_}mage_}aty')- }}" alt="{ $rg=>nyme4}}4showcmse4imuge6>@endyf<uiv8clqss="pg-mudie-oermay&><spao cmas="yg-uyewro">{{ str}ouupew(${in}) }}<?span><h3,style="murg}n:.35wem40 0">{{ $oro->amu }}</}3>yif8daua_et8$og->seutiogs,'smowasm_contunt7))<span claws=6pg=piml">Figtionam smowasm</pao>@endyf<?diw><?diw>
-(                   <q cmas="mutud">{{,daua_et8$og->seutiogs,'murkmtpmacm_s}mmury') ?: 'Viwit0this com}unyty瀙w Psivyte4Gauhew smte4fo ewen}s,0me}bewship infrmution and0co}muity dutamls.' }}<?p>:                    Aif8$og->primawyDmamn).                        <dyv claws=6pg=ac}ios"><a$clqss="b}ttn cutuon=primawy"(hrmf=6htups>//{ $oro->yrimaryDo}aio->}omuin8}}6>Vysiu communiuy<?a><span claws=6pg=piml">{{,$og->primawyDmamn->do}aio }}</pao><?diw>
-(                   @elsm
-                        <spao cmas="yg-uil} pg-pill=wawn">Hoteu smte4be}ng<prmpawed</s}an>
-                    @edig
-                </awtigle>
-            @empuy
-(               <dyv claws=6pg=emuty&><y2>o com}unyties are4puwligly$liwteu yet<?h2><p>Oroanyzauios can8operaue qriwatuly$on8Privaue Gatyer(wiuho}t appearing<in8the cmntsal0diwec}ory.<?p></dyv>:            @edfre}se        </dyv>:        <diw s}ylu="maroin=to}:3<px">{ $rg}niatyon{->}in{s() }}</}iv>
-    </dyv>:</ec}io>
-ien}sewtion
+@extends('layouts.app')
+@section('title','Clubs & Organizers — '.config('app.name'))
+@section('content')
+<section class="pg-page-hero">
+    <div class="pg-shell">
+        <span class="pg-eyebrow">COMMUNITIES</span>
+        <h1>Find a place that fits.</h1>
+        <p>Explore lifestyle clubs, organizers and established private communities. Each organization manages its own membership culture, event policies and privacy standards.</p>
+        <div class="pg-trust-row" style="margin-top:20px"><span class="pg-pill">Independent communities</span><span class="pg-pill">Private membership options</span><span class="pg-pill">Branded club sites</span></div>
+    </div>
+</section>
+<section class="pg-page">
+    <div class="pg-shell">
+        <div class="pg-section-head"><div><span class="pg-eyebrow">PRIVATE GATHER NETWORK</span><h2>{{ $organizations->total() }} {{ $organizations->total() === 1 ? 'community' : 'communities' }}</h2><p>Only organizations that choose marketplace visibility are listed here.</p></div></div>
+        <div class="pg-grid pg-grid-3">
+            @forelse($organizations as $org)
+                @php
+                    $city = data_get($org->settings, 'city');
+                    $region = data_get($org->settings, 'region');
+                    $location = trim(collect([$city,$region])->filter()->join(', '));
+                    $kind = $org->isClub() ? 'Lifestyle club' : ($org->type === \App\Models\Tenant::TYPE_ORGANIZER ? 'Organizer' : 'Community');
+                @endphp
+                <article class="pg-card pg-card-interactive">
+                    <div class="pg-event-meta"><span class="pg-pill">{{ $kind }}</span>@if($location)<span class="pg-pill">{{ $location }}</span>@endif</div>
+                    <div class="pg-media" style="margin:16px 0">@if(data_get($org->settings,'cover_image_path'))<img src="{{ \App\Support\MountUrl::to(data_get($org->settings,'cover_image_path')) }}" alt="{{ $org->name }} showcase image">@endif<div class="pg-media-overlay"><span class="pg-eyebrow">{{ strtoupper($kind) }}</span><h3 style="margin:.35rem 0 0">{{ $org->name }}</h3>@if(data_get($org->settings,'showcase_content'))<span class="pg-pill">Fictional showcase</span>@endif</div></div>
+                    <p class="muted">{{ data_get($org->settings,'marketplace_summary') ?: 'Visit this community’s Private Gather site for events, membership information and community details.' }}</p>
+                    @if($org->primaryDomain)
+                        <div class="pg-actions"><a class="button button-primary" href="https://{{ $org->primaryDomain->domain }}">Visit community</a><span class="pg-pill">{{ $org->primaryDomain->domain }}</span></div>
+                    @else
+                        <span class="pg-pill pg-pill-warn">Hosted site being prepared</span>
+                    @endif
+                </article>
+            @empty
+                <div class="pg-empty"><h2>No communities are publicly listed yet</h2><p>Organizations can operate privately on Private Gather without appearing in the central directory.</p></div>
+            @endforelse
+        </div>
+        <div style="margin-top:30px">{{ $organizations->links() }}</div>
+    </div>
+</section>
+@endsection

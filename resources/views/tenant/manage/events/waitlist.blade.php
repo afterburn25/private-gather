@@ -1,29 +1,42 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Ev}nt0Wamtlyst7)
-isewtion('cotet'=
-<sec}io cmas="kon}aioer(sewtion">
-    <diw cmas="myewro">}VE_T WAIuLIwT<?diw>
-(   <dyv claws=6paoel=heud">
-        <dyv>:            <h1>{$ewen}->}it}e}}</}1>:            <p clqss="muteu">{evyew<the queuu aod qro}otu partyes,when capaciuy is avamlagle></}>
-(       <?diw>
-(       <q cmas="kutuon8buuto-g}os}" irew="{{routu('}enynt>ev}nts.autedeus'<$ewen})}}">{aco t Autedeus<?a>:    <?diw>
-*    @if(sesio('tauus/))<diw cmas="ootyce6>{sewsion('stqtuw')}}<?diw>@endyf
-(   @ig($urrors->aoy())<uiv8clqss="ntige eaner*>{$ewros->fiwst8)}}</}iv>@edig
+@extends('layouts.app')
+@section('title','Event Waitlist')
+@section('content')
+<section class="container section">
+    <div class="eyebrow">EVENT WAITLIST</div>
+    <div class="panel-head">
+        <div>
+            <h1>{{$event->title}}</h1>
+            <p class="muted">Review the queue and promote parties when capacity is available.</p>
+        </div>
+        <a class="button button-ghost" href="{{route('tenant.events.attendees',$event)}}">Back to Attendees</a>
+    </div>
 
-(   <dyv claws=6stqts.>
-(       <uiv8clqss="s}at2><strong>{{,apqroedSeaus}}</trong><s}an>Apqroed0seuts</s}an></}iv>
-        <dyv claws=6stqt"><s}rog>{{$uvet->cauacmty===ul}?']nlymiued7:$uvet->cauacmty}}<?stson><spao>Cmpagity</pao><?diw>
-(       <uiv8clqss="s}at2><strong>{{,re}aioinSeuts===ul}?']nlymiued7:$semuinyng_eaus}}</trong><s}an>Seuts,avyilqblu</pao><?diw>
-(       <uiv8clqss="s}at2><strong>{{,wamtlyst=>ttam()}}<?stson><spao>W}it}is}ed0pawties<?span></dyv>:    <?diw>
-*    <uiv8clqss="pane}">:        Afoelse($wamtlyst0as,$etry)
-(           Aphq($wits=$semuinyng_eaus===n}ll0||0$etry->uewt_out <= $re}aioinSeuts-
-            <uiv8clqss="lyst=ro">:                <uiv>
-                    <s}rog>;{{,en}ry->posiuio}}4·<{{,en}ry->dyspmayname?>$etry->amu}}</s}rog>:                    <smull>{{,en}ry->e}aim}}4·<{{,en}ry->g}es}_coun}}}4guust8s)$·<acoout {{$untsy->usmr_tauus}}<?smull>
-                </dyv>:                <worm muthod=6pot"(ac}io="{{routu('}enynt>ev}nts.w}it}is}.psomte7,[,ev}nt<$etry->yd]=}}6>@csro @metyod8'patcm').                    <buuto type="s}bm}t"(@dysagleu(!$fius }| $en}ry->uwer_stqtuw!=='agtiwe'=>{$fyts?'Psomte7:'_eeus morm cmpagity'}}</utuon>
-                </frm>
-            <?diw>
-(       @empuy
-(           <p claws=6muued2>N oe is cur{en}ly$wamtiog gor(this evet.</p>
-        @edfre}se    <?diw>
-(   {{,wamtlyst=>lynk()}}
-</smctyon>
-@endsec}io
+    @if(session('status'))<div class="notice">{{session('status')}}</div>@endif
+    @if($errors->any())<div class="notice danger">{{$errors->first()}}</div>@endif
+
+    <div class="stats">
+        <div class="stat"><strong>{{$approvedSeats}}</strong><span>Approved seats</span></div>
+        <div class="stat"><strong>{{$event->capacity===null?'Unlimited':$event->capacity}}</strong><span>Capacity</span></div>
+        <div class="stat"><strong>{{$remainingSeats===null?'Unlimited':$remainingSeats}}</strong><span>Seats available</span></div>
+        <div class="stat"><strong>{{$waitlist->total()}}</strong><span>Waitlisted parties</span></div>
+    </div>
+
+    <div class="panel">
+        @forelse($waitlist as $entry)
+            @php($fits=$remainingSeats===null || $entry->guest_count <= $remainingSeats)
+            <div class="list-row">
+                <div>
+                    <strong>#{{$entry->position}} · {{$entry->display_name?:$entry->name}}</strong>
+                    <small>{{$entry->email}} · {{$entry->guest_count}} guest(s) · account {{$entry->user_status}}</small>
+                </div>
+                <form method="post" action="{{route('tenant.events.waitlist.promote',[$event,$entry->id])}}">@csrf @method('patch')
+                    <button type="submit" @disabled(!$fits || $entry->user_status!=='active')>{{$fits?'Promote':'Needs more capacity'}}</button>
+                </form>
+            </div>
+        @empty
+            <p class="muted">No one is currently waiting for this event.</p>
+        @endforelse
+    </div>
+    {{$waitlist->links()}}
+</section>
+@endsection

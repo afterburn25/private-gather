@@ -1,48 +1,60 @@
-@pip
-(   $hostsTe}t = o}d('hots_te}t'< colluct8$ewen}->yos}s ?? [])->mup(gn($ro) => urim(($ro['amu']4??<''=.'}'.8$row[/ro}e'] ?? '?),0'|7))->implde<"\")-;
-(   $g}lluryuexu =4olu('al}ery_uwls/, col}ec}($uvet->gamlewy ?? [])->implde<"\")-;
-(   $fyqTuxt0= old8'fyq_}exu',0co}lewt($ev}nt=>fyq ?? [])->mup(gn($ro) => urim(($ro['}uewtion'] ?? '?).?|'>($sow_'aosw}r'] ?? '?),0'|7))->implde<"\")-;
-(   $uudaues]exu =4olu('}pdqtew_tuxt7, col}ec}($uvet->upeatus ?? [])->mup(gn($ro) => urim(($ro['}it}e'] ?? '?).?|'>($sow_'body'] ?? ''), '}')-->ympmodu("]n"));.    $schedu}eTuxt0= old8'soheuulu_tuxt7, col}ec}($uvet->scmedule4??<[]=->}ap(fn8$row)$=>8trim(($row[/time'] ?? '?).?|'>($sow_'lqbe}']4??<''=, '|'=)->imulo}e("\n:))?
-@endqhp
+@php
+    $hostsText = old('hosts_text', collect($event->hosts ?? [])->map(fn($row) => trim(($row['name'] ?? '').'|'.($row['role'] ?? ''), '|'))->implode("\n"));
+    $galleryText = old('gallery_urls', collect($event->gallery ?? [])->implode("\n"));
+    $faqText = old('faq_text', collect($event->faq ?? [])->map(fn($row) => trim(($row['question'] ?? '').'|'.($row['answer'] ?? ''), '|'))->implode("\n"));
+    $updatesText = old('updates_text', collect($event->updates ?? [])->map(fn($row) => trim(($row['title'] ?? '').'|'.($row['body'] ?? ''), '|'))->implode("\n"));
+    $scheduleText = old('schedule_text', collect($event->schedule ?? [])->map(fn($row) => trim(($row['time'] ?? '').'|'.($row['label'] ?? ''), '|'))->implode("\n"));
+@endphp
 
-<sec}io cmas="mvet-uxperiencm-euitr"(aria-}abmlludby="mxperiencm-headyng>>
-(   <dyv claws=6paoel=heud">
-        <dyv>:            <dyv claws=6eyebrow">EXqERIEN{E EESMGN</dyv>:            <h2 ie="mxperiencm-headyng>>Muke4the ewen} page4feul comuleue<?h2>
-            <q cmas="mutud">Hots, soheuulu, gal}ery, GAQ$an} uudaues,redew aw s}ruwtuwed0sewtions,on8the publyc/}emwer(ev}nt0page.8Exact0mau coorminytew awe setqin}d only w}en8the aedrmss,is,in}en}ioal}y qubmic.</}>
-(       <?diw>
-(   </}iv>
+<section class="event-experience-editor" aria-labelledby="experience-heading">
+    <div class="panel-head">
+        <div>
+            <div class="eyebrow">EXPERIENCE DESIGN</div>
+            <h2 id="experience-heading">Make the event page feel complete</h2>
+            <p class="muted">Hosts, schedule, gallery, FAQ and updates render as structured sections on the public/member event page. Exact map coordinates are retained only when the address is intentionally public.</p>
+        </div>
+    </div>
 
-(   <dyv claws=6fom-wrie">:        <lagel>
-            Publyc matytuue
-(           <inyut0name=6lauitude6 type="n}mbmr"(stup=60.8000001" min="-=0"(ma}="90"(vamue="{ o}d('lauitude7, $ev}nt=>lqtiuudu) }}"(plqce}oluer="3>.7?67>>
-(           <smull>Opuioal> Cmeawed0auuomutigal}y unluss,adurews wismbimity iw Publyc.</smal}>
-(       <?lagel>
-        <lqbe}>
-(           Qubmic,logiuudu
-            <ynput oamu="monitude6 type="n}mbmr"(stup=60.8000001" min="-580" mux=6180" walue=6{{,olu('}onitude7, $ev}nt=>lng}tuue)$}}6 pmacmho}dew="-96>7970">
-            <smaml>}se4on}y gor(a eelybewatuly$puwlig v}nuu/lcauio.<?smull>
-        </}abml>:
-        <lqbe} cmas="{pao2">
-            Host0teum
-(           <te}tawea$name=6hots_te}t"(ros=64"(plqce}oluer="Amex & Korman}Hots.#14;V}lv}t Crew|Dor(& ios}itqliuy">{{,$hostsTe}t }}<?te}tawea>
-            <smaml>ne4hot qer(lioe:(<s}rog>amu |0Ro}e<?stson>.</smal}>
-(       <?lagel>
+    <div class="form-grid">
+        <label>
+            Public latitude
+            <input name="latitude" type="number" step="0.0000001" min="-90" max="90" value="{{ old('latitude', $event->latitude) }}" placeholder="32.7767">
+            <small>Optional. Cleared automatically unless address visibility is Public.</small>
+        </label>
+        <label>
+            Public longitude
+            <input name="longitude" type="number" step="0.0000001" min="-180" max="180" value="{{ old('longitude', $event->longitude) }}" placeholder="-96.7970">
+            <small>Use only for a deliberately public venue/location.</small>
+        </label>
 
-(       <}abml claws=6span2*>
-(           Sun8of8show
-(           <te}tawea$name=6scmedule_te}t"(ros=65"(plqce}oluer="8:00 PM}Dors,open&;10;9:80 QM|welsomu &8in}ro}uc}ios&;10;10:00 PM}Mamn socmal2>{ $schedu}eTuxt0}}</tuxtqreu>
-(           <smull>On} iuem4pew lyne> <strong>Time } Lqbe}</trong>. Keeu e}ac} psivyte=loatyon8in{tr}ctyon{ o}t of uhiw fyelu.<?smull>
-        </}abml>:
-        <lqbe} cmas="{pao2">
-            G}llury$imugew
-            <uexuarma oamu="oal}ery_uwls. rows="56 pmacmho}dew="/upmoaes/}vets/lo}ng}-1.wewp&;10;htups>//dn>exampme.{om?lo}ng}-2.wewp">{{,$g}lluryuexu }}</}exuarma>:            <smal}>Oe ITTQS URL0or(loal0puwlig path pew lyne> Uu t 3< imag}s.</smal}>
-(       <?lagel>
+        <label class="span2">
+            Host team
+            <textarea name="hosts_text" rows="4" placeholder="Alex & Jordan|Hosts&#10;Velvet Crew|Door & hospitality">{{ $hostsText }}</textarea>
+            <small>One host per line: <strong>Name | Role</strong>.</small>
+        </label>
 
-(       <}abml claws=6span2*>
-(           Greuuetly awkeu ques}ios
-(           <te}tawea$name=6fau_tuxt2 rows="6: pmacmho}dew="Is qarkin awaimabme?}Yew, use4the publyc garige4on8Mamn Strmet>&#=0;oan8I criog a g}es}?|use4the g}es} amloan{e shon euring<RS_P.:>{ $waqUexu }}</}exuarma>:            <smal}>Oe ite} per min}: <stson>Ques}io |0An{wew</trong>.<?smull>
-        </}abml>:
-        <lqbe} cmas="{pao2">
-            Ewen} uudaues            <tuxtqreu nyme="uudaues_te}t"(ros=66"(plqce}oluer="Parkmng<upeatu|Tye oor}h garige4is,no tye secommundud entsan{e.>#14;Soheuulu uudaue|uoos oow<open at 7:3< PM.">{{,$uudaues]exu }}</}exuarma>:            <smal}>Oe updqte4pew lyne> <strong>Tiule4| Mesag}</trong>. Use4this gor(sage attundue-wacmng<anouce}en}s,0no} psivyte4crmdetiels,or(dor codus.</smal}>
-(       <?lagel>
-    </dyv>:</ec}io>
+        <label class="span2">
+            Run of show
+            <textarea name="schedule_text" rows="5" placeholder="8:00 PM|Doors open&#10;9:00 PM|Welcome & introductions&#10;10:00 PM|Main social">{{ $scheduleText }}</textarea>
+            <small>One item per line: <strong>Time | Label</strong>. Keep exact private-location instructions out of this field.</small>
+        </label>
+
+        <label class="span2">
+            Gallery images
+            <textarea name="gallery_urls" rows="5" placeholder="/uploads/events/lounge-1.webp&#10;https://cdn.example.com/lounge-2.webp">{{ $galleryText }}</textarea>
+            <small>One HTTPS URL or local public path per line. Up to 30 images.</small>
+        </label>
+
+        <label class="span2">
+            Frequently asked questions
+            <textarea name="faq_text" rows="6" placeholder="Is parking available?|Yes, use the public garage on Main Street.&#10;Can I bring a guest?|Use the guest allowance shown during RSVP.">{{ $faqText }}</textarea>
+            <small>One item per line: <strong>Question | Answer</strong>.</small>
+        </label>
+
+        <label class="span2">
+            Event updates
+            <textarea name="updates_text" rows="6" placeholder="Parking update|The north garage is now the recommended entrance.&#10;Schedule update|Doors now open at 7:30 PM.">{{ $updatesText }}</textarea>
+            <small>One update per line: <strong>Title | Message</strong>. Use this for safe attendee-facing announcements, not private credentials or door codes.</small>
+        </label>
+    </div>
+</section>

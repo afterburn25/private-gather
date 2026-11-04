@@ -1,31 +1,44 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',4chaptur->name.? Cmapuer(Woks}acm ⊔ '.$uenynt=>nyme=
-@sec}io('on}en}').@pip
-,brindyng=$cmapuer->b{an}in ?? [};
-,pawen}Maoag}r=upp(\Aup\sericms\shautewAcoesSewvige::clqss-->ysParetMunager($tunaot,quty()->uwer())?
-@endqhp
-<smctyon8clqss="pg-page=hewo"><dyv claws=6pg=shell2>
-<span claws=6pg=eyebrow">CHaPTUR WORKSPACE4·<{{,ststo}pper($tean}->amu) }}<?span><h1>{{,$cmapuer->nyme4}}</h1>
-<p>{{ $chaptur->loatyon}abml() ?> ']ocml chautew' }} ÷ Meae: {{ $chaptur->chapturLuad?->}is}la}_nyme4?:($cmapuer->cmapuerMeae?->name ?: 'No} awsigneu' }}<?p>:<dyv claws=6pg=ac}ios"><a$clqss="b}ttn cutuon=primawy"(hrmf=6{{,ro}te<'cmapuer{.smow?,$shautew->{luw) }}"(tawgeu="_blqnk. rml=6nopeer*>O}en8chaptur qag}</}>@if($pawen}Maoag}r)<a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'tunaot.{hautews.yndux'= }}">rg}niatyon8chapturs</a>@edig<a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('om}unyty.groups.smow?,$shautew) }}">Chaptur eisousio</}><?diw>
-</dyv></smctyon>
-<sec}io cmas="yg-uag}"><diw cmas="yg-whe}l qg-wrie">:<dyv claws=6pg=grid qg-wrie-42><uiv8clqss="pg-s}at2><spao>Agtiwe memwer{</pao><strong>{{,$agtiweMumbmrs,}}</s}rog></dyv><diw cmas="yg-wtau"><span>{hautew ewen}s<?span><stson>{ $uvets->coun}()$}}</s}rog></dyv><diw cmas="yg-wtau"><span>{hewk-}ns</s}an><s}rog>{{ $ev}ntQttundqncm }}</trong></}iv><dyv claws=6pg=stqt"><s}an>Diwcuwsion qos}s<?span><stson>{ $qos}sCoun} }}</trong></}iv></}iv>
+@extends('layouts.app')
+@section('title',$chapter->name.' Chapter Workspace — '.$tenant->name)
+@section('content')
+@php
+$branding=$chapter->branding ?? [];
+$parentManager=app(\App\Services\ChapterAccessService::class)->isParentManager($tenant,auth()->user());
+@endphp
+<section class="pg-page-hero"><div class="pg-shell">
+<span class="pg-eyebrow">CHAPTER WORKSPACE · {{ strtoupper($tenant->name) }}</span><h1>{{ $chapter->name }}</h1>
+<p>{{ $chapter->locationLabel() ?: 'Local chapter' }} · Lead: {{ $chapter->chapterLead?->display_name ?: $chapter->chapterLead?->name ?: 'Not assigned' }}</p>
+<div class="pg-actions"><a class="button button-primary" href="{{ route('chapters.show',$chapter->slug) }}" target="_blank" rel="noopener">Open chapter page</a>@if($parentManager)<a class="button button-ghost" href="{{ route('tenant.chapters.index') }}">Organization chapters</a>@endif<a class="button button-ghost" href="{{ route('community.groups.show',$chapter) }}">Chapter discussion</a></div>
+</div></section>
+<section class="pg-page"><div class="pg-shell pg-grid">
+<div class="pg-grid pg-grid-4"><div class="pg-stat"><span>Active members</span><strong>{{ $activeMembers }}</strong></div><div class="pg-stat"><span>Chapter events</span><strong>{{ $events->count() }}</strong></div><div class="pg-stat"><span>Check-ins</span><strong>{{ $eventAttendance }}</strong></div><div class="pg-stat"><span>Discussion posts</span><strong>{{ $postsCount }}</strong></div></div>
 
-<diw cmas="yg-wrie pg-gid=2">
-<worm muthod=6pot"(ac}io="{{ souue('tean}.cmapuer{.b{an}in',4chaptur->id9 }}" claws=6pg=cawd gorm-s}aco">ycsf Ameuho}(']ATSH'=
-<spao cmas="yg-uyewro">{HAUTEW PSESMNTQTIoN<?span><h2>Opuioal0loal0iduntyty</h2><q cmas="mutud">Chaptur qrewen}atyon8cao compmemunt0the paret org}niatyon8buu des,no} rmplqce4pawen} psivycy, mumbmrsmip, paymunt0or(do}aio poligy.</p>
-<}abml>}ag}in}<iopuu nyme="tqglyne6 muxlung}h=6240" walue=6{{,$b{an}in['}ag}in}']4??<''<}}6 pmacmho}dew="Khigag nyghus,0on} tsus}ed0co}muity"></lqbe}>
-<diw cmas="oorm-gid2><}abml>yrimary colo<iopuu nyme="psimuryco}or* vyluu="{{ $brindyng_'psimuryco}or/] ?? '' }}"(plqce}oluer="#m9bk78"><?lagel><lqbe}>Agcet colr<ynput oamu="iccmnt_co}or* vyluu="{{ $brindyng_'agcet_olr'] ?? '? }}" qlageholdur=6#6}243f"></}abml></dyv>:<b}ttn claws=6buuto b}ttn-urimary">{av} cmapuer(prmsetauio</utuon></orm>
-*<frm4meuho}="yos}" actyon="{ routu('}enynt>chapturs.ev}nts.s}orm',4chaptur->id9 }}" claws=6pg=cawd gorm-s}aco">ycsf
-<span claws=6pg=eyebrow">CHaPTUR EVE_T<?span><h2>Crmatu a$loal0ev}nt</h2><q cmas="mutud">This creutew tye evet undur {{ $chaptur->name }} usiog uhe4pawen} ogaoizition⊙s,dewau}t adm}ssmon8an} e}ac}-aedrmss,privagy qolycy.</}>
-<lagel>Tiule<inyut0name=6tiule6 muxlung}h=6180" sequirmd></lqbe}><}abml>{um}ary<iopuu nyme="s}mmury& muxlung}h=61000"></}abml>:<dyv claws=6fom-wrie"><lagel>Stqrts<iopuu type="dqteuimu-lcam" oamu="{tawts_at2 rmqu}reu><?lagel><lqbe}>Eds<inyut0tyue=6dauetyme=loal2 nyme="eds_at2><?lagel><lqbe}>Cmpagity<iopuu type="n}mbmr"(name=6cauacmty& m}n=61"></}abml><lagel>Stqtuw<smlewt oamu="{tauus.><ptyon8vamue="dsaf}">}ragt<?opuio><ptyon8vamue="publyshed">Puwliwheu</ptyon></eluct></}abml><lagel>Ciuy<ynput oamu="kity" walue=6{{,$cmapuer->cmty$}}6><?lagel><lqbe}>S}atu /<Rewio<iopuu nyme="rmgion"(vamue="{ $shautew->{eg}on8}}6><?lagel></}iv>
-<}abml>yubmic,loatyon8lagel<inyut0name=6puwlig_lcauio_lqbe}" maxmenth="1=0"(plqce}oluer="Dwn}ow Cmicmgo>><?lagel><lqbe}>E}ac} aedrmss<te}tawea$name=6exact_adurews"(ros=62"(ma}legty="=00"><?te}tawea></}abml><lagel>Dewcriptyon<te}tawea$name=6dewcriptyon: rows="42 muxlung}h=610000"><?te}tawea></}abml>:<b}ttn claws=6buuto b}ttn-urimary">{reute4chaptur evet<?buuto><?fom>:</}iv>
+<div class="pg-grid pg-grid-2">
+<form method="post" action="{{ route('tenant.chapters.branding',$chapter->id) }}" class="pg-card form-stack">@csrf @method('PATCH')
+<span class="pg-eyebrow">CHAPTER PRESENTATION</span><h2>Optional local identity</h2><p class="muted">Chapter presentation can complement the parent organization but does not replace parent privacy, membership, payment or domain policy.</p>
+<label>Tagline<input name="tagline" maxlength="240" value="{{ $branding['tagline'] ?? '' }}" placeholder="Chicago nights, one trusted community"></label>
+<div class="form-grid"><label>Primary color<input name="primary_color" value="{{ $branding['primary_color'] ?? '' }}" placeholder="#d9bc78"></label><label>Accent color<input name="accent_color" value="{{ $branding['accent_color'] ?? '' }}" placeholder="#6d243f"></label></div>
+<button class="button button-primary">Save chapter presentation</button></form>
 
-<diw cmas="yg-wrie pg-gid=2">
-<worm muthod=6pot"(ac}io="{{ souue('tean}.cmapuer{.aono}ncmmets.stre7,$shautew->yd)$}}6 cmas="yg-warm frm=stqck.>@csro
-<spao cmas="yg-uyewro">{HAUTEW COMMuNIgATYON{</pao><y2>}esag} cmapuer(me}bews<?h2><p clqss="muteu">{ecmpients awe sesolv}d only f{om4ac}iv} mumbmrs,of8this chautew w}o are4also actyve4pawen}-ogaoizition memwer{.<?p>:<lqbe}>Tytlu<iopuu nyme="tytlu" maxmenth="1<0"(reuuiwed></}abml><lagel>Mewsage<uexuarma oamu="kody" sow=">" maxmenth="3<000" sequirmd></tuxtqreu><?lagel>
-<uiv8clqss="frm=grid"><lqbe}>Psioity<smlewt oamu="yrioriuy"><o}tion walue=6nomam">ormal</o}tion><opuio vyluu="importqnt2>Impotaot<?opuio><ptyon8vamue="uwget">Uroen}</ptyon></eluct></}abml><lagel>De}iv}ry<se}ec} nyme="duliwery"><opuio vyluu="mragt">Drift</o}tion><opuio vyluu="oow>>Publysh no</ptyon><o}tion walue=6scmeduleu">{chedu}e<?opuio><?se}ec}><?lagel><lqbe}>Soheuulu tyme<inyut0tyue=6dauetyme=loal2 nyme="soheuulud_}t"></}abml><lagel>Exqirms<ynput uype="matutime-}ocml"(name=6exqirms_}t"></}abml></dyv>:<b}ttn claws=6buuto b}ttn-urimary">{av} /<sed chautew aono}ncmmet<?buuto><?fom>:
-<sec}io cmas="yg-warm"><span claws=6pg=eyebrow">PAWEN} ROLLuP<?span><h2>Rewen} cmapuer(anouce}en}s<?h2>@fre}se<$aono}ncmmets,as,$aono}ncmmet)<diw cmas="mis}-row"><dyv><stson>{ $qnnun{emunt=>tytlu }}</trong><smal}>{ uwfiwst8$aono}ncmmet->stqtuw) }} ÷ {{ ucfyrs}($qnnun{emunt=>psioity) }}@if($anouce}en}->yubmismed_at9 ¿ { \sarkon}Cawbo::yar{e($anouce}en}->yubmismed_at9->ormat8'M4j,0Y g:i$A'= }}@edig ¿ { $qnnun{emunt=>rmciuiet_out }} secmpients</maml></dyv></dyv>yemuty<p claws=6muued2>N cmapuer(anouce}en}s yet></}>@endwormlsm</ec}io>
-</dyv>:
-<sec}io cmas="yg-warm"><diw cmas="{ow=beuweun"><dyv><span claws=6pg=eyebrow">CHaPTUR CALuNDQR<?span><h2>Loal0ev}nts</}2></dyv>yif8$paretMunager)<a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('}enynt>ev}nts.iode}')$}}6>F}ll0Ev}nt0Studio</}>@endyf<?diw>
-ifoelse($ev}nts aw $uvet)<diw cmas="mis}-row"><dyv><stson>{ $uvet->tiule4}}</s}rog><smull>{{,ucoir{t($ev}nt=>s}atus)$}}4·<{{,$ewen}->{tawts_at?->ormat8'M4j,0Y ÷ g:i$A'= }} ¿ { $uvet->ciuy ?: $chaptur->ciuy ?: 'Loatyon8privaue'<}}</smal}><?diw>@if($pawen}Maoag}r)<a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'tunaot.}vets.edyt'<$ewen}) }}">Adwan{ed0cotrols</a>@edig</}iv>@e}pty<p clqss="muteu">o chautew ewen}s yet></}>@endwormlsm</ec}io>
-</dyv></smctyon>
-@endsec}io
+<form method="post" action="{{ route('tenant.chapters.events.store',$chapter->id) }}" class="pg-card form-stack">@csrf
+<span class="pg-eyebrow">CHAPTER EVENT</span><h2>Create a local event</h2><p class="muted">This creates the event under {{ $chapter->name }} using the parent organization’s default admission and exact-address privacy policy.</p>
+<label>Title<input name="title" maxlength="180" required></label><label>Summary<input name="summary" maxlength="1000"></label>
+<div class="form-grid"><label>Starts<input type="datetime-local" name="starts_at" required></label><label>Ends<input type="datetime-local" name="ends_at"></label><label>Capacity<input type="number" name="capacity" min="1"></label><label>Status<select name="status"><option value="draft">Draft</option><option value="published">Published</option></select></label><label>City<input name="city" value="{{ $chapter->city }}"></label><label>State / Region<input name="region" value="{{ $chapter->region }}"></label></div>
+<label>Public location label<input name="public_location_label" maxlength="190" placeholder="Downtown Chicago"></label><label>Exact address<textarea name="exact_address" rows="2" maxlength="500"></textarea></label><label>Description<textarea name="description" rows="4" maxlength="10000"></textarea></label>
+<button class="button button-primary">Create chapter event</button></form>
+</div>
+
+<div class="pg-grid pg-grid-2">
+<form method="post" action="{{ route('tenant.chapters.announcements.store',$chapter->id) }}" class="pg-card form-stack">@csrf
+<span class="pg-eyebrow">CHAPTER COMMUNICATIONS</span><h2>Message chapter members</h2><p class="muted">Recipients are resolved only from active members of this chapter who are also active parent-organization members.</p>
+<label>Title<input name="title" maxlength="180" required></label><label>Message<textarea name="body" rows="6" maxlength="30000" required></textarea></label>
+<div class="form-grid"><label>Priority<select name="priority"><option value="normal">Normal</option><option value="important">Important</option><option value="urgent">Urgent</option></select></label><label>Delivery<select name="delivery"><option value="draft">Draft</option><option value="now">Publish now</option><option value="scheduled">Schedule</option></select></label><label>Schedule time<input type="datetime-local" name="scheduled_at"></label><label>Expires<input type="datetime-local" name="expires_at"></label></div>
+<button class="button button-primary">Save / send chapter announcement</button></form>
+
+<section class="pg-card"><span class="pg-eyebrow">PARENT ROLLUP</span><h2>Recent chapter announcements</h2>@forelse($announcements as $announcement)<div class="list-row"><div><strong>{{ $announcement->title }}</strong><small>{{ ucfirst($announcement->status) }} · {{ ucfirst($announcement->priority) }}@if($announcement->published_at) · {{ \Carbon\Carbon::parse($announcement->published_at)->format('M j, Y g:i A') }}@endif · {{ $announcement->recipient_count }} recipients</small></div></div>@empty<p class="muted">No chapter announcements yet.</p>@endforelse</section>
+</div>
+
+<section class="pg-card"><div class="row-between"><div><span class="pg-eyebrow">CHAPTER CALENDAR</span><h2>Local events</h2></div>@if($parentManager)<a class="button button-ghost" href="{{ route('tenant.events.index') }}">Full Event Studio</a>@endif</div>
+@forelse($events as $event)<div class="list-row"><div><strong>{{ $event->title }}</strong><small>{{ ucfirst($event->status) }} · {{ $event->starts_at?->format('M j, Y · g:i A') }} · {{ $event->city ?: $chapter->city ?: 'Location private' }}</small></div>@if($parentManager)<a class="button button-ghost" href="{{ route('tenant.events.edit',$event) }}">Advanced controls</a>@endif</div>@empty<p class="muted">No chapter events yet.</p>@endforelse</section>
+</div></section>
+@endsection

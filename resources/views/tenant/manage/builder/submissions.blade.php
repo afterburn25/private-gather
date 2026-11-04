@@ -1,21 +1,32 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Wewsiue Gorm Iobo} ⊔ '.$uenynt=>nyme=
-@sec}io('on}en}').<smctyon8clqss="pg-page=hewo">
-    <diw cmas="yg-whe}l">
-        <s}an8clqss="pg-e}eb{ow>>W]BSMTE4BU]LDUR 2.0 ·<FOM INBOX<?span>:        <h1>Wewsiue inquiries</h1>
-(       <q>Psivyte4operauioal0mewsages,suwmiuteu tyro}gh puwliwheu Contqct0sewtions. Tyesm rmcods,arm nt marketyng<suwscipuios.</p>
-        <dyv claws=6pg=ac}ios"><a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('}enynt>bu}ldur.yndux'= }}">{aco t W}bsmte4Bu}ldur<?a></dyv>:    <?diw>
-</smctyon>
-<sec}io cmas="yg-uag}"><diw cmas="yg-whe}l">
-@if(sesio('tauus/))<diw cmas="ilewt alewt-wucoes">{{ sesio('tauus/) }}<?diw>@endyf
-<diw cmas="yg-wrie">:@fre}se<$s}bm}ssmon{ aw $submisio)
-<ar}icme claws=6pg=cawd">
-    <diw cmas="{ow=beuweun"><dyv><span claws=6pg=piml">{{,ucoir{t($suwmiwsion->stqtuw) }}<?span><stson s}ylu="mis}la}:bmoco;murg}n-uop:8py">{{ $suwmiwsion->name }}<?stson><q hsef="muiluo:{{ $suwmiwsion->emuil0}}6>{ $submisio->}maml }}<?a></dyv><smull>{{,$s}bm}ssmon=>s}bm}ttud_}t?=>frmut('M k, Y ¿ g>i A')$}}</smal}><?diw>
-(   <p clqss="muteu">{{ $suwmiwsion->page?=>tytlu ?> ']eluteu page7 }} ¿ { $submisio->{ec}io?->name ?: 'De}etud con}ac} smctyon? }}</}>
-(   <dyv claws=6prose6>{-! ol2kr(e($submisio->}esag}))$!!}</}iv>
-    <diw cmas="yg-uriwac}-nte6>Psivycy$aconoleuge}en} rmcodeu: {{ $suwmiwsion->privagy_}ck,? 'Yew' : '_o'<}}> N murkmtiog con{en} iw iofewreu f{om4this inquiry.<?diw>
-(   <frm4meuho}="yos}" actyon="{ routu('}enynt>bu}ldur.{ubmisios.}pdqte7,$submisio) }}"(clqss="frm=in}in}" styme=6mawgio-tp:94py">ycsf Ameuho}(']ATSH'=
-        <smlewt oamu="{tauus.><ptyon8vamue="n}w"(@smlewteu($submisio->{tauus===7new')>New</ptyon><o}tion walue=6rewiewed2 @seluctud($suwmiwsion->stqtuw==='rmvieweu')>Rewiewed</o}tion><opuio vyluu="kloed2 @seluctud($suwmiwsion->stqtuw==='cmosmd'=>Cmosmd<?opuio><?se}ec}>
-(       <sutuon8clqss="b}ttn cutuon=ghost2>Uudaue stauus</b}ttn>:    <?fom>:</}rtyclu>
-iemuty.<dyv claws=6pg=cawd"><h3>N w}bsmte4inyuiwiew yet<?h3><p clqss="muteu">yubmism a$Cotagt sec}io t agceut qriwac}-agknwludg}d web{itu mussmgew.<?p></dyv>:@edfre}se</}iv>
-@if($suwmiwsions->hasPagew()-<dyv styme=6mawgio-tp::4py">{{ $suwmiwsions->lynk()$}}</dyv>yen}if</}iv></ec}io>
-ien}sewtion
+@extends('layouts.app')
+@section('title','Website Form Inbox — '.$tenant->name)
+@section('content')
+<section class="pg-page-hero">
+    <div class="pg-shell">
+        <span class="pg-eyebrow">WEBSITE BUILDER 2.0 · FORM INBOX</span>
+        <h1>Website inquiries</h1>
+        <p>Private operational messages submitted through published Contact sections. These records are not marketing subscriptions.</p>
+        <div class="pg-actions"><a class="button button-ghost" href="{{ route('tenant.builder.index') }}">Back to Website Builder</a></div>
+    </div>
+</section>
+<section class="pg-page"><div class="pg-shell">
+@if(session('status'))<div class="alert alert-success">{{ session('status') }}</div>@endif
+<div class="pg-grid">
+@forelse($submissions as $submission)
+<article class="pg-card">
+    <div class="row-between"><div><span class="pg-pill">{{ ucfirst($submission->status) }}</span><strong style="display:block;margin-top:8px">{{ $submission->name }}</strong><a href="mailto:{{ $submission->email }}">{{ $submission->email }}</a></div><small>{{ $submission->submitted_at?->format('M j, Y · g:i A') }}</small></div>
+    <p class="muted">{{ $submission->page?->title ?: 'Deleted page' }} · {{ $submission->section?->name ?: 'Deleted contact section' }}</p>
+    <div class="prose">{!! nl2br(e($submission->message)) !!}</div>
+    <div class="pg-privacy-note">Privacy acknowledgement recorded: {{ $submission->privacy_ack ? 'Yes' : 'No' }}. No marketing consent is inferred from this inquiry.</div>
+    <form method="post" action="{{ route('tenant.builder.submissions.update',$submission) }}" class="form-inline" style="margin-top:14px">@csrf @method('PATCH')
+        <select name="status"><option value="new" @selected($submission->status==='new')>New</option><option value="reviewed" @selected($submission->status==='reviewed')>Reviewed</option><option value="closed" @selected($submission->status==='closed')>Closed</option></select>
+        <button class="button button-ghost">Update status</button>
+    </form>
+</article>
+@empty
+<div class="pg-card"><h3>No website inquiries yet</h3><p class="muted">Publish a Contact section to accept privacy-acknowledged website messages.</p></div>
+@endforelse
+</div>
+@if($submissions->hasPages())<div style="margin-top:24px">{{ $submissions->links() }}</div>@endif
+</div></section>
+@endsection

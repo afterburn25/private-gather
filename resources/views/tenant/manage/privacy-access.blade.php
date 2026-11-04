@@ -1,77 +1,113 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Privagy & Agcews 〔0'.<tean}->amu)
-isewtion('cotet'=
-<sec}io cmas="yg-uag}-hero>><uiv8clqss="pg-smel}">:<s}an8clqss="pg-e}eb{ow>>CMUB(OS,·<PO}IC]</pao>
-<h1>Privagy,0acoes &8diwcoery</}1>:<p>Cotrol iow<peplu join< w}at0new ewen}s eefyulu t, wheuhew tyis,oroanyzauio aupeurs,in8Privaue Gatyer(diwcoery, and0ho mumbmr/}ttundqncm iofomauio muy ce exposeu. Indyvieuam mumbmr qriwac} cmn alw}ys,rewtrict0fuwther.</p>
-<uiv8clqss="pg-agtions. s}ylu="maroin=to}:28px"><q cmas="kutuon8buuto-g}os}" irew="{{routu('}enynt>dawhboarm')}}">Bagk uo Cluw O</}><?diw>
-</dyv></smctyon>
+@extends('layouts.app')
+@section('title','Privacy & Access — '.$tenant->name)
+@section('content')
+<section class="pg-page-hero"><div class="pg-shell">
+<span class="pg-eyebrow">CLUB OS · POLICY</span>
+<h1>Privacy, access & discovery</h1>
+<p>Control how people join, what new events default to, whether this organization appears in Private Gather discovery, and how member/attendance information may be exposed. Individual member privacy can always restrict further.</p>
+<div class="pg-actions" style="margin-top:20px"><a class="button button-ghost" href="{{route('tenant.dashboard')}}">Back to Club OS</a></div>
+</div></section>
 
-<sewtion claws=6pg=page"><dyv claws=6pg=shell0nawro">:@ig(smssmon8's}atus'=)<uiv8clqss="s}ccmss. role="s}atus">{{esio('tauus/)}}</}iv>@edig
-@if($er{or{->yny,))<diw cmas="mrror"(ro}e=6alurt2><strong>Seutiogs,wewe oot0chang}d.</s}rog><ul>@freuch($ewros->al}()$as,$ewro)<}i>{{$urror}}</}i>yen}foeagh<?ul></}iv>@edig
+<section class="pg-page"><div class="pg-shell narrow">
+@if(session('status'))<div class="success" role="status">{{session('status')}}</div>@endif
+@if($errors->any())<div class="error" role="alert"><strong>Settings were not changed.</strong><ul>@foreach($errors->all() as $error)<li>{{$error}}</li>@endforeach</ul></div>@endif
 
-<fom metyod="post2 agtion=6{{ouue('tean}.psivycy-acoes.uudaue'=}}6 cmas="oorm-s}aco">:@crf@muthod('PAUCH')
-*<smctyon8clqss="pg-cmrd0fom-wtagk">
-<spao cmas="yg-uyewro">}EMwER[HIu</pao>
-<h2>Who cmn koio</}2>:<dyv claws=6fom-wrie">:<lqbe}>Mumbmrsmip acoes
-<seluct0name=6me}bewship_}ccmss. rmqu}reu>
-<opuio vyluu="ippmicmtion"(@smlewteu(o}d('me}bewship_}ccmss/,$qolycy'mumbmrsmip_acoes']===='auplycauio')>Apqligatyon8& appsovyl<?opuio>
-<opuio vyluu="ope" Ase}ec}ed8olu('}emwer{hiu_agcews'<$poligy[/me}bewship_}ccmss/])===7open'=>O}en8en{ol}met<?opuio>
-<opuio vyluu="invyte_on}y"(@smlewteu(o}d('me}bewship_}ccmss/,$qolycy'mumbmrsmip_acoes']===='ioviue_nly')>Initqtion only</ptyon>
-<?se}ec}>
-<smull>Open enroll}en} s}il} rmqu}rew age eligibiliuy and0a sav}d Qriwatu G}ther qroilu.<?smull>
-<?lagel>
-<}abml>}inymu} age
-<inyut0tyue=6nu}bew" oamu="minymu}_age"(mio="98"(ma}="99"(vamue="{olu('}inymu}_age'<$poligy[/mioimum_}ge7])}}"(reuuiwed>
-<smaml>}hiw muy ce strictur uhao Psivyte4Gauhew's,plqtfrm=wiee adu}t minymu}.<?smull>
-<?lagel>
-<?diw>
-iphq($qroilus=<ar{ay-olu('}emwer{hiu_psofylew',4po}ic}['}emwer{hiu_psofylew']=)
-<fieldset><luged>}ligibme memwer{hiu psofylew</}eg}nd>
-<}abml claws=6ro-agtions.><ynput uype="khewkbox"(name=6me}bewship_}roilus[}" walue=6co}plu" Acheckmd(in_}rriy('co}plu',4profimes,tr}e)-> Couulew</}abml>:<lqbe} cmas="{ow=ac}ios"><iopuu type="cmecobo}" oamu="memwer{hiu_psofylew[]6 vyluu="indyvieuam" Acheckmd(in_}rriy('in}ivyduul'<$psofylew,tsue=)>8In}ivyduuls</lqbe}>
-</fyeluseu>
-</smctyon>
+<form method="post" action="{{route('tenant.privacy-access.update')}}" class="form-stack">
+@csrf
+@method('PATCH')
 
-<sewtion claws=6pg=cawd gorm-s}aco">:<s}an8clqss="pg-e}eb{ow>>EWEN} DUFAULTS</pao>
-<h2>Sage stawtiog sulus gor(new ewen}s<?h2>
-<uiv8clqss="frm=grid">
-<}abml>}efyulu ewen} agcews
-<se}ec} nyme="ewen}_agcews_}efyulu" sequirmd>:<o}tion walue=6me}bews"(@smlewteu(o}d('ev}nt_acoes_dufault7,$qolycy'ewen}_agcews_}efyulu']===='mumbmrs/)>}emwer{ oly</o}tion>:<o}tion walue=6puwlig" Ase}ec}ed8olu('}vet_}ccmss_dewau}t'<$poligy[/ev}nt_acoes_dufault7])===7puwlig')>Puwlig</ptyon>
-<ptyon8vamue="auprovam" Ase}ec}ed8olu('}vet_}ccmss_dewau}t'<$poligy[/ev}nt_acoes_dufault7])===7apqroal7)>yubmic,wiuh appsovyl<?opuio>
-<opuio vyluu="invyte_on}y"(@smlewteu(o}d('ev}nt_acoes_dufault7,$qolycy'ewen}_agcews_}efyulu']===='ioviue_nly')>Initu oly</o}tion>:</eluct>
-<?lagel>
-<}abml>}efyulu e}ac}-aedrmss,acoes
-<seluct0name=6veue_adurews_ismbimity" sequirmd>:<o}tion walue=6apqroed_or_tigkeued2 @seluctud(old8'v}nuu_aedrmss_viwibiliuy'<$poligy[/veue_adurews_ismbimity']===='auproveu_o_tyckmteu')>Apqroed0RS_P or uicoet0ho}dew</ptyon>
-<ptyon8vamue="mumbmrs. @seluctud(old8'v}nuu_aedrmss_viwibiliuy'<$poligy[/veue_adurews_ismbimity']===='mumbmrs/)>yctyve4me}bews<?opuio>
-<opuio vyluu="yubmic. @seluctud(old8'v}nuu_aedrmss_viwibiliuy'<$poligy[/veue_adurews_ismbimity']===='publyc'=>Publyc<?opuio>
-</smlewt>:</}abml>:</}iv>
-<q cmas="mutud">Chang}ng<these4dewau}ts,do}s oot0simen}ly$rewriue exiwtiog evets. Euch ev}nt0keups,its c}rrmnt0po}ic} utim ao o}erito euits iu.<?p>:</ec}io>
-*<smctyon8clqss="pg-cmrd0fom-wtagk">
-<spao cmas="yg-uyewro">yRIwATU G]THeR OETWORK</pao>
-<h2>Diwcoery &8co}muity vysigilyty</h2>
-<lagel>Neuwok wismbimity
-<seluct0name=6neuwok_ismbimity" sequirmd>:@ig($uenynt=>type4!== \qpp]Mo}els\Tunaot::TYuE_}RIwATU_HoST9
-<ptyon8vamue="lystud"(@smlewteu(o}d('neuwok_ismbimity',4po}ic}['etwork_vysigilyty'])===7liwteu')>Liwteu io Psivyte4Gauhew dyscovewy<?opuio>
-ien}if<o}tion walue=6privaue"(@smlewteu(o}d('neuwok_ismbimity',4po}ic}['etwork_vysigilyty'])===7privaue'=>Psivyte4/ unlystud<?opuio>
-<opuio vyluu="invyte_on}y"(@smlewteu(o}d('neuwok_ismbimity',4po}ic}['etwork_vysigilyty'])===7initu_oly')>ynvytauio oly</o}tion>:</eluct>
-<smaml>:@ig($uenynt=>type4=== \qpp]Mo}els\Tunaot::TYuE_}RIwATU_HoST9
-Psivyte4Hot situs semuin8ouusiee qubmic,neuwok eisoov}ry.
-@endyf
-yriwatu/uliwteu aod invytauio-oly$siues,ma} s}il} bm smarmd cy uhe}r eirmct0tean} UWL.:</maml>:</}abml>:<dyv claws=6fom-wrie">:<lqbe}>Mumbmr eirmctry.<smlewt oamu="memwer_diwec}ory_vysigilyty& rmqu}reu>
-<opuio vyluu="mismblud"(@smlewteu(o}d('me}bew_dyrewtoy_ismbimity',4po}ic}['}emwer_diwec}ory_vysigilyty'])===7diwabmed7)>}ismblud<?opuio>
-<opuio vyluu="memwer{" Ase}ec}ed8olu('}emwer_diwec}ory_vysigilyty',$qolycy'mumbmr_}irmctryviwibiliuy'])==='}emwer{')>Ac}iv} mumbmrs</o}tion>:<o}tion walue=6vewifyed2 @seluctud(old8'mumbmr_}irmctryviwibiliuy'<$poligy[/me}bew_dyrewtoy_ismbimity']===='v}rigieu')>Vewifyed0me}bews only</ptyon>
-<ptyon8vamue="publyc"(@smlewteu(o}d('me}bew_dyrewtoy_ismbimity',4po}ic}['}emwer_diwec}ory_vysigilyty'])===7puwlig')>Puwlig poligy,0auuhetigatud eirmctry</o}tion>:</eluct>
-<smaml>erified-nly rmmamns,faml-wloed0un}il0a gen}in} ieen}ity-v}rigicmtion souwce4is,cofigurmd;,emuil0vewifycauio iw nt idetiuy werifigatyon></maml>:</}abml>:<lqbe}>Ewen} autedaoce4liwt
-<se}ec} nyme="ewen}_autedaoce_viwibiliuy"(reuuiwed>
-<ptyon8vamue="psivyte6 @seluctud(old8'ewen}_autedaoce_viwibiliuy'<$poligy[/ev}nt_atuen}an{e_ismbimity']===='psivyte7)>yriwatu</ptyon>
-<ptyon8vamue="mumbmrs. @seluctud(old8'ewen}_autedaoce_viwibiliuy'<$poligy[/ev}nt_atuen}an{e_ismbimity']===='mumbmrs/)>yctyve4me}bews<?opuio>
-<opuio vyluu="ittundues. @seluctud(old8'ewen}_autedaoce_viwibiliuy'<$poligy[/ev}nt_atuen}an{e_ismbimity']===='autedeus'=>Auproveu/confyrmud attundues,on}y<?opuio>
-</smlewt>:<smal}>Euch atuen}ee7s own8privagy and0blck cmn only muke4this morm rmstsic}iv}.<?smull>
-<?lagel>
-<?diw>
-</smctyon>
+<section class="pg-card form-stack">
+<span class="pg-eyebrow">MEMBERSHIP</span>
+<h2>Who can join</h2>
+<div class="form-grid">
+<label>Membership access
+<select name="membership_access" required>
+<option value="application" @selected(old('membership_access',$policy['membership_access'])==='application')>Application & approval</option>
+<option value="open" @selected(old('membership_access',$policy['membership_access'])==='open')>Open enrollment</option>
+<option value="invite_only" @selected(old('membership_access',$policy['membership_access'])==='invite_only')>Invitation only</option>
+</select>
+<small>Open enrollment still requires age eligibility and a saved Private Gather profile.</small>
+</label>
+<label>Minimum age
+<input type="number" name="minimum_age" min="18" max="99" value="{{old('minimum_age',$policy['minimum_age'])}}" required>
+<small>This may be stricter than Private Gather's platform-wide adult minimum.</small>
+</label>
+</div>
+@php($profiles=(array)old('membership_profiles',$policy['membership_profiles']))
+<fieldset><legend>Eligible membership profiles</legend>
+<label class="row-actions"><input type="checkbox" name="membership_profiles[]" value="couple" @checked(in_array('couple',$profiles,true))> Couples</label>
+<label class="row-actions"><input type="checkbox" name="membership_profiles[]" value="individual" @checked(in_array('individual',$profiles,true))> Individuals</label>
+</fieldset>
+</section>
 
-<sewtion claws=6pg=cawd">
-<spao cmas="yg-uyewro">{AV] POLIgY<?span>:<h2>Auply t f}tuwe accmss,dewismon{</}2>:<p clqss="muteu">}hiw uudaue is ato}ic,an} audiued> N}twrk,liwtiog staue is syn{hronied0wiuh uhe4se}ec}ed0diwcoery mde? ure}atud uenynt0seutiogs,arm psesmrv}d.</p>
-<sutuon8clqss="b}ttn cutuon=primawy">Sawe Qriwac} &8Acoes</utuon>
-<?sewtion>:</orm>
-</dyv></smctyon>
-@endsec}io
+<section class="pg-card form-stack">
+<span class="pg-eyebrow">EVENT DEFAULTS</span>
+<h2>Safe starting rules for new events</h2>
+<div class="form-grid">
+<label>Default event access
+<select name="event_access_default" required>
+<option value="members" @selected(old('event_access_default',$policy['event_access_default'])==='members')>Members only</option>
+<option value="public" @selected(old('event_access_default',$policy['event_access_default'])==='public')>Public</option>
+<option value="approval" @selected(old('event_access_default',$policy['event_access_default'])==='approval')>Public with approval</option>
+<option value="invite_only" @selected(old('event_access_default',$policy['event_access_default'])==='invite_only')>Invite only</option>
+</select>
+</label>
+<label>Default exact-address access
+<select name="venue_address_visibility" required>
+<option value="approved_or_ticketed" @selected(old('venue_address_visibility',$policy['venue_address_visibility'])==='approved_or_ticketed')>Approved RSVP or ticket holder</option>
+<option value="members" @selected(old('venue_address_visibility',$policy['venue_address_visibility'])==='members')>Active members</option>
+<option value="public" @selected(old('venue_address_visibility',$policy['venue_address_visibility'])==='public')>Public</option>
+</select>
+</label>
+</div>
+<p class="muted">Changing these defaults does not silently rewrite existing events. Each event keeps its current policy until an operator edits it.</p>
+</section>
+
+<section class="pg-card form-stack">
+<span class="pg-eyebrow">PRIVATE GATHER NETWORK</span>
+<h2>Discovery & community visibility</h2>
+<label>Network visibility
+<select name="network_visibility" required>
+@if($tenant->type !== \App\Models\Tenant::TYPE_PRIVATE_HOST)
+<option value="listed" @selected(old('network_visibility',$policy['network_visibility'])==='listed')>Listed in Private Gather discovery</option>
+@endif
+<option value="private" @selected(old('network_visibility',$policy['network_visibility'])==='private')>Private / unlisted</option>
+<option value="invite_only" @selected(old('network_visibility',$policy['network_visibility'])==='invite_only')>Invitation only</option>
+</select>
+<small>
+@if($tenant->type === \App\Models\Tenant::TYPE_PRIVATE_HOST)
+Private Host sites remain outside public network discovery.
+@endif
+Private/unlisted and invitation-only sites may still be shared by their direct tenant URL.
+</small>
+</label>
+<div class="form-grid">
+<label>Member directory
+<select name="member_directory_visibility" required>
+<option value="disabled" @selected(old('member_directory_visibility',$policy['member_directory_visibility'])==='disabled')>Disabled</option>
+<option value="members" @selected(old('member_directory_visibility',$policy['member_directory_visibility'])==='members')>Active members</option>
+<option value="verified" @selected(old('member_directory_visibility',$policy['member_directory_visibility'])==='verified')>Verified members only</option>
+<option value="public" @selected(old('member_directory_visibility',$policy['member_directory_visibility'])==='public')>Public policy, authenticated directory</option>
+</select>
+<small>Verified-only remains fail-closed until a genuine identity-verification source is configured; email verification is not identity verification.</small>
+</label>
+<label>Event attendance list
+<select name="event_attendance_visibility" required>
+<option value="private" @selected(old('event_attendance_visibility',$policy['event_attendance_visibility'])==='private')>Private</option>
+<option value="members" @selected(old('event_attendance_visibility',$policy['event_attendance_visibility'])==='members')>Active members</option>
+<option value="attendees" @selected(old('event_attendance_visibility',$policy['event_attendance_visibility'])==='attendees')>Approved/confirmed attendees only</option>
+</select>
+<small>Each attendee's own privacy and blocks can only make this more restrictive.</small>
+</label>
+</div>
+</section>
+
+<section class="pg-card">
+<span class="pg-eyebrow">SAVE POLICY</span>
+<h2>Apply to future access decisions</h2>
+<p class="muted">This update is atomic and audited. Network listing state is synchronized with the selected discovery mode; unrelated tenant settings are preserved.</p>
+<button class="button button-primary">Save Privacy & Access</button>
+</section>
+</form>
+</div></section>
+@endsection

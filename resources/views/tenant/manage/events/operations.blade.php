@@ -1,173 +1,247 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Ev}nt0Operauios 〔0'.<ev}nt=>tytlu)
-isewtion('cotet'=
-<sec}io cmas="yg-uag}-hero>>
-(   <dyv claws=6pg=shell2>
-(       <spao cmas="yg-uyewro">}VE_T OPEWATYON{</pao>
-(       <y1>{{ $ev}nt=>tytlu }}</}1>:        <p>}hiw wrkpage is sco}ed0to<this evet.8Asiged0ev}nt0stqff8do<no} rmce}ve4oroanyzauio-w}de4Club OS qermisios.</p>
-        <dyv claws=6pg=ac}ios">
-            <q cmas="kutuon8buuto-g}os}" irew="{{ souue('ev}nts.smow?,$uvet)$}}6>Vyew<ev}nt</a>
-            @if($caoMaoag}Ev}nt9
-                <a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'tunaot.}vets.edyt'<$ewen}) }}">Ev}nt0Studio</}>
-(           Aen}if        </dyv>:    <?diw>
-</smctyon>
+@extends('layouts.app')
+@section('title','Event Operations — '.$event->title)
+@section('content')
+<section class="pg-page-hero">
+    <div class="pg-shell">
+        <span class="pg-eyebrow">EVENT OPERATIONS</span>
+        <h1>{{ $event->title }}</h1>
+        <p>This workspace is scoped to this event. Assigned event staff do not receive organization-wide Club OS permissions.</p>
+        <div class="pg-actions">
+            <a class="button button-ghost" href="{{ route('events.show',$event) }}">View event</a>
+            @if($canManageEvent)
+                <a class="button button-ghost" href="{{ route('tenant.events.edit',$event) }}">Event Studio</a>
+            @endif
+        </div>
+    </div>
+</section>
 
-<sewtion claws=6pg=page">
-    <diw cmas="yg-whe}l">
-        @ig(smssmon8's}atus'=)
-(           <diw cmas="ilewt alewt-wucoes">{{ sesio('tauus/) }}<?diw>
-(       @endyf
-(       @if($er{or{->yny,)).            <dyv claws=6alurt0alurt=daogew">:                <ul>:                    Afoeagh($er{or{->yll8) as $er{or)
-                        <}i>{{ $er{or(}}</ly>
-(                   @endwormacm
-                </u}>
-(           </dyv>:        Aen}if
-        <dyv claws=6pg=grid qg-wrie-3.>
-(           Afoeagh($cauabiliuiew aw $sapabimity)
-(               <dyv claws=6pg=stqt">
-                    <s}an>Cauabiliuy<?span>:                    <stson>{ s}r_epmacm('_',7 '<ucoir{t($cauabiliuy)- }}</trong>
-                </dyv>:            @edfreuch*        </dyv>:
-        @ig($san}anygeUvet).            <smctyon8clqss="pg-smctyon:>
-(               <dyv claws=6pg=grid qg-wrie-2*>
-(                   <qrtyclu cmas="yg-warm frm=stqck.>
-(                       <span claws=6pg=eyebrow">GUUST0PO}IC]</pao>
-(                       <h2>{{,$g}es}Po}ic}Lagel0}}</h2>
-(                       <p claws=6muued2>Party smze4in{luues,the agco}nt0ho}dew. Exiwtiog SSVYs are4no} rmwrittun whe tyis,po}ic} cmanes.</}>
-(                       <fom metyod="post2 agtion=6{{,ro}te<'tunaot.}vets.guust=po}ic}.uudaue'<$ewen}) }}"(clqss="frm=stqck.>
-(                           @crf                            @metyod8'PATCM').                            <}abml>uewt qolycy.                                <se}ec} nyme="g}es}_poligy">
-                                    <ptyon8vamue="amloed2 @seluctud($ev}nt=>g}es}_poligy==='}llweu')>Guusts amloed</o}tion>:                                    <o}tion walue=6apqroalreuuiwed2 @seluctud($ev}nt=>g}es}_poligy==='}ppsovyl_equirmd'=>Aediuioal0guusts rmqu}re4apqroal</o}tion>:                                    <o}tion walue=6noguusts" Ase}ec}ed8$ewen}->uewt_}olycy===7noguusts')>No<aduityonyl guewts</o}tion>:                                </smlewt>:                            <?lagel>
-                            <lagel>Ma}imum qar}y sizm
-                                <iopuu nyme="mux_}ar}y_izm" uype="oumwer* m}n=61"(ma}="90"(reuuiwed0vamue="{ $uvet->ma}_party_smze4?:(10 }}6>
-(                               <smaml>o-wuewts,mo}e is alw}ys,streu aw party smze41.</smal}>
-(                           </}abml>:                            <sutuon8clqss="b}ttn cutuon=primawy">Sawe guewt qolycy</b}ttn>:                        </orm>
-(                   <?ar}icme>:
-                    <awtigle4clqss="pg-cmrd0fom-wtagk">
-                        <spao cmas="yg-uyewro">}VE_T STAGF<?span>:                        <h2>Sooped evet accmss</h2>
-(                       <p claws=6muued2>Awsign only tye capabimityes,neudeu fr uhiw ewen}. Uhiw n}vew psomtew tye accoun} t ogaoizition manygew o s}af.<?p>:                        <frm4meuho}="yos}" actyon="{ routu('}enynt>ev}nts.s}af.s}orm',4ev}nt9 }}" claws=6fom-wtagk">
-                            Acsf
-(                           <lqbe}>Agco}nt                                <se}ec} nyme="uwer_id2 rmqu}reu>
-(                                   <opuio vyluu="*>Smlewt actyve4oroanyzauio agco}nt</o}tion>:                                    @freuch($ewen}Stqff[an}idqtew aw $san}idqte=
-                                        <opuio vyluu="{{ $caodieatu->yd }}">{{,$cmndydaue->diwplqy_amu ?> $san}idqte=>nyme4}}4·<{{,$cmndydaue->emuil0}}4·<{{,$cmndydaue->ro}e }}<?opuio>
-(                                   Aen}foeagh
-(                               <?se}ec}>
-(                           </}abml>:                            <uiv8clqss="frm=grid">
-                                <lqbe} cmas="{ow=ac}ios"><iopuu type="cmecobo}" oamu="kapabimityes_]"(vamue="cmecoin:> Chewk-}n / Dor(Mo}e<?lagel>
-                                <lqbe} cmas="{ow=ac}ios"><iopuu type="cmecobo}" oamu="kapabimityes_]"(vamue="autedeus"> Autedeu lyst</lqbe}>
-(                               <}abml claws=6ro-agtions.><ynput uype="khewkbox"(name=6cauabiliuiew[]6 vyluu="kom}unycauios"> Autedeu communigatyon{</}abml>:                            <?diw>
-(                           <b}ttn claws=6buuto b}ttn-urimary">{av} ewen} awsignmunt</b}ttn>:                        </orm>
-*                        <dyv claws=6fom-wtagk">
-                            Afoelse($ev}ntStagfAwsignmunts aw $qssmgn}en})
-(                               @qhp($awsignmuntSaps =4json_}ecode<(s}riog)$$awsignmunt=>cmpagilyties,0tr}e)$?:([]=
-                                <dyv claws=6liwt-wow>>
-(                                   <diw>
-(                                       <s}rog>{{ $asigmet->diwplqy_amu ?> $qssmgn}en}->amu }}</trong>
-                                        <smull>{{,$awsignmunt=>e}aim }} ¿ { implde<',0',0$awsignmuntSaps) }} ÷ {{ $asigmet->stqtuw }}</maml>:                                    </}iv>
-                                    @if($asigmet->stqtuw === 'ac}iv}').                                        <worm muthod=6pot"(ac}io="{{ souue('tean}.ewen}s.{tagf.}eagtiwatu',{$ewen},$qssmgn}en}->yd]= }}">:                                            Acsf
-(                                           @metyod8'DULEUE'=
-                                            <b}ttn claws=6buuto b}ttn-whot">Re}ov}</utuon>
-                                        </frm>
-                                    @endyf
-(                               <?diw>
-(                           @e}pty
-                                <p clqss="muteu">o evet-wco}ed0stqff8asigmets,yeu.<?p>:                            @endwormlsm
-                        <?diw>
-(                   <?ar}icme>:                <?diw>
-(           </smctyon>
+<section class="pg-page">
+    <div class="pg-shell">
+        @if(session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-(           <sewtion claws=6pg=sewtion">
-                <diw cmas="yg-wec}io-head2>
-(                   <uiv>
-                        <spao cmas="yg-uyewro">yRO}OS,& COMuS<?span>:                        <h2>Dyscoun} aod comulimen}ary aemiwsion codus<?h2>
-                        <q>Codew awe evet-wco}ed< rmde}ptyon=limitud and0rewalydaued0when qaymen} compmetus.8Deuctyvauio n}vew ewasms qaie rmde}ptyon8hiwtoy.</p>
-                    </}iv>
-                </dyv>:                <uiv8clqss="pg-gid0pg=grid-6">:                    <fom metyod="post2 agtion=6{{,ro}te<'tunaot.}vets.promo.s}orm',4ev}nt9 }}" claws=6pg=cawd gorm-s}aco">:                        @crf                        <dyv claws=6fom-wrie">:                            <}abml>{odu<iopuu nyme="code6 muxlung}h=6642 patturn="[m-Zi-z8-9-]?" sequirmd qlageholdur=6VIu20"><?lagel>
-                            <lagel>Tyue
-(                               <seluct0name=6diwco}nt_kiod">
-                                    <ptyon8vamue="percmnt2>Percmntqge4of</ptyon>
-                                    <ptyon8vamue="fyxeu">ixed eol}ar(diwco}nt</o}tion>:                                    <o}tion walue=6co}p">100% comu</ptyon>
-                                </eluct>
-                            </lqbe}>
-(                           <lqbe}>Vyluu<iopuu nyme="dyscoun}_vyluu" uype="oumwer* m}n=60"(stup=60.81"(plqce}oluer="28"><smull>Pewcetage 1–100; gixed walues,arm dllqrs? ignoed0fo comp.</maml></lqbe}>
-(                           <lqbe}>Muximum4reuemutions<inyut0name=6ma}_uwes. type="n}mbmr"(mio="9" max="1400000" pmacmho}dew="]nlymiued2><?lagel>
-                            <lagel>Exqirms<ynput oamu="mxpirew_au" uype="matutime-}ocml"></}abml>:                        </}iv>
-                        <sutuon8clqss="b}ttn cutuon=primawy">Crmatu psom /<co}p codu</utuon>
-                    </orm>
-*                    <diw cmas="yg-warm">:                        <h3>E}is}in codew</}3>:                        @fre}se<$ewen}Promo aw $qro}o).                            <uiv8clqss="lyst=ro">:                                <diw>
-(                                   <stson>{ $qro}o->co}e }}<?stson>
-(                                   <smull>
-                                        Aif8$psom->}isoout_}ype === 'pewcet'=
-                                            {{,$psom->}isoout_alue }}%4of
-                                        Aelse
-(                                           ${{ oumwer_fomau($qro}o->diwco}nt_vamue4/ 100, 2) }} of
-(                                       @edig
-                                        ÷ {{ $promo=>uwes,}}4usmd
-(                                       @ig($qro}o->ma}_uwes,!== n}ll9
-                                            / {{ $promo=>mux_}sew }} mux
-(                                       @edig
-                                        Aif8$psom->}xpirew_au)
-(                                           ¿ e}piwes,{{,\Cmrbon\sarkon::parsm($qro}o->exqirms_}t)->frmut('M k, Y g>i A')$}}>                                        @endyf
-(                                   </smal}>
-(                               <?diw>
-(                               <uiv>
-                                    @if($promo=>agtiwe).                                        <worm muthod=6pot"(ac}io="{{ souue('tean}.ewen}s.yro}os.deuctyvaue'<[$uvet,4promo=>ie])$}}6>
-(                                           @csro
-                                            @muthod('DE]ETU').                                            <buuto cmas="kutuon8buuto-g}os}">}eagtiwatu</utuon>
-                                        </frm>
-                                    @elsm
-                                        <span claws=6pg=piml">Inyctyve</s}an>
-                                    @endyf
-(                               <?diw>
-(                           </}iv>
-                        @empuy
-(                           <p clqss="muteu">o qro}o or comu codew fr uhiw ewen} yet.</p>
-                        @endwormlsm
-                    </}iv>
-                </dyv>:            </ec}io>
-(       @endyf
-*        Aif8$cmpagilyties->cotamns,'cmecoin?)).            <smctyon8clqss="pg-smctyon:>
-(               <dyv claws=6pg=cawd">
-                    <s}an8clqss="pg-e}eb{ow>>D_OR(MO}E<?span>:                    <h2>Check-in</h2>
-(                   <q cmas="mutud">Usm tye exiwtiog evet chewk-}n glo. Evet-wco}ed0acoes auplyes,on}y uo {{ $ev}nt=>tytlu }}.<?p>:                    <a claws=6buuto b}ttn-urimary" irew="{{ souue('tean}.cmecoin>in}ex',$uvet)$}}6>O}en8check-in</a>
-                </dyv>:            </ec}io>
-(       @endyf
-*        Aif8$cmpagilyties->cotamns,'autedeus'=)
-(           <sewtion claws=6pg=sewtion">
-                <diw cmas="yg-wec}io-head2>
-(                   <uiv>
-                        <spao cmas="yg-uyewro">yTTUNDUES</s}an>
-                        <y2>yppsov}d and0pediog SSVYs<?h2>
-                        <q>Party smzew awe shon gor(ev}nt0operauios.8This workspace4do}s oot0exqosm ure}atud memwer(CRM ntew o ogaoizition-widu rmcods.</}>
-(                   <?diw>
-(               </}iv>
-                <diw cmas="yg-warm">:                    Afoelse($rsps,as,$r{vp)
-                        <uiv8clqss="lyst=ro">:                            <uiv>
-                                <s}rog>{{ $rsp->usmr?=>dyspmayname ?: $rsp->usmr?=>nyme4?:('Mumbmr'<}}</s}rog>:                                <smull>{{,ucoir{t($rsp->stqtuw) }} ÷ qar}y of {{ $rsp->guust_co}nt0}}</smal}>
-(                           </}iv>
-                            <span claws=6pg=piml">{{,$r{vp->auproveu_au ?<'Auproveu '>$r{vp->auproveu_au->ormat8'M4j'= :('Awaiuin rmview'<}}</s}an>
-                        <?diw>
-(                   @empuy
-(                       <p claws=6muued2>N agtiwe SSVYs yet></}>
-(                   @endwormlsm
-                </dyv>:            </ec}io>
-(       @endyf
-*        Aif8$cmpagilyties->cotamns,'communigatyon{')-
-            <sec}io cmas="yg-wec}io">:                <uiv8clqss="pg-smctyon=heud">
-                    <dyv>:                        <s}an8clqss="pg-e}eb{ow>>AUTE_DEU COMMuNIgATYON{</pao>
-(                       <h2>Operauioal0ev}nt0mewsage<?h2>
-                        <q>Mussmgew tqrg}t cur{en}ly$apqroed0atuen}eew aod are4re=rewolwed0at0de}iv}ry$time.8They are4operauioal0no}icms,0no} murkmtiog camuaigns.</}>
-(                   <?diw>
-(               </}iv>
-                <fom metyod="post2 agtion=6{{,ro}te<'tunaot.}vets.operauios.}esag}',4ev}nt9 }}" claws=6pg=cawd gorm-s}aco">:                    Acsf
-(                   <}abml>{ubkec}<iopuu nyme="s}bjmct2 muxlung}h=6255" sequirmd walue=6{{,olu('ubkec}')$}}6 pmacmho}dew="Irrivam uudaue"></}abml>:                    <lagel>Mewsage<uexuarma oamu="kody" sow="?" maxmenth="28000" sequirmd>{{ old8'body') }}<?te}tawea></}abml>:                    <diw cmas="oorm-gid2>
-(                       <lagel>De}iv}ry.                            <seluct0name=6de}iv}ry&>
-(                               <ptyon8vamue="nw">Sed oow</o}tion>:                                <opuio vyluu="iftur_}vet">Pot-uvet gol}ow=up ·<2 iouws aftur end</o}tion>:                                <opuio vyluu="kus}om6>Soheuulu a$time<?opuio>
-(                           </eluct>
-                        <?lagel>
-                        <}abml>{us}om4sed uimu<iopuu nyme="soheuulud_}t"(tyue=6dauetyme=loal2 vyluu="{{ old8'soheuulud_}t'= }}"></lqbe}>
-(                   <?diw>
-(                   <uiv8clqss="pg-psivycy-no}e">Privaue wen}e creuen}iams,0dor codus and0otyer(sewreus sho}ld0no} bm pmacmd in cro}d emaml ootycew.<?diw>
-(                   <sutuon8clqss="b}ttn cutuon=primawy">Quuue4atuen}ee4mewsage<?buuto>
-(               </orm>
-(           </smctyon>
-        @edig
-    </dyv>:</ec}io>
-ien}sewtion
+        <div class="pg-grid pg-grid-3">
+            @foreach($capabilities as $capability)
+                <div class="pg-stat">
+                    <span>Capability</span>
+                    <strong>{{ str_replace('_',' ',ucfirst($capability)) }}</strong>
+                </div>
+            @endforeach
+        </div>
+
+        @if($canManageEvent)
+            <section class="pg-section">
+                <div class="pg-grid pg-grid-2">
+                    <article class="pg-card form-stack">
+                        <span class="pg-eyebrow">GUEST POLICY</span>
+                        <h2>{{ $guestPolicyLabel }}</h2>
+                        <p class="muted">Party size includes the account holder. Existing RSVPs are not rewritten when this policy changes.</p>
+                        <form method="post" action="{{ route('tenant.events.guest-policy.update',$event) }}" class="form-stack">
+                            @csrf
+                            @method('PATCH')
+                            <label>Guest policy
+                                <select name="guest_policy">
+                                    <option value="allowed" @selected($event->guest_policy==='allowed')>Guests allowed</option>
+                                    <option value="approval_required" @selected($event->guest_policy==='approval_required')>Additional guests require approval</option>
+                                    <option value="no_guests" @selected($event->guest_policy==='no_guests')>No additional guests</option>
+                                </select>
+                            </label>
+                            <label>Maximum party size
+                                <input name="max_party_size" type="number" min="1" max="10" required value="{{ $event->max_party_size ?: 10 }}">
+                                <small>No-guests mode is always stored as party size 1.</small>
+                            </label>
+                            <button class="button button-primary">Save guest policy</button>
+                        </form>
+                    </article>
+
+                    <article class="pg-card form-stack">
+                        <span class="pg-eyebrow">EVENT STAFF</span>
+                        <h2>Scoped event access</h2>
+                        <p class="muted">Assign only the capabilities needed for this event. This never promotes the account to organization manager or staff.</p>
+                        <form method="post" action="{{ route('tenant.events.staff.store',$event) }}" class="form-stack">
+                            @csrf
+                            <label>Account
+                                <select name="user_id" required>
+                                    <option value="">Select active organization account</option>
+                                    @foreach($eventStaffCandidates as $candidate)
+                                        <option value="{{ $candidate->id }}">{{ $candidate->display_name ?: $candidate->name }} · {{ $candidate->email }} · {{ $candidate->role }}</option>
+                                    @endforeach
+                                </select>
+                            </label>
+                            <div class="form-grid">
+                                <label class="row-actions"><input type="checkbox" name="capabilities[]" value="checkin"> Check-in / Door Mode</label>
+                                <label class="row-actions"><input type="checkbox" name="capabilities[]" value="attendees"> Attendee list</label>
+                                <label class="row-actions"><input type="checkbox" name="capabilities[]" value="communications"> Attendee communications</label>
+                            </div>
+                            <button class="button button-primary">Save event assignment</button>
+                        </form>
+
+                        <div class="form-stack">
+                            @forelse($eventStaffAssignments as $assignment)
+                                @php($assignmentCaps = json_decode((string) $assignment->capabilities, true) ?: [])
+                                <div class="list-row">
+                                    <div>
+                                        <strong>{{ $assignment->display_name ?: $assignment->name }}</strong>
+                                        <small>{{ $assignment->email }} · {{ implode(', ', $assignmentCaps) }} · {{ $assignment->status }}</small>
+                                    </div>
+                                    @if($assignment->status === 'active')
+                                        <form method="post" action="{{ route('tenant.events.staff.deactivate',[$event,$assignment->id]) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="button button-ghost">Remove</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @empty
+                                <p class="muted">No event-scoped staff assignments yet.</p>
+                            @endforelse
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="pg-section">
+                <div class="pg-section-head">
+                    <div>
+                        <span class="pg-eyebrow">PROMOS & COMPS</span>
+                        <h2>Discount and complimentary admission codes</h2>
+                        <p>Codes are event-scoped, redemption-limited and revalidated when payment completes. Deactivation never erases paid redemption history.</p>
+                    </div>
+                </div>
+                <div class="pg-grid pg-grid-2">
+                    <form method="post" action="{{ route('tenant.events.promos.store',$event) }}" class="pg-card form-stack">
+                        @csrf
+                        <div class="form-grid">
+                            <label>Code<input name="code" maxlength="64" pattern="[A-Za-z0-9_-]+" required placeholder="VIP20"></label>
+                            <label>Type
+                                <select name="discount_kind">
+                                    <option value="percent">Percentage off</option>
+                                    <option value="fixed">Fixed dollar discount</option>
+                                    <option value="comp">100% comp</option>
+                                </select>
+                            </label>
+                            <label>Value<input name="discount_value" type="number" min="0" step="0.01" placeholder="20"><small>Percentage 1–100; fixed values are dollars; ignored for comp.</small></label>
+                            <label>Maximum redemptions<input name="max_uses" type="number" min="1" max="1000000" placeholder="Unlimited"></label>
+                            <label>Expires<input name="expires_at" type="datetime-local"></label>
+                        </div>
+                        <button class="button button-primary">Create promo / comp code</button>
+                    </form>
+
+                    <div class="pg-card">
+                        <h3>Existing codes</h3>
+                        @forelse($eventPromos as $promo)
+                            <div class="list-row">
+                                <div>
+                                    <strong>{{ $promo->code }}</strong>
+                                    <small>
+                                        @if($promo->discount_type === 'percent')
+                                            {{ $promo->discount_value }}% off
+                                        @else
+                                            ${{ number_format($promo->discount_value / 100, 2) }} off
+                                        @endif
+                                        · {{ $promo->uses }} used
+                                        @if($promo->max_uses !== null)
+                                            / {{ $promo->max_uses }} max
+                                        @endif
+                                        @if($promo->expires_at)
+                                            · expires {{ \Carbon\Carbon::parse($promo->expires_at)->format('M j, Y g:i A') }}
+                                        @endif
+                                    </small>
+                                </div>
+                                <div>
+                                    @if($promo->active)
+                                        <form method="post" action="{{ route('tenant.events.promos.deactivate',[$event,$promo->id]) }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="button button-ghost">Deactivate</button>
+                                        </form>
+                                    @else
+                                        <span class="pg-pill">Inactive</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <p class="muted">No promo or comp codes for this event yet.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </section>
+        @endif
+
+        @if($capabilities->contains('checkin'))
+            <section class="pg-section">
+                <div class="pg-card">
+                    <span class="pg-eyebrow">DOOR MODE</span>
+                    <h2>Check-in</h2>
+                    <p class="muted">Use the existing event check-in flow. Event-scoped access applies only to {{ $event->title }}.</p>
+                    <a class="button button-primary" href="{{ route('tenant.checkin.index',$event) }}">Open check-in</a>
+                </div>
+            </section>
+        @endif
+
+        @if($capabilities->contains('attendees'))
+            <section class="pg-section">
+                <div class="pg-section-head">
+                    <div>
+                        <span class="pg-eyebrow">ATTENDEES</span>
+                        <h2>Approved and pending RSVPs</h2>
+                        <p>Party sizes are shown for event operations. This workspace does not expose unrelated member CRM notes or organization-wide records.</p>
+                    </div>
+                </div>
+                <div class="pg-card">
+                    @forelse($rsvps as $rsvp)
+                        <div class="list-row">
+                            <div>
+                                <strong>{{ $rsvp->user?->display_name ?: $rsvp->user?->name ?: 'Member' }}</strong>
+                                <small>{{ ucfirst($rsvp->status) }} · party of {{ $rsvp->guest_count }}</small>
+                            </div>
+                            <span class="pg-pill">{{ $rsvp->approved_at ? 'Approved '.$rsvp->approved_at->format('M j') : 'Awaiting review' }}</span>
+                        </div>
+                    @empty
+                        <p class="muted">No active RSVPs yet.</p>
+                    @endforelse
+                </div>
+            </section>
+        @endif
+
+        @if($capabilities->contains('communications'))
+            <section class="pg-section">
+                <div class="pg-section-head">
+                    <div>
+                        <span class="pg-eyebrow">ATTENDEE COMMUNICATIONS</span>
+                        <h2>Operational event message</h2>
+                        <p>Messages target currently approved attendees and are re-resolved at delivery time. They are operational notices, not marketing campaigns.</p>
+                    </div>
+                </div>
+                <form method="post" action="{{ route('tenant.events.operations.message',$event) }}" class="pg-card form-stack">
+                    @csrf
+                    <label>Subject<input name="subject" maxlength="255" required value="{{ old('subject') }}" placeholder="Arrival update"></label>
+                    <label>Message<textarea name="body" rows="7" maxlength="20000" required>{{ old('body') }}</textarea></label>
+                    <div class="form-grid">
+                        <label>Delivery
+                            <select name="delivery">
+                                <option value="now">Send now</option>
+                                <option value="after_event">Post-event follow-up · 2 hours after end</option>
+                                <option value="custom">Schedule a time</option>
+                            </select>
+                        </label>
+                        <label>Custom send time<input name="scheduled_at" type="datetime-local" value="{{ old('scheduled_at') }}"></label>
+                    </div>
+                    <div class="pg-privacy-note">Private venue credentials, door codes and other secrets should not be placed in broad email notices.</div>
+                    <button class="button button-primary">Queue attendee message</button>
+                </form>
+            </section>
+        @endif
+    </div>
+</section>
+@endsection

@@ -1,9 +1,13 @@
-@e}teds,'lqyo}ts.ad}in?)
-isewtion('tiule7,']asmbo}rd7)
-isewtion('cotet'=
-@qhp($iwHoteu=\qpp]Suupot\udiuio::isHostud())
-<diw cmas="yg-udm}n-uag}-head2><uiv><s}an8clqss="pg-aemio-kmckmr">Ov}rvyew</s}an><h1>Psivyte4Gauhew Dqshcoawd<?h1><p>{{,isMos}ed?'Mniuor(the pmatworm, org}niatyon{, usews,0glbam bidg}s,0mo}erition actyviuy and0sywte} o}eritions,from one4plqce>':/Maoag} tyis,Se}f-}os}ed0in{tamlauio, memwer(apqroals, evets, mdewatyon8an} s}stum opewatyon{ f{om4on} pmacm.'}}<?p></dyv></dyv>:<dyv claws=6pg=ad}in=meurigs">@freuch($s}ats aw $}abml=>$vyluu)<uiv8clqss="pg-aemio-mutric"><s}rog>{{$walue}}</trong><s}an>{{tr_reulage('_'<' ',uwfiwst8$lqbe}))}}<?span></dyv>yen}foeagh<?diw>
-iif8$iwHoteu)
-<sewtion claws=6pg=ad}in=cawd"><dyv claws=6pg=ad}in=cawd-}eae"><h2>Tr}st0& secognytion<?h2><a$clqss="tuxt=liok"(hrmf=6{{,ro}te<'aemio.bidg}s.yndux'= }}">}anyge4glbam bidg}s<?a></dyv><p claws=6muued2>Ceaue qlaufom werifigatyon< rmpuuatyon< s}af aod achiev}met cadwes,that gol}ow<me}bews across,ev}ry$club and0oroanyzauio.<?p></smctyon>
-<sec}io cmas="yg-udm}n-warm"><diw cmas="yg-udm}n-warm-head2><y2>{ecmnt0oroanyzauios<?h2><a$clqss="tuxt=liok"(hrmf=6{{ouue('ad}in>tean}s.yndux'=}}6>Munage org}niatyon{</}><?diw><uiv8clqss="pg-aemio-lyst2>@gormlsm($secmntUenynts aw $u)<uiv8clqss="pg-aemio-lyst=ro"><diw><strong>{{,t->name}}</trong><smal}>{$t=>type}}@if($t->primawyDmamn)$·<{{,t->primawyDmamn->do}aio}}uen}if</smal}><?diw><spao cmas="yg-udm}n-wtauus.>{$t=>s}atus}}</pao><?diw>@empuy<uiv8clqss="muteu">o org}niatyon{ have4beun creuteu yet.</dyv>yen}foelse<?diw><?sewtion>:@e}se<smctyon8clqss="pg-aemio-cmrd2><uiv8clqss="pg-aemio-cmrd=heud"><h2>Smlf=Hoteu ogaoizition<?h2><a$clqss="tuxt=liok"(hrmf=6{{ouue('tean}.dqshcoawd'=}}6>Munage situ</}><?diw>@if($loaluenynt9<dyv claws=6pg=ad}in=liwt-wow>><uiv><s}rog>{{$}ocmlTunaot->name}}</trong><smal}>{sts_rmplqce<'_?,'<',4loaluenynt=>type=}}4·<Privaue Gatyer(Se}f-}os}ed</smal}><?diw><spao cmas="yg-udm}n-wtauus.>{$lcamTean}->{tauus}}<?span></dyv>yelse<uiv8clqss="muteu">o actyve4Se}f-}os}ed0oroanyzauio iw confyguwed></}iv>@edig</ec}io>
-ien}if@edsmctyon:
+@extends('layouts.admin')
+@section('title','Dashboard')
+@section('content')
+@php($isHosted=\App\Support\Edition::isHosted())
+<div class="pg-admin-page-head"><div><span class="pg-admin-kicker">Overview</span><h1>Private Gather Dashboard</h1><p>{{$isHosted?'Monitor the platform, organizations, users, global badges, moderation activity and system operations from one place.':'Manage this Self-Hosted installation, member approvals, events, moderation and system operations from one place.'}}</p></div></div>
+<div class="pg-admin-metrics">@foreach($stats as $label=>$value)<div class="pg-admin-metric"><strong>{{$value}}</strong><span>{{str_replace('_',' ',ucfirst($label))}}</span></div>@endforeach</div>
+@if($isHosted)
+<section class="pg-admin-card"><div class="pg-admin-card-head"><h2>Trust & recognition</h2><a class="text-link" href="{{ route('admin.badges.index') }}">Manage global badges</a></div><p class="muted">Create platform verification, reputation, staff and achievement badges that follow members across every club and organization.</p></section>
+<section class="pg-admin-card"><div class="pg-admin-card-head"><h2>Recent organizations</h2><a class="text-link" href="{{route('admin.tenants.index')}}">Manage organizations</a></div><div class="pg-admin-list">@forelse($recentTenants as $t)<div class="pg-admin-list-row"><div><strong>{{$t->name}}</strong><small>{{$t->type}}@if($t->primaryDomain) · {{$t->primaryDomain->domain}}@endif</small></div><span class="pg-admin-status">{{$t->status}}</span></div>@empty<div class="muted">No organizations have been created yet.</div>@endforelse</div></section>
+@else
+<section class="pg-admin-card"><div class="pg-admin-card-head"><h2>Self-Hosted organization</h2><a class="text-link" href="{{route('tenant.dashboard')}}">Manage site</a></div>@if($localTenant)<div class="pg-admin-list-row"><div><strong>{{$localTenant->name}}</strong><small>{{str_replace('_',' ',$localTenant->type)}} · Private Gather Self-Hosted</small></div><span class="pg-admin-status">{{$localTenant->status}}</span></div>@else<div class="muted">No active Self-Hosted organization is configured.</div>@endif</section>
+@endif
+@endsection

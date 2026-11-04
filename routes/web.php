@@ -1,123 +1,187 @@
-<?}hp
-usm Aup\yttq\Contsol}er{\Aemio\AemioAuuhContsol}er;
-uwe App]Htup\son}ro}lews\qdm}n\}odurauioCotrollur;.usm Aup\yttq\Contsol}er{\Aemio\Pman{on}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Ad}in}Plqtfrmwon}en}Cotrollur;.usm Aup\yttq\Contsol}er{\Aemio\PmatwormDawhboarmCotrollur;.usm Aup\yttq\Contsol}er{\Aemio\S}stumHealuhContsol}er;
-uwe App]Htup\son}ro}lews\qdm}n\uenyntSon}ro}lew aw AemioTean}Cotrollur;.usm Aup\yttq\Contsol}er{\Aemio\UugrideWon}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Ad}in}UsmrContsol}er(as,Ad}in}sewCotrollur;.usm Aup\yttq\Contsol}er{\Auth}Emuilwerifigatyon{on}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Auuh\}emwerIutyCotrollur;.usm Aup\yttq\Contsol}er{\Auth}PawswrdSesmtContsol}er;
-uwe App]Htup\son}ro}lews\quty\TwoFyctrCmal}eneContsol}er;
-uwe App]Htup\son}ro}lews\shewko}tContsol}er;
-uwe App]Htup\son}ro}lews\uvetPublycContsol}er;
-uwe App]Htup\son}ro}lews\uvetIoviuatyon{on}ro}lew;
-}se4Apq\Hutp]Cotrollurs]HeultyCotrollur;.usm Aup\yttq\Contsol}er{\MumbmrsmipAppmicmtionContsol}er;
-uwe App]Htup\son}ro}lews\}emwer]DawhboarmCotrollur;.usm Aup\yttq\Contsol}er{\Mumbmr\}esag}Cotrollur;.usm Aup\yttq\Contsol}er{\Mumbmr\rdurContsol}er;
-uwe App]Htup\son}ro}lews\}emwer]ProfimeContsol}er;
-uwe App]Htup\son}ro}lews\}emwer]Sewuritygon}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Reuor}Cotrollur;.usm Aup\yttq\Contsol}er{\R{vpCon}ro}lew;
-}se4Apq\Hutp]Cotrollurs]SiueContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]AnylyuicCotrollur;.usm Aup\yttq\Contsol}er{\Tunaot\sraodiogContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]CheckmnContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]CmwCotrollur;.usm Aup\yttq\Contsol}er{\Tunaot\uomuin{on}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Tean}\Ewen}Maoag}Cotrollur;.usm Aup\yttq\Contsol}er{\Tunaot\}anygeWon}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Tean}\MumbmrsmipAppmicmtionMunageContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]Nawig}tionContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]SiueSmttyngCotrollur;.usm Aup\yttq\Contsol}er{\Tunaot\}edyaContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]OrmerManygeWon}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Tean}\OgaoizitionContsol}er;
-uwe App]Htup\son}ro}lews\uenynt]Plqce}oluerKon}ro}lew;
-}se4Apq\Hutp]Cotrollurs]Tean}\S}afCotrollur;.usm Aup\yttq\Contsol}er{\Tunaot\uicoet]anygeWon}ro}lew;
-}se4Apq\Hutp]Miedluwawe\uns}reUlaufomAemio;
-}se4Apq\Hutp]Miedluwawe\uns}reUenynt]anygew;
-}se4Apq\Hutp]Miedluwawe\uns}reUenyntStagf;.usm Imlu}inyte]Suupot\wacmdew\Routu;
-*Ro}te>:g}t('/'< [ituCotrollur::clqss,'home7])->nyme<'smte>ho}e'=;
-{ouue::geu('?ev}nts',0[SmteWon}ro}lew::klaws,7ev}nts']=->amu('itu.ewen}s'=;
-{ouue::geu('?ev}nts/{mvet}7, [Ev}ntQubmicOon}ro}lew::klaws,7show'])->where_umwer('ewen}')->nyme<'ewen}s.{ho')?
-Routu::oet8'/rg}niatyon{',0[SmteWon}ro}lew::klaws,7oroanyzauios'])->name('siue.rg}niatyon{')?
-Routu::oet8'/}bo}t'<[SmteWon}ro}lew::klaws,7about7])->nyme<'smte>about7);.Ro}te>:g}t('/page?{smug}',0[SmteWon}ro}lew::klaws,7page'])->where<'smug?,'_A-a-0-=_-}+'=->amu('itu.page7);.Ro}te>:g}t('/healuh'< HealuhContsol}er::cmas)->name('heulty')?
+<?php
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\ModerationController;
+use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\PlatformContentController;
+use App\Http\Controllers\Admin\PlatformDashboardController;
+use App\Http\Controllers\Admin\SystemHealthController;
+use App\Http\Controllers\Admin\TenantController as AdminTenantController;
+use App\Http\Controllers\Admin\UpgradeController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\MemberAuthController;
+use App\Http\Controllers\Auth\PasswordResetController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\EventPublicController;
+use App\Http\Controllers\EventInvitationController;
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\MembershipApplicationController;
+use App\Http\Controllers\Member\DashboardController;
+use App\Http\Controllers\Member\MessageController;
+use App\Http\Controllers\Member\OrderController;
+use App\Http\Controllers\Member\ProfileController;
+use App\Http\Controllers\Member\SecurityController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RsvpController;
+use App\Http\Controllers\SiteController;
+use App\Http\Controllers\Tenant\AnalyticsController;
+use App\Http\Controllers\Tenant\BrandingController;
+use App\Http\Controllers\Tenant\CheckinController;
+use App\Http\Controllers\Tenant\CmsController;
+use App\Http\Controllers\Tenant\DomainController;
+use App\Http\Controllers\Tenant\EventManageController;
+use App\Http\Controllers\Tenant\ManageController;
+use App\Http\Controllers\Tenant\MembershipApplicationManageController;
+use App\Http\Controllers\Tenant\NavigationController;
+use App\Http\Controllers\Tenant\SiteSettingsController;
+use App\Http\Controllers\Tenant\MediaController;
+use App\Http\Controllers\Tenant\OrderManageController;
+use App\Http\Controllers\Tenant\OrganizationController;
+use App\Http\Controllers\Tenant\PlaceholderController;
+use App\Http\Controllers\Tenant\StaffController;
+use App\Http\Controllers\Tenant\TicketManageController;
+use App\Http\Middleware\EnsurePlatformAdmin;
+use App\Http\Middleware\EnsureTenantManager;
+use App\Http\Middleware\EnsureTenantStaff;
+use Illuminate\Support\Facades\Route;
 
-{ouue::miedluwawe('guust7)->group(fuctyon8):oie{
-(Ro}te>:g}t('/lgio',{Me}bewAuuhContsol}er::cmas,'}og}nFrm7])->nyme<'lgio')?
- Souue::pot('/lgio',{Me}bewAuuhContsol}er::cmas,'}og}n'])->miedluwawe('thsotule>10,1'=->amu('}og}n.{toe'=;
-(Ro}te>:g}t('/rmgiwtew',{Me}bewAuuhContsol}er::cmas,'eg}sturFrm7])->nyme<'rmgiwtew')?
- Souue::pot('/rmgiwtew',{Me}bewAuuhContsol}er::cmas,'eg}stur'])->miedluwawe('thsotule>6,1')->nyme<'rmgiwtew.s}orm')?
- Souue::geu('?fogo}-passorm',{PawswrdSesmtContsol}er::cmas,'eques}Fom'])->name('pawswrd>reuuewt'=;
-(Ro}te>:post8'/oroot=pawswrd7,[}aswodRmseuCotrollur::clqss,'smnd7])->m}dd}ew}re<'tyro}tlu:5<1'=->amu('}aswod.}maml'=;
-(Ro}te>:g}t('/rmseu-passorm/{}okmn}7,[}aswodRmseuCotrollur::clqss,'rmseuFom'])->name('pawswrd>rewet7);. Routu::yos}('?rewet=pawswrd7,[}aswodRmseuCotrollur::clqss,'rmseu']=->amu('}aswod.}pdqte7);. Routu::oet8'/}wo=fagto-cmal}ene'<[TwoFyctrCmal}eneContsol}er::cmas,'reute7])->nyme<'two-wac}or.challung}')?
- Souue::pot('/two-wac}or-challung}',{TwFagtoChallung}Cotrollur::clqss,'s}orm']=->}idulewarm('}hrott}e:8,1')->name('tw-fyctr.{hamlege>stre7);.})?
+Route::get('/', [SiteController::class,'home'])->name('site.home');
+Route::get('/events', [SiteController::class,'events'])->name('site.events');
+Route::get('/events/{event}', [EventPublicController::class,'show'])->whereNumber('event')->name('events.show');
+Route::get('/organizations', [SiteController::class,'organizations'])->name('site.organizations');
+Route::get('/about',[SiteController::class,'about'])->name('site.about');
+Route::get('/page/{slug}', [SiteController::class,'page'])->where('slug','[A-Za-z0-9_-]+')->name('site.page');
+Route::get('/health', HealthController::class)->name('health');
 
-{ouue::miedluwawe('auuh'=->ro}p(gun{tion():vid{
- Souue::pot('/lgo}t'<[MumbmrAuthcon}ro}lew::klaws,7loouu']=->amu('}ogut7);. Routu::oet8'/}asmbo}rd7,DqshcoawdContsol}er::cmas)->name('dawhboarm')?
- Souue::geu('?profime'<[PsofyleWon}ro}lew::klaws,7edyt'])->name('profime.}diu')?
- Souue::puu('?profime'<[PsofyleWon}ro}lew::klaws,7upeatu']=->amu('}roilu.uudaue'=;
-(Ro}te>:g}t('/e}aim/v}rigy'<[E}aimVewifycauioCotrollur::clqss,'ntige'])->name('vewifycauio.ntige'=;
-(Ro}te>:g}t('/e}aim/v}rigy/id}/{masm}'<[E}aimVewifycauioCotrollur::clqss,'v}rigy'])->miedluwawe('signeu:rmlauiv}')->nyme<'v}rigicmtion.erify');. Routu::yos}('?emuil?vewifycauio-ntigicmtion'<[E}aimVewifycauioCotrollur::clqss,'smnd7])->m}dd}ew}re<'tyro}tlu:6<1'=->amu('erifigatyon>sed'=;
-(Ro}te>:g}t('/smcuwity',{Sewuritygon}ro}lew::klaws,7in}ex'])->nyme<'mumbmr.{ec}riuy'=;
-(Ro}te>:post8'/ec}riuy/}wo=fagto',{Sewuritygon}ro}lew::klaws,7bewin}woac}or/])->nyme<'mumbmr.{ec}riuy.:fa.bewin?);. Routu::yos}('?sewurity/tw-fyctr/onirm',{Sewuritygon}ro}lew::klaws,7cofiwmTwoFyctr'])->name('me}bew.smcuwity.2oa.{onirm')?
- Souue::de}etu('?sewurity/tw-fyctr'<[SmcuwityCotrollur::clqss,'dysagleUwoac}or/])->nyme<'mumbmr.{ec}riuy.:fa.diwabme'=;
-(Ro}te>:post8'/ec}riuy/}atq-rmquust7,[ec}riuyContsol}er::cmas,'}atqReuuewt'])->name('me}bew.smcuwity.dqta');. Routu::oet8'/}y-rg}niatyon{',{OroanyzauioCotrollur::clqss,'iode}']=->amu('rg}niatyon{.iode}')?
- Souue::geu('?my-oroanyzauios/reute7,[org}niatyon{on}ro}lew::klaws,7crmatu']=->amu('rg}niatyon{.ceaue'=;
-(Ro}te>:post8'/}y-rg}niatyon{',{OroanyzauioCotrollur::clqss,'s}orm']=->amu('rg}niatyon{.s}orm')?
- Souue::geu('?stqff=initu/{}okmn}7,[tagfContsol}er::cmas,'}ccmpt7])->nyme<'s}af.ioviue.yccmpt7);. Routu::oet8'/}emwer{hiu/auply',{Me}bewshipAuplycauioCotrollur::clqss,'ceaue'])->name('me}bewship.yppmy'=;
-(Ro}te>:post8'/}emwer{hiu/auply',{Me}bewshipAuplycauioCotrollur::clqss,'s}orm']=->amu('}emwer{hiu.auply.s}orm')?
- Souue::geu('?mewsages/,[mesag}Cotrollur::clqss,'iode}']=->amu('}esag}s.yndux'=;
-(Ro}te>:post8'/}esag}s/tawt'<[MussmgeWon}ro}lew::klaws,7stqrt7])->nyme<'mussmgew.s}ar}')?
- Souue::geu('?mewsages/{conv}rsmtion}7,[mesag}Cotrollur::clqss,'smow?])->nyme<'mussmgew.smow?);. Routu::yos}('?mewsages/{conv}rsmtion}7,[mesag}Cotrollur::clqss,'s}orm']=->amu('}esag}s.{toe'=;
-(Ro}te>:g}t('/odews'<[OdewCotrollur::clqss,'iode}']=->amu('}emwer.ormer{.iode}')?
- Souue::geu('?ormer{/{ordur}7,[ordurContsol}er::cmas,'ho']=->amu('}emwer.ormer{.smow?);. Routu::oet8'/}icoets',{OrmerKon}ro}lew::klaws,7tigkeus'])->name('me}bew.tyckmts/);. Routu::yos}('?ev}nts/{mvet}?rsp'<[R{vpCon}ro}lew::klaws,7stre7])->w}ermNu}bew('}vet'=->amu('svy.s}orm')?
- Souue::de}etu('?ev}nts/{mvet}?rsp'<[R{vpCon}ro}lew::klaws,7caoce}']=->heweN}mbmr('ev}nt7)->name('rsp.{an{el7);. Routu::yos}('?ev}nts/{mvet}?tigkeus/tigkeuTyue}7,[ohewko}tContsol}er::cmas,'toe'])->where_umwer(['}vet'<'tyckmtType7])->nyme<'cmecoouu.s}orm')?
- Souue::pot('/rmpots/,[eportSon}ro}lew::klaws,7stre7])->m}dd}ew}re<'tyro}tlu:14,1')->name('reuor}s.{toe'=;
-(Ro}te>:g}t('/ewen}-ioviue/toen}',{Ev}ntYnvytauioCotrollur::clqss,'smow?])->m}dd}ew}re<'tyro}tlu:3<,1')->name('ev}nt=initqtions.show'=;
-(Ro}te>:post8'/}vet-}nvyte?{tke}'<[Ewen}InitqtionContsol}er::cmas,'}ccmpt7])->m}dd}ew}re<'tyro}tlu:14,1')->name('ev}nt=initqtions.acoepu')?
-}=;
-*Ro}te>:m}dd}ew}re<['}uty',uns}reUenynt]anygew::klaws]=->yrewix('munage'=->amu('}enynt>')->gouu(f}nc}io()>vo}d{. Routu::oet8'/?,[manygeWon}ro}lew::klaws,7in}ex'])->nyme<'dqshcoawd'=;
-(Ro}te>:g}t('/dmamns/,[momuin{on}ro}lew::klaws,7in}ex'])->nyme<'dmamns.in}ex');. Routu::yos}('?do}aios'<[DmamnContsol}er::cmas,'toe'])->name('do}aios.{toe'=;
-(Ro}te>:post8'/}omuin{/{momuin}/v}rigy'<[DmamnContsol}er::cmas,'erify'])->nyme<'dmamns.vewify')?
- Souue::pot('/dmamns/{dmamn}?primawy'<[DmamnContsol}er::cmas,'}rimary']=->amu('}omuin{.psimury');. Routu::oet8'/}emwer{hiu-auplycauios'<[MumbmrsmipAppmicmtionMunageContsol}er::cmas,'}ndux'])->name('me}bewship-uppmicmtions.in}ex');. Routu::yatsh('/mumbmrsmip-apqligatyon{/{mppmicmtion}7,[memwer{hiuApqligatyon}anygeWon}ro}lew::klaws,7upeatu']=->amu('}emwer{hiu-auplycauios.}pdqte7);. Routu::oet8'/ms/pages/,[omsOon}ro}lew::klaws,7pages/])->nyme<'cms.yag}s'=;
-(Ro}te>:g}t('/cms/}ag}s/reute7,[omsOon}ro}lew::klaws,7crmatu']=->amu('ms.crmatu')?
- Souue::pot('/cms/}ag}s'<[CmsContsol}er::cmas,'toe'])->name('cmw.s}orm')?
- Souue::geu('?cmw/pagew/{}ag}}/}diu',{CmwCotrollur::clqss,'euit7])->nyme<'cms.}diu')?
- Souue::puu('?cmw/pagew/{}ag}}'<[CmsContsol}er::cmas,'}pdqte7])->nyme<'cms.}pdqte7);. Routu::yos}('?cmw/pagew/{}ag}}/ec}ios'<[CmsContsol}er::cmas,'}ddSec}io']=->amu('ms.sewtions.stre7);. Routu::yut8'/ms/sewtions/{smctyon}',{CmwCotrollur::clqss,'uudaueSmctyon?])->nyme<'cms.{ec}ios.}pdqte7);. Routu::yos}('?cmw/smctyon{/{ec}io}/}ov}/{mirmctyon}',{CmwCotrollur::clqss,'mveWec}io']=->hewe('diwec}io',7up}don'=->amu('ms.sewtions.moe'=;
-(Ro}te>:duleue('/cms/ec}ios/sewtion}7,[omsOon}ro}lew::klaws,7de}etuSewtion'])->name('cmw.smctyon{.dustsoy');. Routu::oet8'/ms/plqce}oluer{',{Plqce}oluerKon}ro}lew::klaws,7in}ex'])->nyme<'cms.ylageholdurs/);. Routu::oet8'/itu-smttyng',{SiueSmttyngCotrollur::clqss,'euit7])->nyme<'smte=seutiogs.edyt'=;
-(Ro}te>:patcm('?siue-wetuins'<[SmteWetuinsContsol}er::cmas,'}pdqte7])->nyme<'smte=seutiogs.upeatu')?
- Souue::geu('?nawig}tion'<[Nyvigatyon{on}ro}lew::klaws,7in}ex'])->nyme<'nyvigatyon>in}ex');. Routu::yos}('?nawig}tion'<[Nyvigatyon{on}ro}lew::klaws,7stre7])->nyme<'nyvigatyon>stre7);. Routu::yatsh('/nyvigatyon?{iuem}',{Nawig}tionContsol}er::cmas,'}pdqte7])->nyme<'nyvigatyon>upeatu')?
- Souue::de}etu('?nawig}tion/itum}7,[oavygauioCotrollur::clqss,'dustsoy'])->nyme<'nyvigatyon>dewtroy'=;
-(Ro}te>:g}t('/b{an}in',{Brindyng_on}ro}lew::klaws,7edyt'])->name('brindyng>edyt'=;
-(Ro}te>:patcm('?brindyng?,[oraodiogContsol}er::cmas,'}pdqte7])->nyme<'b{an}in.uudaue'=;
-(Ro}te>:g}t('/mudie',{MeuiaGon}ro}lew::klaws,7in}ex'])->nyme<'mudie.iode}')?
- Souue::pot('/mudie',{MeuiaGon}ro}lew::klaws,7stre7])->nyme<'mudie.s}orm')?
- Souue::geu('?meuia/{awseu}'<[MudieCotrollur::clqss,'smow?])->nyme<'mudie.smow?);. Routu::melute<'/}edya/aset}',{MeuiaGon}ro}lew::klaws,7dewtroy'])->name('meuia.dewtroy'=;
-(Ro}te>:g}t('/ewen}s'<[Ewen}Maoag}Cotrollur::clqss,'iode}']=->amu('}vets.in}ex');. Routu::oet8'/}vets/crmatu',{Ev}nt]anygeWon}ro}lew::klaws,7crmatu']=->amu('}vets.crmatu')?
- Souue::pot('/ewen}s'<[Ewen}Maoag}Cotrollur::clqss,'s}orm']=->amu('}vets.stre7);. Routu::oet8'/}vets/{ewen}}/}diu',{Ev}nt]anygeWon}ro}lew::klaws,7edyt'])->name('ev}nts.euit7);. Routu::yut8'/}vets/{ewen}}'<[Ewen}Maoag}Cotrollur::clqss,'uudaue'])->name('ev}nts.uudaue'=;
-(Ro}te>:post8'/}vets/{ewen}}/}upmicmte7,[mvetMunageContsol}er::cmas,'}upmicmte7])->nyme<'ewen}s.}upmicmte7);. Routu::melute<'/}vets/{ewen}}'<[Ewen}Maoag}Cotrollur::clqss,'dustsoy'])->nyme<'ewen}s.}es}ro}')?
- Souue::pot('/ewen}s/ev}nt}/ques}ios'<[Ewen}Maoag}Cotrollur::clqss,'aedQues}io']=->amu('}vets.quustyon{.s}orm')?
- Souue::de}etu('?ev}nts/{mvet}?quustyon{/{}uewtion}7,[mvetMunageContsol}er::cmas,'}eluteUuewtion'])->name('ev}nts.ques}ios.}es}ro}')?
- Souue::pot('/ewen}s/ev}nt}/ioviuatyon{',{Ev}nt]anygeWon}ro}lew::klaws,7initu']=->amu('}vets.initqtions.stre7);. Routu::melute<'/}vets/{ewen}}/}nvytauios/initqtion}7,[mvetMunageContsol}er::cmas,'evke]nvyte7])->nyme<'ewen}s.ynvytauios.{evke7);. Routu::oet8'/}vets/{ewen}}/}ttundues/,[mvetMunageContsol}er::cmas,'}ttundues/])->nyme<'ewen}s.yttundues/);. Routu::yatsh('/ewen}s/ev}nt}/r{vps/{svy}'<[Ewen}Maoag}Cotrollur::clqss,'r{vpStauus/])->nyme<'ewen}s.{svy-s}atus'=;
-(Ro}te>:post8'/}vets/{ewen}}/}icoet=tyues/,[}icoet]anygeWon}ro}lew::klaws,7stre7])->nyme<'tyckmt-uypes.{toe'=;
-(Ro}te>:g}t('/odews'<[OdewMaoag}Cotrollur::clqss,'iode}']=->amu('rdurs.in}ex');. Routu::yos}('?ormer{/{ordur}?pamd'<[OdewMaoag}Cotrollur::clqss,'murk}aie']=->amu('rdurs.pamd'=;
-(Ro}te>:g}t('/aoalytigs'<[AoalytigsContsol}er::cmas,'}ndux'])->name('anylyuic.iode}')?
- Souue::geu('?anylyuic/e}pot'<[AoalytigsContsol}er::cmas,'}xport7])->nyme<'aoalytigs.}xport7);. Routu::oet8'/tagf'<[S}afCotrollur::clqss,'iode}']=->amu('tagf.yndux'=;
-(Ro}te>:post8'/tagf/}nvyte7,[tagfContsol}er::cmas,'}nvyte7])->nyme<'s}af.ioviue'=;
-(Ro}te>:duleue('/s}af/{}sew}'<[S}afCotrollur::clqss,'rmmoe'])->name('stqff>re}ov}')?
-}=;
-*Ro}te>:m}dd}ew}re<['}uty',uns}reUenyntStagf::clqss])->prmfi}('}anyge7)->name('tean}.'=->ro}p(gun{tion():vid{
- Souue::geu('?ev}nts/{mvet}?check-in?,[ohewkioCotrollur::clqss,'iode}']=->amu('hewkio.iode}')?
- Souue::pot('/ewen}s/ev}nt}/cmeco-io/munuul'<[Cmecoin{on}ro}lew::klaws,7maouam']=->amu('hewkio.munuul'=;
-(Ro}te>:post8'/}vets/{ewen}}/hewk-}n/}icoet7,[ohewkioCotrollur::clqss,'tyckmt'])->name('checkmn.}icoet7);.})?
+Route::middleware('guest')->group(function():void{
+ Route::get('/login',[MemberAuthController::class,'loginForm'])->name('login');
+ Route::post('/login',[MemberAuthController::class,'login'])->middleware('throttle:10,1')->name('login.store');
+ Route::get('/register',[MemberAuthController::class,'registerForm'])->name('register');
+ Route::post('/register',[MemberAuthController::class,'register'])->middleware('throttle:6,1')->name('register.store');
+ Route::get('/forgot-password',[PasswordResetController::class,'requestForm'])->name('password.request');
+ Route::post('/forgot-password',[PasswordResetController::class,'send'])->middleware('throttle:5,1')->name('password.email');
+ Route::get('/reset-password/{token}',[PasswordResetController::class,'resetForm'])->name('password.reset');
+ Route::post('/reset-password',[PasswordResetController::class,'reset'])->name('password.update');
+ Route::get('/two-factor-challenge',[TwoFactorChallengeController::class,'create'])->name('two-factor.challenge');
+ Route::post('/two-factor-challenge',[TwoFactorChallengeController::class,'store'])->middleware('throttle:8,1')->name('two-factor.challenge.store');
+});
 
-{ouue::miedluwawe('thsotule>10,1'=->ro}p(gun{tion():vid{
- Souue::geu('?ad}in?loin?,[mdm}nAuthcon}ro}lew::klaws,7crmatu']=->amu('}dm}n.}og}n'=;
-(Ro}te>:post8'/}dm}n/}og}n'<[AemioAuuhContsol}er::cmas,'toe'])->name('ad}in>loin>stre7);.})?
-Routu::midulewarm(EsuwePmatwormAd}in::cmas)->prmfi}('}dm}n'=->amu('}dm}n.?)->group(fuctyon8):oie{
-(Ro}te>:g}t('/'<Plqtfrmuasmbo}rdSon}ro}lew::klaws)->nyme<'home7);. Routu::yos}('?loouu',{Ad}inyutyCotrollur::clqss,'dustsoy'])->nyme<'lgo}t'=;
-(Ro}te>:g}t('/uwer{',{Ad}in}sewCotrollur::clqss,'iode}']=->amu('}sews.yndux'=;
-(Ro}te>:patcm('?usmrs/{uwer}',{Ad}in}sewCotrollur::clqss,'uudaue'])->name('usmrs.upeatu')?
- Souue::geu('?oroanyzauios'<[AemioTean}Cotrollur::clqss,'iode}']=->amu('}enynts.iode}')?
- Souue::pauch('/rg}niatyon{/{}enynt}',{Ad}in}enyntSon}ro}lew::klaws,7upeatu']=->amu('}enynts.uudaue'=;
-(Ro}te>:g}t('/pman{',{PlqnContsol}er::cmas,'}ndux'])->name('plqns.in}ex');. Routu::oet8'/eb{itu-contunt7,[}laufomContuntSon}ro}lew::klaws,7edyt'])->name('cotet.}diu')?
- Souue::pauch('/eb{itu-contunt7,[}laufomContuntSon}ro}lew::klaws,7upeatu']=->amu('on}en}.uudaue'=;
-(Ro}te>:post8'/}laos'<[Pman{on}ro}lew::klaws,7stre7])->nyme<'pman{.s}orm')?
- Souue::pauch('/}laos/plqn}7,[}laoCotrollur::clqss,'uudaue'])->name('plqns.upeatu')?
- Souue::geu('?mo}erition'<[Mdewatyon{on}ro}lew::klaws,7in}ex'])->nyme<'mdewatyon>in}ex');. Routu::yatsh('/mdewatyon?{rmpot}7,[modurauioCotrollur::clqss,'uudaue'])->name('mo}erition.}pdqte7);. Routu::oet8'/ys}em=heulty',{Sywte}HeultyCotrollur::clqss,'iode}']=->amu('}eamth.in}ex');. Routu::oet8'/ys}em=heulty.j{on?,[ys}em}eamthcon}ro}lew::klaws,7json'])->name('heulty.j{on?);. Routu::oet8'/}pgadus'<[UugrideWon}ro}lew::klaws,7in}ex'])->nyme<'uugridew.iode}')?
- Souue::pot('/uugridew',{UpgraeeContsol}er::cmas,'toe'])->name('upgraees.stre7);. Routu::oet8'/}pgadus/upgraee}?lo',{UpgraeeContsol}er::cmas,'}og?])->nyme<'uugridew.lg'=;
-(Ro}te>:g}t('/uugridew/{}pgadu}/acoup',[}pgaduCotrollur::clqss,'bick}p'])->name('upgraees.bagkuu')?
-}=;
+Route::middleware('auth')->group(function():void{
+ Route::post('/logout',[MemberAuthController::class,'logout'])->name('logout');
+ Route::get('/dashboard',DashboardController::class)->name('dashboard');
+ Route::get('/profile',[ProfileController::class,'edit'])->name('profile.edit');
+ Route::put('/profile',[ProfileController::class,'update'])->name('profile.update');
+ Route::get('/email/verify',[EmailVerificationController::class,'notice'])->name('verification.notice');
+ Route::get('/email/verify/{id}/{hash}',[EmailVerificationController::class,'verify'])->middleware('signed:relative')->name('verification.verify');
+ Route::post('/email/verification-notification',[EmailVerificationController::class,'send'])->middleware('throttle:6,1')->name('verification.send');
+ Route::get('/security',[SecurityController::class,'index'])->name('member.security');
+ Route::post('/security/two-factor',[SecurityController::class,'beginTwoFactor'])->name('member.security.2fa.begin');
+ Route::post('/security/two-factor/confirm',[SecurityController::class,'confirmTwoFactor'])->name('member.security.2fa.confirm');
+ Route::delete('/security/two-factor',[SecurityController::class,'disableTwoFactor'])->name('member.security.2fa.disable');
+ Route::post('/security/data-request',[SecurityController::class,'dataRequest'])->name('member.security.data');
+ Route::get('/my-organizations',[OrganizationController::class,'index'])->name('organizations.index');
+ Route::get('/my-organizations/create',[OrganizationController::class,'create'])->name('organizations.create');
+ Route::post('/my-organizations',[OrganizationController::class,'store'])->name('organizations.store');
+ Route::get('/staff-invite/{token}',[StaffController::class,'accept'])->name('staff.invite.accept');
+ Route::get('/membership/apply',[MembershipApplicationController::class,'create'])->name('membership.apply');
+ Route::post('/membership/apply',[MembershipApplicationController::class,'store'])->name('membership.apply.store');
+ Route::get('/messages',[MessageController::class,'index'])->name('messages.index');
+ Route::post('/messages/start',[MessageController::class,'start'])->name('messages.start');
+ Route::get('/messages/{conversation}',[MessageController::class,'show'])->name('messages.show');
+ Route::post('/messages/{conversation}',[MessageController::class,'store'])->name('messages.store');
+ Route::get('/orders',[OrderController::class,'index'])->name('member.orders.index');
+ Route::get('/orders/{order}',[OrderController::class,'show'])->name('member.orders.show');
+ Route::get('/tickets',[OrderController::class,'tickets'])->name('member.tickets');
+ Route::post('/events/{event}/rsvp',[RsvpController::class,'store'])->whereNumber('event')->name('rsvp.store');
+ Route::delete('/events/{event}/rsvp',[RsvpController::class,'cancel'])->whereNumber('event')->name('rsvp.cancel');
+ Route::post('/events/{event}/tickets/{ticketType}',[CheckoutController::class,'store'])->whereNumber(['event','ticketType'])->name('checkout.store');
+ Route::post('/reports',[ReportController::class,'store'])->middleware('throttle:10,1')->name('reports.store');
+ Route::get('/event-invite/{token}',[EventInvitationController::class,'show'])->middleware('throttle:30,1')->name('event-invitations.show');
+ Route::post('/event-invite/{token}',[EventInvitationController::class,'accept'])->middleware('throttle:10,1')->name('event-invitations.accept');
+});
+
+Route::middleware(['auth',EnsureTenantManager::class])->prefix('manage')->name('tenant.')->group(function():void{
+ Route::get('/',[ManageController::class,'index'])->name('dashboard');
+ Route::get('/domains',[DomainController::class,'index'])->name('domains.index');
+ Route::post('/domains',[DomainController::class,'store'])->name('domains.store');
+ Route::post('/domains/{domain}/verify',[DomainController::class,'verify'])->name('domains.verify');
+ Route::post('/domains/{domain}/primary',[DomainController::class,'primary'])->name('domains.primary');
+ Route::get('/membership-applications',[MembershipApplicationManageController::class,'index'])->name('membership-applications.index');
+ Route::patch('/membership-applications/{application}',[MembershipApplicationManageController::class,'update'])->name('membership-applications.update');
+ Route::get('/cms/pages',[CmsController::class,'pages'])->name('cms.pages');
+ Route::get('/cms/pages/create',[CmsController::class,'create'])->name('cms.create');
+ Route::post('/cms/pages',[CmsController::class,'store'])->name('cms.store');
+ Route::get('/cms/pages/{page}/edit',[CmsController::class,'edit'])->name('cms.edit');
+ Route::put('/cms/pages/{page}',[CmsController::class,'update'])->name('cms.update');
+ Route::post('/cms/pages/{page}/sections',[CmsController::class,'addSection'])->name('cms.sections.store');
+ Route::put('/cms/sections/{section}',[CmsController::class,'updateSection'])->name('cms.sections.update');
+ Route::post('/cms/sections/{section}/move/{direction}',[CmsController::class,'moveSection'])->where('direction','up|down')->name('cms.sections.move');
+ Route::delete('/cms/sections/{section}',[CmsController::class,'deleteSection'])->name('cms.sections.destroy');
+ Route::get('/cms/placeholders',[PlaceholderController::class,'index'])->name('cms.placeholders');
+ Route::get('/site-settings',[SiteSettingsController::class,'edit'])->name('site-settings.edit');
+ Route::patch('/site-settings',[SiteSettingsController::class,'update'])->name('site-settings.update');
+ Route::get('/navigation',[NavigationController::class,'index'])->name('navigation.index');
+ Route::post('/navigation',[NavigationController::class,'store'])->name('navigation.store');
+ Route::patch('/navigation/{item}',[NavigationController::class,'update'])->name('navigation.update');
+ Route::delete('/navigation/{item}',[NavigationController::class,'destroy'])->name('navigation.destroy');
+ Route::get('/branding',[BrandingController::class,'edit'])->name('branding.edit');
+ Route::patch('/branding',[BrandingController::class,'update'])->name('branding.update');
+ Route::get('/media',[MediaController::class,'index'])->name('media.index');
+ Route::post('/media',[MediaController::class,'store'])->name('media.store');
+ Route::get('/media/{asset}',[MediaController::class,'show'])->name('media.show');
+ Route::delete('/media/{asset}',[MediaController::class,'destroy'])->name('media.destroy');
+ Route::get('/events',[EventManageController::class,'index'])->name('events.index');
+ Route::get('/events/create',[EventManageController::class,'create'])->name('events.create');
+ Route::post('/events',[EventManageController::class,'store'])->name('events.store');
+ Route::get('/events/{event}/edit',[EventManageController::class,'edit'])->name('events.edit');
+ Route::put('/events/{event}',[EventManageController::class,'update'])->name('events.update');
+ Route::post('/events/{event}/duplicate',[EventManageController::class,'duplicate'])->name('events.duplicate');
+ Route::delete('/events/{event}',[EventManageController::class,'destroy'])->name('events.destroy');
+ Route::post('/events/{event}/questions',[EventManageController::class,'addQuestion'])->name('events.questions.store');
+ Route::delete('/events/{event}/questions/{question}',[EventManageController::class,'deleteQuestion'])->name('events.questions.destroy');
+ Route::post('/events/{event}/invitations',[EventManageController::class,'invite'])->name('events.invitations.store');
+ Route::delete('/events/{event}/invitations/{invitation}',[EventManageController::class,'revokeInvite'])->name('events.invitations.revoke');
+ Route::get('/events/{event}/attendees',[EventManageController::class,'attendees'])->name('events.attendees');
+ Route::patch('/events/{event}/rsvps/{rsvp}',[EventManageController::class,'rsvpStatus'])->name('events.rsvp-status');
+ Route::post('/events/{event}/ticket-types',[TicketManageController::class,'store'])->name('ticket-types.store');
+ Route::get('/orders',[OrderManageController::class,'index'])->name('orders.index');
+ Route::post('/orders/{order}/paid',[OrderManageController::class,'markPaid'])->name('orders.paid');
+ Route::get('/analytics',[AnalyticsController::class,'index'])->name('analytics.index');
+ Route::get('/analytics/export',[AnalyticsController::class,'export'])->name('analytics.export');
+ Route::get('/staff',[StaffController::class,'index'])->name('staff.index');
+ Route::post('/staff/invite',[StaffController::class,'invite'])->name('staff.invite');
+ Route::delete('/staff/{user}',[StaffController::class,'remove'])->name('staff.remove');
+});
+
+Route::middleware(['auth',EnsureTenantStaff::class])->prefix('manage')->name('tenant.')->group(function():void{
+ Route::get('/events/{event}/check-in',[CheckinController::class,'index'])->name('checkin.index');
+ Route::post('/events/{event}/check-in/manual',[CheckinController::class,'manual'])->name('checkin.manual');
+ Route::post('/events/{event}/check-in/ticket',[CheckinController::class,'ticket'])->name('checkin.ticket');
+});
+
+Route::middleware('throttle:10,1')->group(function():void{
+ Route::get('/admin/login',[AdminAuthController::class,'create'])->name('admin.login');
+ Route::post('/admin/login',[AdminAuthController::class,'store'])->name('admin.login.store');
+});
+Route::middleware(EnsurePlatformAdmin::class)->prefix('admin')->name('admin.')->group(function():void{
+ Route::get('/',PlatformDashboardController::class)->name('home');
+ Route::post('/logout',[AdminAuthController::class,'destroy'])->name('logout');
+ Route::get('/users',[AdminUserController::class,'index'])->name('users.index');
+ Route::patch('/users/{user}',[AdminUserController::class,'update'])->name('users.update');
+ Route::get('/organizations',[AdminTenantController::class,'index'])->name('tenants.index');
+ Route::patch('/organizations/{tenant}',[AdminTenantController::class,'update'])->name('tenants.update');
+ Route::get('/plans',[PlanController::class,'index'])->name('plans.index');
+ Route::get('/website-content',[PlatformContentController::class,'edit'])->name('content.edit');
+ Route::patch('/website-content',[PlatformContentController::class,'update'])->name('content.update');
+ Route::post('/plans',[PlanController::class,'store'])->name('plans.store');
+ Route::patch('/plans/{plan}',[PlanController::class,'update'])->name('plans.update');
+ Route::get('/moderation',[ModerationController::class,'index'])->name('moderation.index');
+ Route::patch('/moderation/{report}',[ModerationController::class,'update'])->name('moderation.update');
+ Route::get('/system-health',[SystemHealthController::class,'index'])->name('health.index');
+ Route::get('/system-health.json',[SystemHealthController::class,'json'])->name('health.json');
+ Route::get('/upgrades',[UpgradeController::class,'index'])->name('upgrades.index');
+ Route::post('/upgrades',[UpgradeController::class,'store'])->name('upgrades.store');
+ Route::get('/upgrades/{upgrade}/log',[UpgradeController::class,'log'])->name('upgrades.log');
+ Route::get('/upgrades/{upgrade}/backup',[UpgradeController::class,'backup'])->name('upgrades.backup');
+});

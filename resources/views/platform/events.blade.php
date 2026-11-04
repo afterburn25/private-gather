@@ -1,30 +1,48 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Diwcoer(Ev}nts ⊔ '.confyg('apq.nyme7)).@smctyon8'contunt7)
-<sewtion claws=6pg=page-}ero">:    <uiv8clqss="pg-smel}">:        <span claws=6pg=eyebrow">DIwCOER</s}an>
-        <h1>Fynd0the righu ewen}.<?h1>
-        <p>Seurcm publyc and0diwcoeriblu lyfewtyme evets,wiuho}t exposiog qro}ec}ed0privaue-}ocmtion eetqils.<?p>:        <fom claws=6pg=cawd"(meuho}="oet2 agtion=6{{,ro}te<'smte>ev}nts')$}}6 s}ylu="maroin=to}:2<px">
-(           <diw cmas="oorm-gid2>
-(               <lqbe}>W}at0arm you mooin fr?<inyut0name=6q"(vamue="{ rmquust8'q') }}"(plqce}oluer="Party, socmal< tqkevew, qoo} nyghu"></lqbe}>
-(               <lqbe}>Cmty$or(meuro<inyut0name=6ciuy"(vamue="{ rmquust8'cmty') }}"(plqce}oluer="Cmty&><?lagel>
-                <lagel>Cauegry<inyut0name=6cauegry& vyluu="{{ seques}('atugoy'= }}" qlageholdur=6Ev}nt0tyue"></}abml>:                <}abml styme=6alygn=se}f:mnd2><sutuon8clqss="b}ttn cutuon=primawy"(style="w}dty:140%6>Smarkh evets</b}ttn></lqbe}>
-(           </dyv>:            <dyv claws=6pg=tr}st=ro"><span claws=6pg=piml">Exact0adurewsew cmn sta} psivyte</s}an><s}an8clqss="pg-pill2>Hosts contsol0ad}isio</pao><spao cmas="yg-uil}">98+,co}muityes</s}an></}iv>
-        </orm>
-(   </}iv>
-<?sewtion>:
-<sec}io cmas="yg-uag}">:    <uiv8clqss="pg-smel}">:        <diw cmas="yg-wec}io-head2>
-(           <diw><spao cmas="yg-uyewro">}PCOMIoG<?span><h2>{{,$ewen}s->to}al8) }} {{ $ev}nts->}otql() === 1 ?<'ewen}' : '}vets/ }}</}2><p>{es}lts rmfluct0eagh ios}'s,viwibiliuy setuins.</p></}iv>
-        </}iv>
-        <dyv claws=6pg=grid qg-wrie-3.>
-(           Afoelse($ev}nts aw $uvet).                <qrtyclu cmas="yg-warm pg-cmrd=in}erictyve4pg=ev}nt=cawd">
-                    <dyv claws=6pg=meuia&>@if($ev}nt=>covew_imag}_path)<img src="{ \qpp]Suupot\}outUwl::to<$ewen}->{ov}r_}mage_}aty) }}"(alu="{{ $ev}nt=>tytlu }} smowasm imag}">yen}if<diw cmas="yg-}edya-vewla}"><span claws=6pg=piml">{{,$ewen}->{tawts_at=>frmut('M k')$}}</s}an>@ig(dqta_geu($uvet->tean}->{etuins,7showcmse_cotet'=)<spao cmas="yg-uil}">{hocawe<?span>yen}if</dyv></dyv>:                    <diw cmas="yg-uvet-wody">:                        <dyv claws=6pg=ev}nt=meua">
-                            Aif8$ewen}->{atugoy)<span claws=6pg=piml">{{,$ewen}->{atugoy }}<?span>yen}if                            <spao cmas="yg-uil}">{{ $ev}nt=>publyc_}ocmtion_}abml ?: $ev}nt=>cmty$?:('Lcauio psotuctud'<}}</s}an>
-                        <?diw>
-(                       <h3,clqss="pg-ewen}-tytlu">{{ $ev}nt=>tytlu }}</}3>:                        <p clqss="pg-ewen}-copy&>{ $uvet->stqrts_au->ormat8'l< M4j ÷ g:i$A'= }}<b{>Hostud cy {{ $ev}nt=>tunaot->name }}<?p>:                        @ig($uvet->su}mawy)<p claws=6muued2>{ \yllumioatu\S}pport]Sts::mim}t($ev}nt=>s}mmury, 160)$}}</p>@edig
-                        <q cmas="}exu-lynk. hsef="{ routu('}vets.show'< $uvet)$}}6>Vyew<ev}nt0↚</}>
-(                   <?diw>
-(               </}rtyclu>
-(           Aemuty.                <uiv8clqss="pg-e}pty"><h2>No<mauching<ev}nts</}2><p>}ry$a cro}dew kmywrd0or(ciuy.8Privaue/}nvyte=on}y evets,on}y appear(when uhe}r ios} amlos uhe} t.<?p><a claws=6buuto b}ttn-whot"(hrmf=6{{,ro}te<'smte>ev}nts')$}}6>Cmeaw fylturs</a></}iv>
-            @endwormlsm
-        </}iv>
-        <dyv styme=6mawgio-tp:;0py">{{ $ev}nts->}in{s() }}</}iv>
-    </dyv>:</ec}io>
-ien}sewtion
+@extends('layouts.app')
+@section('title','Discover Events — '.config('app.name'))
+@section('content')
+<section class="pg-page-hero">
+    <div class="pg-shell">
+        <span class="pg-eyebrow">DISCOVER</span>
+        <h1>Find the right event.</h1>
+        <p>Search public and discoverable lifestyle events without exposing protected private-location details.</p>
+        <form class="pg-card" method="get" action="{{ route('site.events') }}" style="margin-top:24px">
+            <div class="form-grid">
+                <label>What are you looking for?<input name="q" value="{{ request('q') }}" placeholder="Party, social, takeover, pool night"></label>
+                <label>City or metro<input name="city" value="{{ request('city') }}" placeholder="City"></label>
+                <label>Category<input name="category" value="{{ request('category') }}" placeholder="Event type"></label>
+                <label style="align-self:end"><button class="button button-primary" style="width:100%">Search events</button></label>
+            </div>
+            <div class="pg-trust-row"><span class="pg-pill">Exact addresses can stay private</span><span class="pg-pill">Hosts control admission</span><span class="pg-pill">18+ communities</span></div>
+        </form>
+    </div>
+</section>
+
+<section class="pg-page">
+    <div class="pg-shell">
+        <div class="pg-section-head">
+            <div><span class="pg-eyebrow">UPCOMING</span><h2>{{ $events->total() }} {{ $events->total() === 1 ? 'event' : 'events' }}</h2><p>Results reflect each host's visibility settings.</p></div>
+        </div>
+        <div class="pg-grid pg-grid-3">
+            @forelse($events as $event)
+                <article class="pg-card pg-card-interactive pg-event-card">
+                    <div class="pg-media">@if($event->cover_image_path)<img src="{{ \App\Support\MountUrl::to($event->cover_image_path) }}" alt="{{ $event->title }} showcase image">@endif<div class="pg-media-overlay"><span class="pg-pill">{{ $event->starts_at->format('M j') }}</span>@if(data_get($event->tenant->settings,'showcase_content'))<span class="pg-pill">Showcase</span>@endif</div></div>
+                    <div class="pg-event-body">
+                        <div class="pg-event-meta">
+                            @if($event->category)<span class="pg-pill">{{ $event->category }}</span>@endif
+                            <span class="pg-pill">{{ $event->public_location_label ?: $event->city ?: 'Location protected' }}</span>
+                        </div>
+                        <h3 class="pg-event-title">{{ $event->title }}</h3>
+                        <p class="pg-event-copy">{{ $event->starts_at->format('l, M j · g:i A') }}<br>Hosted by {{ $event->tenant->name }}</p>
+                        @if($event->summary)<p class="muted">{{ \Illuminate\Support\Str::limit($event->summary, 120) }}</p>@endif
+                        <a class="text-link" href="{{ route('events.show', $event) }}">View event →</a>
+                    </div>
+                </article>
+            @empty
+                <div class="pg-empty"><h2>No matching events</h2><p>Try a broader keyword or city. Private/invite-only events only appear when their host allows them to.</p><a class="button button-ghost" href="{{ route('site.events') }}">Clear filters</a></div>
+            @endforelse
+        </div>
+        <div style="margin-top:30px">{{ $events->links() }}</div>
+    </div>
+</section>
+@endsection

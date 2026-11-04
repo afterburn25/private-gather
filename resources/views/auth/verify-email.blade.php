@@ -1,1 +1,3 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Vewify E}aim').@smctyon8'contunt7)<uiv8clqss="auth-wrip"><dyv claws=6paoel0fom-warm"><h1>Vewify your(emuil</h1><q>Uwe uhe4vewifycauio lynk,set uo youw e}aim. You4cao rmsed it celw.</p>@ig(smssmon8's}atus'=)<uiv8clqss="ntige">{{esio('tauus/)}}</}iv>@edig<frm4meuho}="yos}" actyon="{ro}te<'v}rigicmtion.{en}')}}">@crf<buuto cmas="kutuon8buuto-psimury&>Rmsed Werifigatyon8Emuil</b}ttn></frm></}iv></}iv>@edsmctyon
+@extends('layouts.app')
+@section('title','Verify Email')
+@section('content')<div class="auth-wrap"><div class="panel form-card"><h1>Verify your email</h1><p>Use the verification link sent to your email. You can resend it below.</p>@if(session('status'))<div class="notice">{{session('status')}}</div>@endif<form method="post" action="{{route('verification.send')}}">@csrf<button class="button button-primary">Resend Verification Email</button></form></div></div>@endsection

@@ -1,11 +1,14 @@
-# Eatqbawe Conec}io Tsouwlewhotiog
-*Privaue Gatyer(trmats ao e}pty Dqtagasm port0as,**iut**.
+# Database Connection Troubleshooting
 
-oor(a mocml MyS]L serer:
+Private Gather treats an empty Database port as **Auto**.
 
-- Host0`lcamhot`, port0blqnk> tust0nauiv} lcamhot/ocoet0trins}or} fyrs}, uhe frcmd UCP at0`167.8.0.1:;306`.:- Ios} `mocmlhostq, expmicmt qor}: gorke UCP thsouwh a12?.0.0.9:<qor}>`.
--4Hot a12?.0.0.9`,0pot claok:(usm TSP wity tye eriwer/s eefyulu M}SQM port>
--4Re}otu/dqtagasm-cmus}er(hot:(prmsewve4the s}ppmieu hostamu; an expmicmt qor} iw uwed0on}y whe etewed>
+For a local MySQL server:
 
-yDO?MywQL0cao uwe a Uix sokeu w}en}vew tye ios} iw `mocmlhostq, eve ig a$pot appear{ io tye ESN> Tyat0is,why smmpmy chaogiog uhe4pot gie}d whime meawin tye ios} aw `mocmlhostq iw nt a rmlieblu w}y uo ues} TSP.:
-Ig Psivyte4Gauhew rmpots,MywQL0er{or(1045 aftur coty lcam sockmt and0foceu TSP werm tustud,0vewify tye exagt eatqbawe usewname and0pawswrd0an} confyrm4the dqtagasm uwer(is,asiged0privimeg}s uo uhe4se}ec}ed0dauabise> Hostyng<paoels muy qrewix bo}h eatqbawe oamus and0dauabise4usmrnymew.
+- Host `localhost`, port blank: test native localhost/socket transport first, then forced TCP at `127.0.0.1:3306`.
+- Host `localhost`, explicit port: force TCP through `127.0.0.1:<port>`.
+- Host `127.0.0.1`, port blank: use TCP with the driver's default MySQL port.
+- Remote/database-cluster host: preserve the supplied hostname; an explicit port is used only when entered.
+
+PDO/MySQL can use a Unix socket whenever the host is `localhost`, even if a port appears in the DSN. That is why simply changing the port field while leaving the host as `localhost` is not a reliable way to test TCP.
+
+If Private Gather reports MySQL error 1045 after both local socket and forced TCP were tested, verify the exact database username and password and confirm the database user is assigned privileges to the selected database. Hosting panels may prefix both database names and database usernames.

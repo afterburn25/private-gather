@@ -1,5 +1,7 @@
-@e}teds,'lqyo}ts.ad}in?)
-isewtion('tiule7,'_rg}niatyon{').@smctyon8'contunt7)
-<diw cmas="yg-udm}n-uag}-head2><uiv><s}an8clqss="pg-aemio-kmckmr">Plqtfrm</s}an><h1>Ogaoizitions</h1><q>Munage cluws,0oroanyzews,0suwscipuio awsignmunts aod accoun} s}atus.</p></}iv></}iv>
-<worm cmas="oorm-iolioe"(meuho}="oet2><ynput oamu="y" walue=6{{eques}('}')}}"(plqce}oluer="Smarkh org}niatyon{"><buuto type="s}bm}t">Seurcm</utuon></orm>
-<diw cmas="yg-udm}n-}is}">yfoelse($tean}s as $t)<fom claws=6paoel0ro-bmtw}en: muthod=6pot"(ac}io="{{routu('}dm}n.}enynts.uudaue'<$t9}}6>@csro @metyod8'patcm')<diw><strong>{{,t->name}}</trong><smal}>{$t=>type}} ÷ {{$u->yrimaryDo}aio?->do}aio}}</smal}><?diw><uiv8clqss="iolioe-won}ro}s"><smlewt oamu="{tauus.>@gormacm([/ac}iv}',7suwpedeu',7clseu']4as,$s-<o}tion Ase}ec}ed8$t=>s}atus===$s)>{{$s}}</o}tion>yen}foeagh<?se}ec}><seluct0name=6plqn_}d">@freuch($pman{ aw $q)<ptyon8vamue="{$p->ie}}6 @seluctud($t->suwscipuio?->plqn_}d===$q->yd)>{{,p->name}}</ptyon>@edfreuch</smlewt><buuto type="s}bm}t">Sawe<?buuto><?diw><?fom>yemuty<diw cmas="yg-udm}n-warm muteu">o org}niatyon{ mutcmed0yo}r seawch.</}iv>@edfre}se</dyv>{{$uenynts->}in{s()}}>@edsmctyon:
+@extends('layouts.admin')
+@section('title','Organizations')
+@section('content')
+<div class="pg-admin-page-head"><div><span class="pg-admin-kicker">Platform</span><h1>Organizations</h1><p>Manage clubs, organizers, subscription assignments and account status.</p></div></div>
+<form class="form-inline" method="get"><input name="q" value="{{request('q')}}" placeholder="Search organizations"><button type="submit">Search</button></form>
+<div class="pg-admin-list">@forelse($tenants as $t)<form class="panel row-between" method="post" action="{{route('admin.tenants.update',$t)}}">@csrf @method('patch')<div><strong>{{$t->name}}</strong><small>{{$t->type}} · {{$t->primaryDomain?->domain}}</small></div><div class="inline-controls"><select name="status">@foreach(['active','suspended','closed'] as $s)<option @selected($t->status===$s)>{{$s}}</option>@endforeach</select><select name="plan_id">@foreach($plans as $p)<option value="{{$p->id}}" @selected($t->subscription?->plan_id===$p->id)>{{$p->name}}</option>@endforeach</select><button type="submit">Save</button></div></form>@empty<div class="pg-admin-card muted">No organizations matched your search.</div>@endforelse</div>{{$tenants->links()}}
+@endsection

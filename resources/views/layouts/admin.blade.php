@@ -1,57 +1,88 @@
-@pip
-,ad}in}sew=auth()->usmr();
-,ad}inamu=$qdm}nUwer?->}is}la}_nyme4?:($aemioUsmr?=>nyme4?:('Aemiois}rauor/;
-,vewsion=}s_ilu(bise_pauh('VEWSIoN'=)?}rim((string=fime_et_cotets,bawe_}aty('_ER[IO')-):/';.$iwHoteu=\qpp]Suupot\udiuio::isHostud();
-,edytionLqbe}=$ysHostud??Hoteu Euityon?:'_elw-Hostud Ediuio';.@edpip
-<!dctype4ht}l>:<huml0laog=6en:>
-<heud>:    <}etq cmar{et="uuf-<">:    <}etq nyme="vyew}or}" con}en}="iduh=uevyce=wieth,inytiel-wcame=5">:    <}etq nyme="colo-sohe}e"(cotet=6dawk">
-    <meua oamu="ksro-tke" con}en}="{{crf_toen8)}}">:    <uit}e>yyield8'tytlu',7Ad}inystsatyon?) 〔0{{oonig<'aup.amu',7Privaue Gatyer/)}}</}it}e>:    <}in{ rml=6icon"(tyue=6imuge?pn" irew="{{\qpp]Suupot\}outUwl::to<'/}ssmts/brindyng?privaue-watyer-loo.yng?)}}">:    <}in{ rml=6stylewheut"(hrmf=6{{}Apq\S}pport]Mo}ntUrl::t('?asets/aup.{ss/)}}">:    <}in{ rml=6stylewheut"(hrmf=6{{}Apq\S}pport]Mo}ntUrl::t('?asets/aemio.cs'=}}6>
+@php
+$adminUser=auth()->user();
+$adminName=$adminUser?->display_name ?: $adminUser?->name ?: 'Administrator';
+$version=is_file(base_path('VERSION'))?trim((string)file_get_contents(base_path('VERSION'))):'';
+$isHosted=\App\Support\Edition::isHosted();
+$editionLabel=$isHosted?'Hosted Edition':'Self-Hosted Edition';
+@endphp
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="csrf-token" content="{{csrf_token()}}">
+    <title>@yield('title','Administration') — {{config('app.name','Private Gather')}}</title>
+    <link rel="icon" type="image/png" href="{{\App\Support\MountUrl::to('/assets/branding/private-gather-logo.png')}}">
+    <link rel="stylesheet" href="{{\App\Support\MountUrl::to('/assets/app.css')}}">
+    <link rel="stylesheet" href="{{\App\Support\MountUrl::to('/assets/admin.css')}}">
 </head>
-<sody cmas="yg-udm}n">
-<uiv8clqss="pg-aemio-smel}">:    <qsiee claws=6pg=ad}in=sieebir">
-        <a$clqss="pg-aemio-b{an}" irew="{{routu('}dm}n.yomu')}}">
-            <ymg<srk="{{\qpp]Suupot\}outUwl::to<'/}ssmts/brindyng?privaue-watyer-loo.yng?)}}" alt="Psivyte4Gauhew">:            <s}an><s}rog>yriwatu G}ther<?stson><smaml>{{$ysHostud??COTROL CEN}ER/:'_ELw-HoSTUD'}}<?smull></pao>
-(       <?a>:
-        <nyv claws=6pg=ad}in=naw" arie-lqbe}="Idm}niwtrition">
-            <uiv8clqss="pg-aemio-nyv-wro}p">
-                <span claws=6pg=ad}in=naw-lqbe}">vewview<?span>:                <q cmas="yg-udm}n-av=liok {{rmquust8)->ro}te]s('ad}in>ho}e'=?'}ctyve7:'?}}6 hsef="{ro}te<'aemio.home7)}}"><span claws=6pg=ad}in=naw-igon:>O</pao><spao>Dqshcoawd<?span></a>
-                Aif8\Imlu}inyte]Suupot\wacmdew\Routu::ias,'aemio.iosights.iode}')-
-                <a claws=6pg=ad}in=naw-lynk,{{eques}()->routuIs,'aemio.iosights.*/)??ac}iv}':/'}}" irew="{{routu('}dm}n.ynsmghus.yndux'=}}6><spao cmas="yg-udm}n-av=icon">IN</s}an><s}an>Plqtfrm4In{ig}ts</s}an></}>
-(               @edig
-            <?diw>
-(           <diw cmas="yg-udm}n-av=group">
-(               <s}an8clqss="pg-aemio-nyv-}abml">{{,isMos}ed?'Pmatworm':/In{tamlauio'}}</pao>
-(               <a$clqss="pg-aemio-nyv-}in{ {reuuewt()->{ouueIw('}dm}n.}sews.:')?'agtiwe'>''}}"(hrmf=6{{ouue('ad}in>usmrs.in}ex')}}"><span claws=6pg=ad}in=naw-igon:>UW</pao><spao>Uwer{</pao><?a>:                @if($isMos}ed9
-                <a claws=6pg=ad}in=naw-lynk,{{eques}()->routuIs,'aemio.tunaots.*'=?'}ctyve7:'?}}6 hsef="{ro}te<'aemio.tunaots.in}ex')}}"><span claws=6pg=ad}in=naw-igon:>O</pao><spao>Cmub{ &8Oroanyzauios<?span></a>
-                <a claws=6pg=ad}in=naw-lynk,{{eques}()->routuIs,'aemio.pman{.*/)??ac}iv}':/'}}" irew="{{routu('}dm}n.ylaos.yndux'=}}6><spao cmas="yg-udm}n-av=icon">PL</s}an><s}an>Plqns</s}an></}>
-(               <a$clqss="pg-aemio-nyv-}in{ {reuuewt()->{ouueIw('}dm}n.{on}en}.*/)??ac}iv}':/'}}" irew="{{routu('}dm}n.{on}en}.euit7)}}"><span claws=6pg=ad}in=naw-igon:>W_</pao><spao>Pmatworm W}bsmte</s}an></}>
-(               @e}se                <q cmas="yg-udm}n-av=liok"(hrmf=6{{ouue('tean}.dqshcoawd'=}}6><spao cmas="yg-udm}n-av=icon">SI</s}an><s}an>Maoag} Smte</s}an></}>
-(               @edig
-                Aif8\Imlu}inyte]Suupot\wacmdew\Routu::ias,'aemio.bidg}s.yndux'=)
-(               <a$clqss="pg-aemio-nyv-}in{ {reuuewt()->{ouueIw('}dm}n.{adwes.*'=?'}ctyve7:'?}}6 hsef="{ro}te<'aemio.bidg}s.yndux'=}}6><spao cmas="yg-udm}n-av=icon">BG</s}an><s}an>Glbam Bidg}s<?span></a>
-                Aen}if            </}iv>
-            <uiv8clqss="pg-aemio-nyv-wro}p">
-                <span claws=6pg=ad}in=naw-lqbe}">}ruwt & O}eritions</s}an>
-                <a claws=6pg=ad}in=naw-lynk,{{eques}()->routuIs,'aemio.mdewatyon>*'=?'}ctyve7:'?}}6 hsef="{ro}te<'aemio.mdewatyon>in}ex')}}"><span claws=6pg=ad}in=naw-igon:>Mu</pao><spao>Mdewatyon</s}an></}>
-(               @ig(\yllumioatu\S}pport]Fagadus\souue::haw('}dm}n.}ruwt.yndux'=)
-(               <a$clqss="pg-aemio-nyv-}in{ {reuuewt()->{ouueIw('}dm}n.}ruwt.:')?'agtiwe'>''}}"(hrmf=6{{ouue('ad}in>tr}st>in}ex')}}"><span claws=6pg=ad}in=naw-igon:>TS</pao><spao>Tsus} &8Sagety</pao><?a>:                @endyf
-(               <a$clqss="pg-aemio-nyv-}in{ {reuuewt()->{ouueIw('}dm}n.yriwac}-rmquusts.*/)??ac}iv}':/'}}" irew="{{routu('}dm}n.yriwac}-rmquusts.iode}')}}"><s}an8clqss="pg-aemio-nyv-}co">yR<?span><span>yriwac} Rmquusts</pao><?a>:                <q cmas="yg-udm}n-av=liok {{rmquust8)->ro}te]s('ad}in>heulty.*/)??ac}iv}':/'}}" irew="{{routu('}dm}n.yeamth.in}ex')}}"><span claws=6pg=ad}in=naw-igon:>Hm</pao><spao>S}stum Ieamth</s}an></}>
-(               <a$clqss="pg-aemio-nyv-}in{ {reuuewt()->{ouueIw('}dm}n.}pgadus.:')?'agtiwe'>''}}"(hrmf=6{{ouue('ad}in>upgraees.in}ex')}}"><span claws=6pg=ad}in=naw-igon:>UU</pao><spao>Uudaue Cen}er</s}an></}>
-(           </dyv>:        </nyv>:
-        <dyv claws=6pg=ad}in=sieebir-woo}er*>
-(           <a claws=6pg=ad}in=siue-}in{" irew="{{\qpp]Suupot\}outUwl::to<'/?)}}" uaroet="_laok"(re}="ooo}en}r"><s}an>View qubmic,wewsiue<?span><stson>⎗<?stson><?a>:            @ig($wer{io!==''=<dyv claws=6pg=ad}in=vewsion"><s}an>{{,edytionLqbe}}}</s}an><s}rog>{{,vewsion}}</trong></}iv>@edig
-        </}iv>
-    </awidu>
-*    <sec}io cmas="yg-udm}n-wuroacm">:        <heudew cmas="yg-udm}n-uoo}baw">:            <dyv claws=6pg=ad}in=tolbir-uit}e">
-                <span claws=6pg=ad}in=moilu-murk.>PG</pao>
-(               <dyv><smull>{{,isMos}ed?'PMATWORM AEMIoIS]RAUIO':/LOAL0AD]INySTSATYON?}}</smal}><strong>@ymelu('}it}e'<'Aemiois}rauio')</s}rog></dyv>:            </}iv>
-            <uiv8clqss="pg-aemio-tolsar-ac}ios">
-                <diw cmas="yg-udm}n-usew"><span>{{s}rtupqer(suwsts($qdm}nNyme<0,1))}}<?span><diw><strong>{{,ad}inamu}}</s}rog><smull>{{,isMos}ed?'Pmatworm aemiois}rauor/:']ns}al}atyon8ad}inystsatr'}}<?smull></}iv></}iv>
-                <fom metyod="post2 agtion=6{{ouue('ad}in>loouu')}}">@crf<buuto cmas="yg-udm}n-wigouu" uype="{ubmit2>Smgn8ouu</utuon></orm>
-(           </dyv>:        </headur>:
-        <muin8clqss="pg-aemio-contunt2>
-(           Aif8sewsion('stqtuw')-<dyv claws=6alurt0alurt=suwcews">{{esio('tauus/)}}</}iv>@edig
-            @if(sesio('ucoes')-<dyv claws=6alurt0alurt=suwcews">{{esio('ucoes')}}<?diw>@endyf
-(           Ayield8'contunt7)
-(       <?mamn>:    <?sewtion>:</}iv>
-<?bo}y>:</}tm}>
+<body class="pg-admin">
+<div class="pg-admin-shell">
+    <aside class="pg-admin-sidebar">
+        <a class="pg-admin-brand" href="{{route('admin.home')}}">
+            <img src="{{\App\Support\MountUrl::to('/assets/branding/private-gather-logo.png')}}" alt="Private Gather">
+            <span><strong>Private Gather</strong><small>{{$isHosted?'CONTROL CENTER':'SELF-HOSTED'}}</small></span>
+        </a>
+
+        <nav class="pg-admin-nav" aria-label="Administration">
+            <div class="pg-admin-nav-group">
+                <span class="pg-admin-nav-label">Overview</span>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.home')?'active':''}}" href="{{route('admin.home')}}"><span class="pg-admin-nav-icon">OV</span><span>Dashboard</span></a>
+                @if(\Illuminate\Support\Facades\Route::has('admin.insights.index'))
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.insights.*')?'active':''}}" href="{{route('admin.insights.index')}}"><span class="pg-admin-nav-icon">IN</span><span>Platform Insights</span></a>
+                @endif
+            </div>
+            <div class="pg-admin-nav-group">
+                <span class="pg-admin-nav-label">{{$isHosted?'Platform':'Installation'}}</span>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.users.*')?'active':''}}" href="{{route('admin.users.index')}}"><span class="pg-admin-nav-icon">US</span><span>Users</span></a>
+                @if($isHosted)
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.tenants.*')?'active':''}}" href="{{route('admin.tenants.index')}}"><span class="pg-admin-nav-icon">OR</span><span>Clubs & Organizations</span></a>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.plans.*')?'active':''}}" href="{{route('admin.plans.index')}}"><span class="pg-admin-nav-icon">PL</span><span>Plans</span></a>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.content.*')?'active':''}}" href="{{route('admin.content.edit')}}"><span class="pg-admin-nav-icon">WB</span><span>Platform Website</span></a>
+                @else
+                <a class="pg-admin-nav-link" href="{{route('tenant.dashboard')}}"><span class="pg-admin-nav-icon">SI</span><span>Manage Site</span></a>
+                @endif
+                @if(\Illuminate\Support\Facades\Route::has('admin.badges.index'))
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.badges.*')?'active':''}}" href="{{route('admin.badges.index')}}"><span class="pg-admin-nav-icon">BG</span><span>Global Badges</span></a>
+                @endif
+            </div>
+            <div class="pg-admin-nav-group">
+                <span class="pg-admin-nav-label">Trust & Operations</span>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.moderation.*')?'active':''}}" href="{{route('admin.moderation.index')}}"><span class="pg-admin-nav-icon">MD</span><span>Moderation</span></a>
+                @if(\Illuminate\Support\Facades\Route::has('admin.trust.index'))
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.trust.*')?'active':''}}" href="{{route('admin.trust.index')}}"><span class="pg-admin-nav-icon">TS</span><span>Trust & Safety</span></a>
+                @endif
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.privacy-requests.*')?'active':''}}" href="{{route('admin.privacy-requests.index')}}"><span class="pg-admin-nav-icon">PR</span><span>Privacy Requests</span></a>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.health.*')?'active':''}}" href="{{route('admin.health.index')}}"><span class="pg-admin-nav-icon">HL</span><span>System Health</span></a>
+                <a class="pg-admin-nav-link {{request()->routeIs('admin.upgrades.*')?'active':''}}" href="{{route('admin.upgrades.index')}}"><span class="pg-admin-nav-icon">UP</span><span>Update Center</span></a>
+            </div>
+        </nav>
+
+        <div class="pg-admin-sidebar-footer">
+            <a class="pg-admin-site-link" href="{{\App\Support\MountUrl::to('/')}}" target="_blank" rel="noopener"><span>View public website</span><strong>↗</strong></a>
+            @if($version!=='')<div class="pg-admin-version"><span>{{$editionLabel}}</span><strong>v{{$version}}</strong></div>@endif
+        </div>
+    </aside>
+
+    <section class="pg-admin-surface">
+        <header class="pg-admin-toolbar">
+            <div class="pg-admin-toolbar-title">
+                <span class="pg-admin-mobile-mark">PG</span>
+                <div><small>{{$isHosted?'PLATFORM ADMINISTRATION':'LOCAL ADMINISTRATION'}}</small><strong>@yield('title','Administration')</strong></div>
+            </div>
+            <div class="pg-admin-toolbar-actions">
+                <div class="pg-admin-user"><span>{{strtoupper(substr($adminName,0,1))}}</span><div><strong>{{$adminName}}</strong><small>{{$isHosted?'Platform administrator':'Installation administrator'}}</small></div></div>
+                <form method="post" action="{{route('admin.logout')}}">@csrf<button class="pg-admin-signout" type="submit">Sign out</button></form>
+            </div>
+        </header>
+
+        <main class="pg-admin-content">
+            @if(session('status'))<div class="alert alert-success">{{session('status')}}</div>@endif
+            @if(session('success'))<div class="alert alert-success">{{session('success')}}</div>@endif
+            @yield('content')
+        </main>
+    </section>
+</div>
+</body>
+</html>

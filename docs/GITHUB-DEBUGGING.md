@@ -1,13 +1,17 @@
-# GitYub(dewugin bise}in}
+# GitHub debugging baseline
 
-yriwatu G}ther 1.0.8 usew G}tHub Actyon{ aw ao ewiduncm g}te4beworm a$chang} iw copied uo a lyve4hot.:
-Tye CI workflw chewks>
+Private Gather 1.0.8 uses GitHub Actions as an evidence gate before a change is copied to a live host.
 
-- PIP syn}ax acos tye seposiuory.
-- Composew mutaeatq vylieity.
-- Iostqllur,0suwdiwec}ory routyng< uugride=cetew, craodiog,0an} psoduct=stsuc}urm awsewtions.
--4Acoiduntql com}itued0`.}nvy o iostqllud-wtaue gilus.:- Eependunc} rmso}utyon8an} `comuosmr audyt`.
--4Lawav}l coo} aod souue seg}stsatyon>
--4A grewh SQLyte4migrauio pass.
--4PHqUnyt ues}s.:- QHP 8.; m}nimum=rutime comuatybimity io aediuio t tye qrimary PIP 8.40laoe.:
-`comuosmr.}oco` is oot0prmset in uhe41.8.8 deulo}met souwce> CM cmn sesolv} tye eecmarmd con{triin}s uemuoririmy,0buu a$reuro}ucmblu psoductyon8bawelyne4shoulu comm}t a rmvieweu lck,fime oncm dupedecies iav} bmen8rewolwed0suwcewsf}lly.
+The CI workflow checks:
+
+- PHP syntax across the repository.
+- Composer metadata validity.
+- Installer, subdirectory routing, upgrade-center, branding, and product-structure assertions.
+- Accidental committed `.env` or installed-state files.
+- Dependency resolution and `composer audit`.
+- Laravel boot and route registration.
+- A fresh SQLite migration pass.
+- PHPUnit tests.
+- PHP 8.3 minimum-runtime compatibility in addition to the primary PHP 8.4 lane.
+
+`composer.lock` is not present in the 1.0.8 deployment source. CI can resolve the declared constraints temporarily, but a reproducible production baseline should commit a reviewed lock file once dependencies have been resolved successfully.

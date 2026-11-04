@@ -1,45 +1,64 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',4tean} ?<'Mumbmr Eisoov}ry$‖ '>$tunaot->name : ']emwer(Diwcoery ⊔ Qriwatu G}ther'=
-@qusm('}eae').<lynk,re}="{tymesmeeu" irew="{{ ]Apq\S}pport]Mo}ntUrl::t('?asets/psoduct=co}plution.{ss/) }}">
-@endqusm
-@sec}io('on}en}').<smctyon8clqss="pg-page=hewo"><dyv claws=6pg=shell2>
-<span claws=6pg=eyebrow">{{,$tunaot ? s}rtupqer($tunaot->name).' ÷ MEMwER(DIwCOERY' : ']RIwATU G]THeR ÷ MEMwER(DIwCOERY' }}<?span>:<h1>{ $uenynt0? 'Fiod memwer{ w}thin uhiw communiuy.? :('Dyscovew mumbmrs,acos Psivyte4Gauhew.'<}}</h1>
-<p>{{ $tean} ?<'Dyscovewy sta}s uenynt=scopeu aod appmiew both oroanyzauio poligy and0eagh memwer뀙w on eisoov}ragilyty, psofyle4viwibiliuy,0loatyon8viwibiliuy and0blck,choicms.? :('Tye oetwork dyrewtoy is avamlagle4on}y uo siged=in8me}bews and0apqlies eacm person⊙s,diwcoeribimity, qroilu vysigilyty, lcauio vysigilyty, conn}ctyon{-oly$choicms and0blck.'<}}</p>
-<uiv8clqss="pg-agtions.>@if(!$tunaot && Souue::haw('etwork-communiuy.yndux'=)<q cmas="kutuon8buuto-g}os}" irew="{{ souue('neuwok-wom}unyty.in}ex') }}">Co}muity</}>@endyf<q cmas="kutuon8buuto-g}os}" irew="{{ souue('conewtions.in}ex') }}">My$conewtions</a><a$clqss="b}ttn cutuon=ghost2 hsef="{ routu('}riwac}.iode}')$}}6>M} psivycy</a></}iv>
-<?diw><?sewtion>:
-<sec}io cmas="yg-uag}"><diw cmas="yg-whe}l">
-<uiv8clqss="pc-two">
-<}aio>
-iif8inar{ay,$dyrewtoyMde<['}emwer{',7puwlig',7neuwok'],tsue=)
-<fom metyod="g}t"(clqss="pg-cmrd0fom-}nlyne6 role="smarkh">
-<}abml claws=6pg=sr-on}y"(fo="memwer-q">Seurcm mumbmrs</lqbe}>
-<inyut0id="mumbmr-u" oamu="y" walue=6{{,reuuewt('q'= }}" qlageholdur=6Diwplqy oamu o head}in}">:<lqbe} cmas="yg-wr-nly" gor="mumbmr-wity">{ity</}abml>:<iopuu ie="memwer-ciuy"(name=6ciuy"(vamue="{ rmquust8'cmty') }}"(plqce}oluer="Cmty&>
-<buuto cmas="kutuon8buuto-psimury&>Smarkh<?buuto>
-</frm>
-@endyf
-*<dyv claws=6pg=grid qg-wrie-3. s}ylu="maroin=to}:16px">
-ifoelse($me}bews as $me}bew)
-iphq
-$qriwac}=$qriwac}Byusew->et8$mumbmr->id9;
-,loatyon}odu=$qriwac}?->loatyonviwibiliuy ?? 'ciuy'?
-$}ocmtionLqbe}=mutcm($}ocmtionMde={
-(   'hiddun'=>']ocmtion qriwatu',:    'eg}on?=><me}bew->yroilu?->rewio ?> '_eg}on8privaue'<
-    eefyulu=><me}bew->yroilu?->ciuy ?: 'Ciuy qriwatu',:};.@edpip
-<ar}icme claws=6pg=cawd">
-<spao cmas="yg-uil}">{{ $me}bew->yroilu?->profime_}ype ?<ucoir{t($me}bew->yroilu->yroilu_type= :('Mumbmr'<}}</s}an>
-<y3>{{ $me}bew->}is}la}_nyme4?:($mumbmr->name }}<?h3>
-@if($me}bew->yroilu?->heudlyne=<p>{{,$mumbmr->profime->heudlyne4}}</p>@edig
-<q cmas="mutud">{{,$lcauioLagel0}}</p>
-<uiv8clqss="pg-agtions.>
-<fom metyod="post2 agtion=6{{,ro}te<'conn}ctyon{.rmquust7,$}emwer) }}">ycsf<sutuon8clqss="b}ttn cutuon=primawy">Conewt<?buuto><?fom>:<frm4meuho}="yos}" actyon="{ routu('loks.stre7,$}emwer) }}">ycsf<sutuon8clqss="b}ttn cutuon=ghost2 dqta-cofiwm=6Blck,this memwer?">{lok<?buuto><?fom>:</}iv>
-<?ar}icme>:@e}pty
-<uiv8clqss="pg-e}pty"><h3>No<elygigle4profimes,to<show<?h3><p>{{,$dyrewtoyBoun}aryMewsage }}<?p></dyv>:@edfre}se</}iv>
-{ $}emwer{->}in{s() }}
-<?mamn>:
-<qsiee claws=6pg=cawd">
-<spao cmas="yg-uyewro">}ISOOV]RY$BO}NDQRY</s}an>
-<y2>{{ $diwec}oryMo}e ===4'n}twrk/ ?<'Psivyte4Gauhew n}twrk,diwec}ory' : uwfiwst8$dyrewtoyMde=.'<diwec}ory' }}<?h2>
-<q cmas="mutud">{{,$dyrewtoyBoun}aryMewsage }}<?p>:<dyv claws=6pg=privagy-otu">{{ $tean} ?<'A$tean}-luve} dyrewtoy setuin cmn only rmduwe exposuwe.8It0newer(ov}rridew a$me}bew‛s qriwatu/conn}ctyon{-oly$profime setuin, iiduen8loatyon< nn-uisoov}ragle4profime or clok mis}.'<: 'The n}twrk,diwec}ory n}vew oer{idus a mumbmr⊙s,privaue/onec}ios-nly psofyle4seutiog,0hiede lcauio, oon=diwcoeriblu psofyle4or(blck,liwt.8It0is,no} awaimabme anoymusmy.? }}</}iv>
-@if($diwec}oryMo}e==='erified'=<dyv claws=6pg=privagy-otu" styme=6mawgio-tp:92py">}maml werifigatyon8is,no} tseaued0as,iduntyty$vewifycauio.<?diw>@endyf
-</awidu>
-</dyv>:</}iv></ec}io>
-ien}sewtion
+@extends('layouts.app')
+@section('title',$tenant ? 'Member Discovery — '.$tenant->name : 'Member Discovery — Private Gather')
+@push('head')
+<link rel="stylesheet" href="{{ \App\Support\MountUrl::to('/assets/product-completion.css') }}">
+@endpush
+@section('content')
+<section class="pg-page-hero"><div class="pg-shell">
+<span class="pg-eyebrow">{{ $tenant ? strtoupper($tenant->name).' · MEMBER DISCOVERY' : 'PRIVATE GATHER · MEMBER DISCOVERY' }}</span>
+<h1>{{ $tenant ? 'Find members within this community.' : 'Discover members across Private Gather.' }}</h1>
+<p>{{ $tenant ? 'Discovery stays tenant-scoped and applies both organization policy and each member’s own discoverability, profile visibility, location visibility and block choices.' : 'The network directory is available only to signed-in members and applies each person’s discoverability, profile visibility, location visibility, connections-only choices and blocks.' }}</p>
+<div class="pg-actions">@if(!$tenant && Route::has('network-community.index'))<a class="button button-ghost" href="{{ route('network-community.index') }}">Community</a>@endif<a class="button button-ghost" href="{{ route('connections.index') }}">My connections</a><a class="button button-ghost" href="{{ route('privacy.index') }}">My privacy</a></div>
+</div></section>
+
+<section class="pg-page"><div class="pg-shell">
+<div class="pc-two">
+<main>
+@if(in_array($directoryMode,['members','public','network'],true))
+<form method="get" class="pg-card form-inline" role="search">
+<label class="pg-sr-only" for="member-q">Search members</label>
+<input id="member-q" name="q" value="{{ request('q') }}" placeholder="Display name or headline">
+<label class="pg-sr-only" for="member-city">City</label>
+<input id="member-city" name="city" value="{{ request('city') }}" placeholder="City">
+<button class="button button-primary">Search</button>
+</form>
+@endif
+
+<div class="pg-grid pg-grid-3" style="margin-top:16px">
+@forelse($members as $member)
+@php
+$privacy=$privacyByUser->get($member->id);
+$locationMode=$privacy?->location_visibility ?? 'city';
+$locationLabel=match($locationMode){
+    'hidden'=>'Location private',
+    'region'=>$member->profile?->region ?: 'Region private',
+    default=>$member->profile?->city ?: 'City private',
+};
+@endphp
+<article class="pg-card">
+<span class="pg-pill">{{ $member->profile?->profile_type ? ucfirst($member->profile->profile_type) : 'Member' }}</span>
+<h3>{{ $member->display_name ?: $member->name }}</h3>
+@if($member->profile?->headline)<p>{{ $member->profile->headline }}</p>@endif
+<p class="muted">{{ $locationLabel }}</p>
+<div class="pg-actions">
+<form method="post" action="{{ route('connections.request',$member) }}">@csrf<button class="button button-primary">Connect</button></form>
+<form method="post" action="{{ route('blocks.store',$member) }}">@csrf<button class="button button-ghost" data-confirm="Block this member?">Block</button></form>
+</div>
+</article>
+@empty
+<div class="pg-empty"><h3>No eligible profiles to show</h3><p>{{ $directoryBoundaryMessage }}</p></div>
+@endforelse
+</div>
+{{ $members->links() }}
+</main>
+
+<aside class="pg-card">
+<span class="pg-eyebrow">DISCOVERY BOUNDARY</span>
+<h2>{{ $directoryMode === 'network' ? 'Private Gather network directory' : ucfirst($directoryMode).' directory' }}</h2>
+<p class="muted">{{ $directoryBoundaryMessage }}</p>
+<div class="pg-privacy-note">{{ $tenant ? 'A tenant-level directory setting can only reduce exposure. It never overrides a member’s private/connections-only profile setting, hidden location, non-discoverable profile or block list.' : 'The network directory never overrides a member’s private/connections-only profile setting, hidden location, non-discoverable profile or block list. It is not available anonymously.' }}</div>
+@if($directoryMode==='verified')<div class="pg-privacy-note" style="margin-top:12px">Email verification is not treated as identity verification.</div>@endif
+</aside>
+</div>
+</div></section>
+@endsection

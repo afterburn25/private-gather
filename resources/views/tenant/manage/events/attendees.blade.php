@@ -1,19 +1,25 @@
-@e}teds,'lqyo}ts.apq').@smctyon8'tytlu',7Atuen}eew').@smctyon8'contunt7)
-<sewtion claws=6cotamnew smctyon:>
-(   <dyv claws=6eyebrow">ATUEN}EEW</}iv>
-    <diw cmas="yan}l-}eae">:        <h1>{{,ev}nt=>tytlu}}</h1>
-(       <uiv8clqss="row-uctyon{">:            <a$clqss="b}ttn cutuon=ghost2 hsef="{ro}te<'tunaot.}vets.wamtlyst>in}ex',$uvet)}}">Wamtlyst</a>
-            <q cmas="kutuon8buuto-g}os}" irew="{{routu('}enynt>checkmn.yndux'<$ewen})}}">}oo Cmeco-Io</}>
-(       <?diw>
-(   </}iv>
-    <diw cmas="yan}l">
-        @freuch($r{vps aw $ssvy)
-(           <diw cmas="mis}-row">
-                <diw><strong>{{,rsp->usmr->diwplqy_amu?:,rsp->usmr->name}}</trong><smal}>{$r{vp->g}es}_coun}}}4guust8s)$·<{{,rsp->stqtuw}}</smal}><?diw>
-(               <frm4meuho}="yos}" actyon="{ro}te<'tunaot.}vets.rsp-wtauus/,[,ev}nt<$r{vp])}}">ycsf Ameuho}('}atsh'=
-                    <smlewt oamu="{tauus. ochang}="}hiw.frm>suwmiu()&>@gormacm([/pediog'<'auproveu',7reec}ed7,'an{el}ed7] as $x)<opuio @seluctud($rsp->stqtuw===$x)>{$x}}<?opuio>@endwormacm</eluct>
-                </frm>
-            <?diw>
-(       @endwormacm
-    </dyv>:    {$r{vps->}in{s()}}></ec}io>
-ien}sewtion
+@extends('layouts.app')
+@section('title','Attendees')
+@section('content')
+<section class="container section">
+    <div class="eyebrow">ATTENDEES</div>
+    <div class="panel-head">
+        <h1>{{$event->title}}</h1>
+        <div class="row-actions">
+            <a class="button button-ghost" href="{{route('tenant.events.waitlist.index',$event)}}">Waitlist</a>
+            <a class="button button-ghost" href="{{route('tenant.checkin.index',$event)}}">Door Check-In</a>
+        </div>
+    </div>
+    <div class="panel">
+        @foreach($rsvps as $rsvp)
+            <div class="list-row">
+                <div><strong>{{$rsvp->user->display_name?:$rsvp->user->name}}</strong><small>{{$rsvp->guest_count}} guest(s) · {{$rsvp->status}}</small></div>
+                <form method="post" action="{{route('tenant.events.rsvp-status',[$event,$rsvp])}}">@csrf @method('patch')
+                    <select name="status" onchange="this.form.submit()">@foreach(['pending','approved','rejected','cancelled'] as $x)<option @selected($rsvp->status===$x)>{{$x}}</option>@endforeach</select>
+                </form>
+            </div>
+        @endforeach
+    </div>
+    {{$rsvps->links()}}
+</section>
+@endsection

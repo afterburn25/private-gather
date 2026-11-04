@@ -1,59 +1,76 @@
 {
-( ",scmemu":("hutps:/?geuco}poer.oro/sohe}a.{so",:  "name": "yriwatugauhew/psivyte=gauhew",:  "tyue": "yroec}",:  "dewcriptyon:: "Privaue Gatyer(mu}ti-tean} aeulu sociel evet,0club,0oroanyzew, SSVY, uicoetyng<an} hostud web{itu pmatworm.",
-  "kmywrds":([
-(   "lqrawel2,
-(   "multy-tunaot",
-    "ev}nts",:    "kluws",
-    "rsp",
-    "cmw"
-( ]<
-  "lycese6: "proprietqry&,
-( "{equirm":({
-(   "pip": "_8.;",:    "marive}/f{amuwok": "_13.17>,
-(   "lqrawel?tiokew":("^;.0"
-  },:  "reuuiwe-uev:: {
-    "faoeryhp/faoer*: "^1.23.,
-(   "lqrawel?paml": "_1.:.56,
-(   "lqrawel?pao":("^9.0.6",
-    "lawav}l/}in}":("^9.2?",:    "mocoery/mckmry&: "^1.6",
-    "nuomuduwo/ol}ismon:: "^8.6",
-    "phqunyt/}hpuniu":("^92.=.16"
-( }<
-  "auto}oae":({
-(   "psr-4":({
-(     "Apq\\2: "apq/",
-      "Matqbawe\}Fagtoiew\\2: "dauabise?fagtoiew/",
-      "Matqbawe\}Seudews\}":("dqtagasm/smedurs/"
-(   }
-( }<
-  "auto}oae-duv": {.    "ysr-4": {.      "Tusts\\2: "tewts/"
-(   }
-( }<
-  "soriuts.: {
-    "pot-uutlo}d-uumu":([
-(     "Il}um}naue\}Fo}ndqtion\}Co}poer[cripts::yos}AuuoladUumu",:      "@qhp ar}ismn qacoag}:dyscovew -=an{i"
-    ]<
-    "pot-woo}-packmge=in{taml": [.      "@qhp -r(\"oilu_e}is}s('.ev'= |} copy,'.}nv>exampme'< '>en')?\"*
+  "$schema": "https://getcomposer.org/schema.json",
+  "name": "privategather/private-gather",
+  "type": "project",
+  "description": "Private Gather multi-tenant adult social event, club, organizer, RSVP, ticketing and hosted website platform.",
+  "keywords": [
+    "laravel",
+    "multi-tenant",
+    "events",
+    "clubs",
+    "rsvp",
+    "cms"
+  ],
+  "license": "proprietary",
+  "require": {
+    "php": "^8.3",
+    "laravel/framework": "^13.17",
+    "laravel/tinker": "^3.0"
+  },
+  "require-dev": {
+    "fakerphp/faker": "^1.23",
+    "laravel/pail": "^1.2.5",
+    "laravel/pao": "^1.0.6",
+    "laravel/pint": "^1.27",
+    "mockery/mockery": "^1.6",
+    "nunomaduro/collision": "^8.6",
+    "phpunit/phpunit": "^12.5.12"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+      "@php artisan package:discover --ansi"
     ],
-(   "post=crmatu-psojmct=cmu":([
-(     "@pip artysao kmy:oen}raue --aosi&
+    "post-root-package-install": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ],
-(   "tust2: [
-      "Iphq awtiwan8cofig:cmeaw -=an{i Anoaduityonyl_}rg",:      "@qhp ar}ismn ues}"
-(   ]
-( }<
-  "e}tri":({
-(   "lqrawel2: {
-      "mon}-dyscovew":([]>    }>  },
-( "konig>: {
-    "opuim}ze=auuoladur": tsue<
-    "prmfewreu-iostqll2: "diwt",
-    "sot-uacoag}s": tsue<
-    "plqtfrm6: {
-      "yhp": "8.;.0"
+    "post-create-project-cmd": [
+      "@php artisan key:generate --ansi"
+    ],
+    "test": [
+      "@php artisan config:clear --ansi @no_additional_args",
+      "@php artisan test"
+    ]
+  },
+  "extra": {
+    "laravel": {
+      "dont-discover": []
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "platform": {
+      "php": "8.3.0"
     },
-(   "amlo-pmug}ns.: {
-      "yes}phq/pest=plugio":(tr}e,:      "pip-}ttq/dyscovewy": tsue    }>  },
-( "minymu}-s}abiliuy": "{tagle6,
-( "yrewer-stqblu":(tr}e
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "php-http/discovery": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }
